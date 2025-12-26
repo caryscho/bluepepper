@@ -1,0 +1,172 @@
+{
+  "scale": 1,
+  "unit": "meter",
+  "structure": {
+    "dimensions": {
+      "length": 50,
+      "width": 30,
+      "height": 10
+    },
+    "columns": [
+      {
+        "id": "col-1",
+        "position": { "x": 5, "z": 5 },
+        "size": { "width": 0.5, "depth": 0.5 },
+        "height": 10
+      },
+      {
+        "id": "col-2",
+        "position": { "x": 15, "z": 5 },
+        "size": { "width": 0.5, "depth": 0.5 },
+        "height": 10
+      },
+      {
+        "id": "col-3",
+        "position": { "x": 25, "z": 5 },
+        "size": { "width": 0.5, "depth": 0.5 },
+        "height": 10
+      },
+      {
+        "id": "col-4",
+        "position": { "x": 35, "z": 5 },
+        "size": { "width": 0.5, "depth": 0.5 },
+        "height": 10
+      },
+      {
+        "id": "col-5",
+        "position": { "x": 45, "z": 5 },
+        "size": { "width": 0.5, "depth": 0.5 },
+        "height": 10
+      },
+      {
+        "id": "col-6",
+        "position": { "x": 5, "z": 25 },
+        "size": { "width": 0.5, "depth": 0.5 },
+        "height": 10
+      },
+      {
+        "id": "col-7",
+        "position": { "x": 15, "z": 25 },
+        "size": { "width": 0.5, "depth": 0.5 },
+        "height": 10
+      },
+      {
+        "id": "col-8",
+        "position": { "x": 25, "z": 25 },
+        "size": { "width": 0.5, "depth": 0.5 },
+        "height": 10
+      },
+      {
+        "id": "col-9",
+        "position": { "x": 35, "z": 25 },
+        "size": { "width": 0.5, "depth": 0.5 },
+        "height": 10
+      },
+      {
+        "id": "col-10",
+        "position": { "x": 45, "z": 25 },
+        "size": { "width": 0.5, "depth": 0.5 },
+        "height": 10
+      }
+    ],
+    "walls": [
+      {
+        "id": "wall-north",
+        "start": [0, 0],
+        "end": [50, 0],
+        "height": 10,
+        "thickness": 0.3,
+        "type": "exterior"
+      },
+      {
+        "id": "wall-south",
+        "start": [0, 30],
+        "end": [50, 30],
+        "height": 10,
+        "thickness": 0.3,
+        "type": "exterior"
+      },
+      {
+        "id": "wall-east",
+        "start": [50, 0],
+        "end": [50, 30],
+        "height": 10,
+        "thickness": 0.3,
+        "type": "exterior"
+      },
+      {
+        "id": "wall-west",
+        "start": [0, 0],
+        "end": [0, 30],
+        "height": 10,
+        "thickness": 0.3,
+        "type": "exterior"
+      }
+    ],
+    "doors": [
+      {
+        "id": "door-main",
+        "wallId": "wall-south",
+        "position": 0.5,
+        "width": 3,
+        "height": 4
+      }
+    ],
+    "windows": [],
+    "shelves": [
+      {
+        "id": "shelf-1",
+        "position": { "x": 10, "z": 10 },
+        "size": { "length": 5, "width": 2, "height": 3 },
+        "tiers": 4,
+        "orientation": "north"
+      },
+      {
+        "id": "shelf-2",
+        "position": { "x": 20, "z": 10 },
+        "size": { "length": 5, "width": 2, "height": 3 },
+        "tiers": 4,
+        "orientation": "north"
+      },
+      {
+        "id": "shelf-3",
+        "position": { "x": 30, "z": 10 },
+        "size": { "length": 5, "width": 2, "height": 3 },
+        "tiers": 4,
+        "orientation": "north"
+      },
+      {
+        "id": "shelf-4",
+        "position": { "x": 10, "z": 20 },
+        "size": { "length": 5, "width": 2, "height": 3 },
+        "tiers": 4,
+        "orientation": "south"
+      },
+      {
+        "id": "shelf-5",
+        "position": { "x": 20, "z": 20 },
+        "size": { "length": 5, "width": 2, "height": 3 },
+        "tiers": 4,
+        "orientation": "south"
+      },
+      {
+        "id": "shelf-6",
+        "position": { "x": 30, "z": 20 },
+        "size": { "length": 5, "width": 2, "height": 3 },
+        "tiers": 4,
+        "orientation": "south"
+      }
+    ],
+    "lights": [
+      { "id": "light-1", "position": { "x": 10, "y": 9, "z": 10 }, "type": "ceiling" },
+      { "id": "light-2", "position": { "x": 20, "y": 9, "z": 10 }, "type": "ceiling" },
+      { "id": "light-3", "position": { "x": 30, "y": 9, "z": 10 }, "type": "ceiling" },
+      { "id": "light-4", "position": { "x": 10, "y": 9, "z": 20 }, "type": "ceiling" },
+      { "id": "light-5", "position": { "x": 20, "y": 9, "z": 20 }, "type": "ceiling" },
+      { "id": "light-6", "position": { "x": 30, "y": 9, "z": 20 }, "type": "ceiling" }
+    ]
+  },
+  "notes": "Example warehouse structure - 50m x 30m x 10m",
+  "lastUpdated": "2024-01-01T00:00:00Z"
+}
+
