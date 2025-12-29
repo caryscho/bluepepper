@@ -1,172 +1,621 @@
 {
-  "scale": 1,
-  "unit": "meter",
+  "warehouseId": "WH-001",
+  "name": "Main Distribution Center",
+  "metadata": {
+    "scale": 1,
+    "unit": "meter",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-15T10:30:00Z",
+    "version": "1.2.0"
+  },
   "structure": {
     "dimensions": {
-      "length": 50,
-      "width": 30,
-      "height": 10
+      "length": 80,
+      "width": 50,
+      "height": 11
     },
     "columns": [
       {
         "id": "col-1",
-        "position": { "x": 5, "z": 5 },
-        "size": { "width": 0.5, "depth": 0.5 },
-        "height": 10
+        "position": { "x": 10, "z": 10 },
+        "size": { "width": 0.6, "depth": 0.6 },
+        "height": 11
       },
       {
         "id": "col-2",
-        "position": { "x": 15, "z": 5 },
-        "size": { "width": 0.5, "depth": 0.5 },
-        "height": 10
+        "position": { "x": 20, "z": 10 },
+        "size": { "width": 0.6, "depth": 0.6 },
+        "height": 11
       },
       {
         "id": "col-3",
-        "position": { "x": 25, "z": 5 },
-        "size": { "width": 0.5, "depth": 0.5 },
-        "height": 10
+        "position": { "x": 30, "z": 10 },
+        "size": { "width": 0.6, "depth": 0.6 },
+        "height": 11
       },
       {
         "id": "col-4",
-        "position": { "x": 35, "z": 5 },
-        "size": { "width": 0.5, "depth": 0.5 },
-        "height": 10
+        "position": { "x": 40, "z": 10 },
+        "size": { "width": 0.6, "depth": 0.6 },
+        "height": 11
       },
       {
         "id": "col-5",
-        "position": { "x": 45, "z": 5 },
-        "size": { "width": 0.5, "depth": 0.5 },
-        "height": 10
+        "position": { "x": 50, "z": 10 },
+        "size": { "width": 0.6, "depth": 0.6 },
+        "height": 11
       },
       {
         "id": "col-6",
-        "position": { "x": 5, "z": 25 },
-        "size": { "width": 0.5, "depth": 0.5 },
-        "height": 10
+        "position": { "x": 60, "z": 10 },
+        "size": { "width": 0.6, "depth": 0.6 },
+        "height": 11
       },
       {
         "id": "col-7",
-        "position": { "x": 15, "z": 25 },
-        "size": { "width": 0.5, "depth": 0.5 },
-        "height": 10
+        "position": { "x": 70, "z": 10 },
+        "size": { "width": 0.6, "depth": 0.6 },
+        "height": 11
       },
       {
         "id": "col-8",
-        "position": { "x": 25, "z": 25 },
-        "size": { "width": 0.5, "depth": 0.5 },
-        "height": 10
+        "position": { "x": 10, "z": 25 },
+        "size": { "width": 0.6, "depth": 0.6 },
+        "height": 11
       },
       {
         "id": "col-9",
-        "position": { "x": 35, "z": 25 },
-        "size": { "width": 0.5, "depth": 0.5 },
-        "height": 10
+        "position": { "x": 20, "z": 25 },
+        "size": { "width": 0.6, "depth": 0.6 },
+        "height": 11
       },
       {
         "id": "col-10",
-        "position": { "x": 45, "z": 25 },
-        "size": { "width": 0.5, "depth": 0.5 },
-        "height": 10
+        "position": { "x": 30, "z": 25 },
+        "size": { "width": 0.6, "depth": 0.6 },
+        "height": 11
+      },
+      {
+        "id": "col-11",
+        "position": { "x": 40, "z": 25 },
+        "size": { "width": 0.6, "depth": 0.6 },
+        "height": 11
+      },
+      {
+        "id": "col-12",
+        "position": { "x": 50, "z": 25 },
+        "size": { "width": 0.6, "depth": 0.6 },
+        "height": 11
+      },
+      {
+        "id": "col-13",
+        "position": { "x": 60, "z": 25 },
+        "size": { "width": 0.6, "depth": 0.6 },
+        "height": 11
+      },
+      {
+        "id": "col-14",
+        "position": { "x": 70, "z": 25 },
+        "size": { "width": 0.6, "depth": 0.6 },
+        "height": 11
+      },
+      {
+        "id": "col-15",
+        "position": { "x": 10, "z": 40 },
+        "size": { "width": 0.6, "depth": 0.6 },
+        "height": 11
+      },
+      {
+        "id": "col-16",
+        "position": { "x": 20, "z": 40 },
+        "size": { "width": 0.6, "depth": 0.6 },
+        "height": 11
+      },
+      {
+        "id": "col-17",
+        "position": { "x": 30, "z": 40 },
+        "size": { "width": 0.6, "depth": 0.6 },
+        "height": 11
+      },
+      {
+        "id": "col-18",
+        "position": { "x": 40, "z": 40 },
+        "size": { "width": 0.6, "depth": 0.6 },
+        "height": 11
+      },
+      {
+        "id": "col-19",
+        "position": { "x": 50, "z": 40 },
+        "size": { "width": 0.6, "depth": 0.6 },
+        "height": 11
+      },
+      {
+        "id": "col-20",
+        "position": { "x": 60, "z": 40 },
+        "size": { "width": 0.6, "depth": 0.6 },
+        "height": 11
+      },
+      {
+        "id": "col-21",
+        "position": { "x": 70, "z": 40 },
+        "size": { "width": 0.6, "depth": 0.6 },
+        "height": 11
       }
     ],
     "walls": [
       {
         "id": "wall-north",
         "start": [0, 0],
-        "end": [50, 0],
-        "height": 10,
-        "thickness": 0.3,
+        "end": [80, 0],
+        "height": 11,
+        "thickness": 0.4,
         "type": "exterior"
       },
       {
         "id": "wall-south",
-        "start": [0, 30],
-        "end": [50, 30],
-        "height": 10,
-        "thickness": 0.3,
+        "start": [0, 50],
+        "end": [80, 50],
+        "height": 11,
+        "thickness": 0.4,
         "type": "exterior"
       },
       {
         "id": "wall-east",
-        "start": [50, 0],
-        "end": [50, 30],
-        "height": 10,
-        "thickness": 0.3,
+        "start": [80, 0],
+        "end": [80, 50],
+        "height": 11,
+        "thickness": 0.4,
         "type": "exterior"
       },
       {
         "id": "wall-west",
         "start": [0, 0],
-        "end": [0, 30],
-        "height": 10,
-        "thickness": 0.3,
+        "end": [0, 50],
+        "height": 11,
+        "thickness": 0.4,
         "type": "exterior"
+      },
+      {
+        "id": "wall-interior-1",
+        "start": [40, 0],
+        "end": [40, 25],
+        "height": 11,
+        "thickness": 0.2,
+        "type": "interior"
+      },
+      {
+        "id": "wall-interior-2",
+        "start": [40, 25],
+        "end": [40, 50],
+        "height": 11,
+        "thickness": 0.2,
+        "type": "interior"
       }
     ],
     "doors": [
       {
-        "id": "door-main",
+        "id": "door-main-loading",
         "wallId": "wall-south",
+        "position": 0.4,
+        "width": 5,
+        "height": 6
+      },
+      {
+        "id": "door-main-loading-2",
+        "wallId": "wall-south",
+        "position": 0.6,
+        "width": 5,
+        "height": 6
+      },
+      {
+        "id": "door-personnel",
+        "wallId": "wall-west",
+        "position": 0.3,
+        "width": 1.2,
+        "height": 2.5
+      },
+      {
+        "id": "door-emergency",
+        "wallId": "wall-east",
+        "position": 0.7,
+        "width": 1.5,
+        "height": 2.5
+      },
+      {
+        "id": "door-interior-1",
+        "wallId": "wall-interior-1",
         "position": 0.5,
-        "width": 3,
-        "height": 4
+        "width": 2.5,
+        "height": 3.5
       }
     ],
-    "windows": [],
+    "windows": [
+      {
+        "id": "window-north-1",
+        "wallId": "wall-north",
+        "position": 0.15,
+        "width": 3,
+        "height": 2,
+        "yPosition": 2
+      },
+      {
+        "id": "window-north-2",
+        "wallId": "wall-north",
+        "position": 0.5,
+        "width": 3,
+        "height": 2,
+        "yPosition": 2
+      },
+      {
+        "id": "window-north-3",
+        "wallId": "wall-north",
+        "position": 0.85,
+        "width": 3,
+        "height": 2,
+        "yPosition": 2
+      },
+      {
+        "id": "window-east-1",
+        "wallId": "wall-east",
+        "position": 0.2,
+        "width": 4,
+        "height": 2.5,
+        "yPosition": 1.5
+      },
+      {
+        "id": "window-east-2",
+        "wallId": "wall-east",
+        "position": 0.8,
+        "width": 4,
+        "height": 2.5,
+        "yPosition": 1.5
+      }
+    ],
     "shelves": [
       {
-        "id": "shelf-1",
-        "position": { "x": 10, "z": 10 },
-        "size": { "length": 5, "width": 2, "height": 3 },
-        "tiers": 4,
+        "id": "shelf-row-1-1",
+        "position": { "x": 12, "z": 12 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
         "orientation": "north"
       },
       {
-        "id": "shelf-2",
-        "position": { "x": 20, "z": 10 },
-        "size": { "length": 5, "width": 2, "height": 3 },
-        "tiers": 4,
+        "id": "shelf-row-1-2",
+        "position": { "x": 20, "z": 12 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
         "orientation": "north"
       },
       {
-        "id": "shelf-3",
-        "position": { "x": 30, "z": 10 },
-        "size": { "length": 5, "width": 2, "height": 3 },
-        "tiers": 4,
+        "id": "shelf-row-1-3",
+        "position": { "x": 28, "z": 12 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
         "orientation": "north"
       },
       {
-        "id": "shelf-4",
-        "position": { "x": 10, "z": 20 },
-        "size": { "length": 5, "width": 2, "height": 3 },
-        "tiers": 4,
+        "id": "shelf-row-2-1",
+        "position": { "x": 12, "z": 18 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
         "orientation": "south"
       },
       {
-        "id": "shelf-5",
-        "position": { "x": 20, "z": 20 },
-        "size": { "length": 5, "width": 2, "height": 3 },
-        "tiers": 4,
+        "id": "shelf-row-2-2",
+        "position": { "x": 20, "z": 18 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
         "orientation": "south"
       },
       {
-        "id": "shelf-6",
-        "position": { "x": 30, "z": 20 },
-        "size": { "length": 5, "width": 2, "height": 3 },
-        "tiers": 4,
+        "id": "shelf-row-2-3",
+        "position": { "x": 28, "z": 18 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
         "orientation": "south"
+      },
+      {
+        "id": "shelf-row-3-1",
+        "position": { "x": 52, "z": 12 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
+        "orientation": "north"
+      },
+      {
+        "id": "shelf-row-3-2",
+        "position": { "x": 60, "z": 12 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
+        "orientation": "north"
+      },
+      {
+        "id": "shelf-row-3-3",
+        "position": { "x": 68, "z": 12 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
+        "orientation": "north"
+      },
+      {
+        "id": "shelf-row-4-1",
+        "position": { "x": 52, "z": 18 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
+        "orientation": "south"
+      },
+      {
+        "id": "shelf-row-4-2",
+        "position": { "x": 60, "z": 18 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
+        "orientation": "south"
+      },
+      {
+        "id": "shelf-row-4-3",
+        "position": { "x": 68, "z": 18 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
+        "orientation": "south"
+      },
+      {
+        "id": "shelf-row-5-1",
+        "position": { "x": 12, "z": 27 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
+        "orientation": "north"
+      },
+      {
+        "id": "shelf-row-5-2",
+        "position": { "x": 20, "z": 27 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
+        "orientation": "north"
+      },
+      {
+        "id": "shelf-row-5-3",
+        "position": { "x": 28, "z": 27 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
+        "orientation": "north"
+      },
+      {
+        "id": "shelf-row-6-1",
+        "position": { "x": 12, "z": 33 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
+        "orientation": "south"
+      },
+      {
+        "id": "shelf-row-6-2",
+        "position": { "x": 20, "z": 33 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
+        "orientation": "south"
+      },
+      {
+        "id": "shelf-row-6-3",
+        "position": { "x": 28, "z": 33 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
+        "orientation": "south"
+      },
+      {
+        "id": "shelf-row-7-1",
+        "position": { "x": 52, "z": 27 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
+        "orientation": "north"
+      },
+      {
+        "id": "shelf-row-7-2",
+        "position": { "x": 60, "z": 27 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
+        "orientation": "north"
+      },
+      {
+        "id": "shelf-row-7-3",
+        "position": { "x": 68, "z": 27 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
+        "orientation": "north"
+      },
+      {
+        "id": "shelf-row-8-1",
+        "position": { "x": 52, "z": 33 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
+        "orientation": "south"
+      },
+      {
+        "id": "shelf-row-8-2",
+        "position": { "x": 60, "z": 33 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
+        "orientation": "south"
+      },
+      {
+        "id": "shelf-row-8-3",
+        "position": { "x": 68, "z": 33 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
+        "orientation": "south"
+      },
+      {
+        "id": "shelf-row-9-1",
+        "position": { "x": 12, "z": 42 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
+        "orientation": "north"
+      },
+      {
+        "id": "shelf-row-9-2",
+        "position": { "x": 20, "z": 42 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
+        "orientation": "north"
+      },
+      {
+        "id": "shelf-row-9-3",
+        "position": { "x": 28, "z": 42 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
+        "orientation": "north"
+      },
+      {
+        "id": "shelf-row-10-1",
+        "position": { "x": 52, "z": 42 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
+        "orientation": "north"
+      },
+      {
+        "id": "shelf-row-10-2",
+        "position": { "x": 60, "z": 42 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
+        "orientation": "north"
+      },
+      {
+        "id": "shelf-row-10-3",
+        "position": { "x": 68, "z": 42 },
+        "size": { "length": 6, "width": 1.2, "height": 5 },
+        "tiers": 5,
+        "orientation": "north"
       }
     ],
     "lights": [
-      { "id": "light-1", "position": { "x": 10, "y": 9, "z": 10 }, "type": "ceiling" },
-      { "id": "light-2", "position": { "x": 20, "y": 9, "z": 10 }, "type": "ceiling" },
-      { "id": "light-3", "position": { "x": 30, "y": 9, "z": 10 }, "type": "ceiling" },
-      { "id": "light-4", "position": { "x": 10, "y": 9, "z": 20 }, "type": "ceiling" },
-      { "id": "light-5", "position": { "x": 20, "y": 9, "z": 20 }, "type": "ceiling" },
-      { "id": "light-6", "position": { "x": 30, "y": 9, "z": 20 }, "type": "ceiling" }
+      {
+        "id": "light-zone-1-1",
+        "position": { "x": 16, "y": 10, "z": 12 },
+        "type": "ceiling",
+        "intensity": 0.9
+      },
+      {
+        "id": "light-zone-1-2",
+        "position": { "x": 16, "y": 10, "z": 18 },
+        "type": "ceiling",
+        "intensity": 0.9
+      },
+      {
+        "id": "light-zone-1-3",
+        "position": { "x": 24, "y": 10, "z": 12 },
+        "type": "ceiling",
+        "intensity": 0.9
+      },
+      {
+        "id": "light-zone-1-4",
+        "position": { "x": 24, "y": 10, "z": 18 },
+        "type": "ceiling",
+        "intensity": 0.9
+      },
+      {
+        "id": "light-zone-2-1",
+        "position": { "x": 16, "y": 10, "z": 27 },
+        "type": "ceiling",
+        "intensity": 0.9
+      },
+      {
+        "id": "light-zone-2-2",
+        "position": { "x": 16, "y": 10, "z": 33 },
+        "type": "ceiling",
+        "intensity": 0.9
+      },
+      {
+        "id": "light-zone-2-3",
+        "position": { "x": 24, "y": 10, "z": 27 },
+        "type": "ceiling",
+        "intensity": 0.9
+      },
+      {
+        "id": "light-zone-2-4",
+        "position": { "x": 24, "y": 10, "z": 33 },
+        "type": "ceiling",
+        "intensity": 0.9
+      },
+      {
+        "id": "light-zone-3-1",
+        "position": { "x": 56, "y": 10, "z": 12 },
+        "type": "ceiling",
+        "intensity": 0.9
+      },
+      {
+        "id": "light-zone-3-2",
+        "position": { "x": 56, "y": 10, "z": 18 },
+        "type": "ceiling",
+        "intensity": 0.9
+      },
+      {
+        "id": "light-zone-3-3",
+        "position": { "x": 64, "y": 10, "z": 12 },
+        "type": "ceiling",
+        "intensity": 0.9
+      },
+      {
+        "id": "light-zone-3-4",
+        "position": { "x": 64, "y": 10, "z": 18 },
+        "type": "ceiling",
+        "intensity": 0.9
+      },
+      {
+        "id": "light-zone-4-1",
+        "position": { "x": 56, "y": 10, "z": 27 },
+        "type": "ceiling",
+        "intensity": 0.9
+      },
+      {
+        "id": "light-zone-4-2",
+        "position": { "x": 56, "y": 10, "z": 33 },
+        "type": "ceiling",
+        "intensity": 0.9
+      },
+      {
+        "id": "light-zone-4-3",
+        "position": { "x": 64, "y": 10, "z": 27 },
+        "type": "ceiling",
+        "intensity": 0.9
+      },
+      {
+        "id": "light-zone-4-4",
+        "position": { "x": 64, "y": 10, "z": 33 },
+        "type": "ceiling",
+        "intensity": 0.9
+      },
+      {
+        "id": "light-zone-5-1",
+        "position": { "x": 16, "y": 10, "z": 42 },
+        "type": "ceiling",
+        "intensity": 0.9
+      },
+      {
+        "id": "light-zone-5-2",
+        "position": { "x": 24, "y": 10, "z": 42 },
+        "type": "ceiling",
+        "intensity": 0.9
+      },
+      {
+        "id": "light-zone-6-1",
+        "position": { "x": 56, "y": 10, "z": 42 },
+        "type": "ceiling",
+        "intensity": 0.9
+      },
+      {
+        "id": "light-zone-6-2",
+        "position": { "x": 64, "y": 10, "z": 42 },
+        "type": "ceiling",
+        "intensity": 0.9
+      },
+      {
+        "id": "light-loading-1",
+        "position": { "x": 32, "y": 10, "z": 48 },
+        "type": "ceiling",
+        "intensity": 1.0
+      },
+      {
+        "id": "light-loading-2",
+        "position": { "x": 48, "y": 10, "z": 48 },
+        "type": "ceiling",
+        "intensity": 1.0
+      }
     ]
-  },
-  "notes": "Example warehouse structure - 50m x 30m x 10m",
-  "lastUpdated": "2024-01-01T00:00:00Z"
+  }
 }
-
