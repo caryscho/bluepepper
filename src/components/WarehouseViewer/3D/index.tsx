@@ -83,6 +83,7 @@ function ThreeDViewer({
     installedDevices,
     onInstalledDevicesChange,
     onDeviceClick,
+    editingDeviceId,
 }: {
     centerX: number;
     centerZ: number;
@@ -94,6 +95,7 @@ function ThreeDViewer({
     installedDevices: any[];
     onInstalledDevicesChange: (devices: any[]) => void;
     onDeviceClick?: (device: any) => void;
+    editingDeviceId?: string | null;
 }) {
     // 미리보기 위치 및 회전
     const [previewPosition, setPreviewPosition] =
@@ -122,28 +124,57 @@ function ThreeDViewer({
         attachedTo: "wall" | "column",
         attachedToId: string
     ) => {
-        const newDevice = {
-            id: `device-${Date.now()}`,
-            serialNumber: selectedDeviceSerialNumber,
-            position: {
-                x: position.x,
-                y: position.y,
-                z: position.z,
-            },
-            rotation: {
-                x: rotation.x,
-                y: rotation.y,
-                z: rotation.z,
-            },
-            attachedTo,
-            attachedToId,
-            installedAt: new Date(),
-            status: "active" as const,
-        };
+        if (editingDeviceId) {
+            // 위치 변경 모드: 기존 디바이스 업데이트
+            const existingDevice = installedDevices.find(
+                (d) => d.id === editingDeviceId
+            );
+            if (existingDevice) {
+                const updatedDevice = {
+                    ...existingDevice,
+                    position: {
+                        x: position.x,
+                        y: position.y,
+                        z: position.z,
+                    },
+                    rotation: {
+                        x: rotation.x,
+                        y: rotation.y,
+                        z: rotation.z,
+                    },
+                    attachedTo,
+                    attachedToId,
+                };
+                const updatedDevices = installedDevices.map((d) =>
+                    d.id === editingDeviceId ? updatedDevice : d
+                );
+                onInstalledDevicesChange(updatedDevices);
+            }
+        } else {
+            // 새 디바이스 추가
+            const newDevice = {
+                id: `device-${Date.now()}`,
+                serialNumber: selectedDeviceSerialNumber,
+                position: {
+                    x: position.x,
+                    y: position.y,
+                    z: position.z,
+                },
+                rotation: {
+                    x: rotation.x,
+                    y: rotation.y,
+                    z: rotation.z,
+                },
+                attachedTo,
+                attachedToId,
+                installedAt: new Date(),
+                status: "active" as const,
+            };
 
-        const updatedDevices = [...installedDevices, newDevice];
-        // 부모에게 설치된 디바이스 목록 업데이트
-        onInstalledDevicesChange(updatedDevices);
+            const updatedDevices = [...installedDevices, newDevice];
+            onInstalledDevicesChange(updatedDevices);
+        }
+
         // 배치 완료 후 모드 해제
         onCloseDeviceMode();
         setPreviewPosition(null);

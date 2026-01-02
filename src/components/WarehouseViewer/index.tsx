@@ -22,7 +22,7 @@ function WarehouseViewer() {
     const [installedDevices, setInstalledDevices] = useState<any[]>([
         {
             id: "device-1767337870239",
-            serialNumber: "52751318",
+            serialNumber: "52751318(T70)",
             position: {
                 x: 29.526240007844812,
                 y: 8.14631127217582,
@@ -42,12 +42,15 @@ function WarehouseViewer() {
     // 바닥의 중심점 계산 (원점 기준으로 창고가 0,0부터 시작한다고 가정)
     const centerX = length / 2;
     const centerZ = width / 2;
+
+    // 기기 목록 모드
     const [isDeviceListMode, setIsDeviceListMode] = useState(false);
     // 선택된 디바이스 (상세 정보 모달용)
     const [selectedDevice, setSelectedDevice] = useState<any | null>(null);
+    // 위치 변경 중인 디바이스 ID (null이면 새로 추가, 있으면 위치 변경)
+    const [editingDeviceId, setEditingDeviceId] = useState<string | null>(null);
     // 모드 토글 핸들러
     const handleToggleAddDeviceMode = () => {
-        console.log("device 더할건디");
         // 리스트는 꺼버림
         setIsDeviceListMode(false);
         if (isAddDeviceMode) {
@@ -69,6 +72,7 @@ function WarehouseViewer() {
     const handleCloseModal = () => {
         setSelectedDeviceSerialNumber(null);
         setIsAddDeviceMode(false);
+        setEditingDeviceId(null);
     };
 
     const handleToggleDeviceListMode = () => {
@@ -82,6 +86,17 @@ function WarehouseViewer() {
 
     // 디바이스 상세 모달 닫기
     const handleCloseDeviceDetail = () => {
+        setSelectedDevice(null);
+    };
+
+    // 위치 변경 핸들러
+    const handleChangePosition = () => {
+        if (!selectedDevice) return;
+        // 위치 변경 모드 활성화
+        setEditingDeviceId(selectedDevice.id);
+        setSelectedDeviceSerialNumber(selectedDevice.serialNumber);
+        setIsAddDeviceMode(true);
+        // 상세 모달 닫기
         setSelectedDevice(null);
     };
 
@@ -102,6 +117,7 @@ function WarehouseViewer() {
                     installedDevices={installedDevices}
                     onInstalledDevicesChange={setInstalledDevices}
                     onDeviceClick={handleDeviceClick}
+                    editingDeviceId={editingDeviceId}
                 />
             )}
             {/* 기기 선택 모달 */}
@@ -138,6 +154,7 @@ function WarehouseViewer() {
                 <DeviceDetailModal
                     device={selectedDevice}
                     onClose={handleCloseDeviceDetail}
+                    onChangePosition={handleChangePosition}
                 />
             )}
         </div>

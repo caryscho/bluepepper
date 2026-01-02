@@ -15,11 +15,13 @@ interface DeviceDetailModalProps {
         humidity?: number;
     };
     onClose: () => void;
+    onChangePosition: () => void;
 }
 
 export default function DeviceDetailModal({
     device,
     onClose,
+    onChangePosition,
 }: DeviceDetailModalProps) {
     // 상태별 색상
     const getStatusColor = (status: string) => {
@@ -116,6 +118,12 @@ export default function DeviceDetailModal({
                     <div>
                         <label className="block mb-1 text-sm font-medium text-gray-700">
                             위치
+                            <span
+                                onClick={onChangePosition}
+                                className="ml-2 text-blue-500 cursor-pointer"
+                            >
+                                위치 변경
+                            </span>
                         </label>
                         <p className="text-sm text-gray-600">
                             {device.attachedTo === "wall"

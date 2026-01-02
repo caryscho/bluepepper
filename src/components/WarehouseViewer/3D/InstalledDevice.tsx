@@ -108,7 +108,7 @@ export default function InstalledDevice({
                 device.rotation?.y || 0,
                 device.rotation?.z || 0,
             ]}
-            scale={isHovered ? 1.5 : 1.2} // 기본 크기 1.2배, 호버 시 1.5배
+            scale={isHovered ? 1.3 : 1.2} // 기본 크기 1.2배, 호버 시 1.3배
         >
             <boxGeometry
                 args={[

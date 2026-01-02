@@ -12,12 +12,12 @@ function DeviceSelector({
     excludedSerialNumbers = [],
 }: DeviceSelectorProps) {
     const SNList = [
-        "52751318",
-        "01234567",
-        "34901753",
-        "34900326",
-        "VC7KR13A",
-        "VC7KR18F",
+        "52751318(T70)",
+        "01234567(T70)",
+        "34901753(T70)",
+        "34900326(T70)",
+        "VC7KR13A(T71)",
+        "VC7KR18F(T71)",
     ];
 
     // 선택된 것과 제외 목록을 합쳐서 필터링
