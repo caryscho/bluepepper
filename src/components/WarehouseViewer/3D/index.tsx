@@ -1,9 +1,13 @@
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import warehouseData from "../../../data/warehouse-example.json";
 import * as THREE from "three";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import ThreeDContoller from "./3DContoller";
+import DeviceSelector from "./DeviceSelector";
+import DevicePreview from "./DevicePreview";
+import DevicePlacementHandler from "./DevicePlacementHandler";
+import { AVAILABLE_DEVICE_TYPES, DeviceType } from "../../../types/device";
 // 바닥 위에만 그리드를 그리는 커스텀 컴포넌트
 function FloorGrid({
   length,
@@ -78,9 +82,72 @@ function ThreeDViewer({
   length: number;
   width: number;
 }) {
+  // 디바이스 추가 모드 상태
+  const [isAddDeviceMode, setIsAddDeviceMode] = useState(false);
+  // 선택된 디바이스 타입
+  const [selectedDeviceTypeId, setSelectedDeviceTypeId] = useState<string | null>(null);
+  // 미리보기 위치
+  const [previewPosition, setPreviewPosition] = useState<THREE.Vector3 | null>(null);
+  const [isPreviewValid, setIsPreviewValid] = useState(false);
+  // 설치된 디바이스 목록 (나중에 상태 관리로 이동)
+  const [installedDevices, setInstalledDevices] = useState<any[]>([]);
+
+  const selectedDeviceType = selectedDeviceTypeId
+    ? AVAILABLE_DEVICE_TYPES.find((d) => d.id === selectedDeviceTypeId) || null
+    : null;
+
+  // 디바이스 배치 핸들러
+  const handlePlaceDevice = (position: THREE.Vector3, deviceType: DeviceType) => {
+    // 시리얼 넘버 입력 받기 (간단하게 prompt 사용, 나중에 모달로 변경)
+    const serialNumber = prompt(`기기 시리얼 넘버를 입력하세요:\n${deviceType.name} (${deviceType.model})`);
+    if (!serialNumber) return;
+
+    const newDevice = {
+      id: `device-${Date.now()}`,
+      deviceTypeId: deviceType.id,
+      serialNumber,
+      position: {
+        x: position.x,
+        y: position.y,
+        z: position.z,
+      },
+      attachedTo: "floor" as const,
+      installedAt: new Date(),
+      status: "active" as const,
+    };
+
+    setInstalledDevices([...installedDevices, newDevice]);
+    // 배치 완료 후 모드 해제
+    setIsAddDeviceMode(false);
+    setSelectedDeviceTypeId(null);
+    setPreviewPosition(null);
+  };
+
+  // 모드 토글 시 선택 초기화
+  const handleToggleMode = () => {
+    if (isAddDeviceMode) {
+      // 모드 해제 시 초기화
+      setSelectedDeviceTypeId(null);
+      setPreviewPosition(null);
+    }
+    setIsAddDeviceMode(!isAddDeviceMode);
+  };
+
   return (
     <div className="relative w-full h-full">
-      <ThreeDContoller />
+      {/* 기기 선택 사이드바 */}
+      {isAddDeviceMode && (
+        <DeviceSelector
+          selectedDeviceTypeId={selectedDeviceTypeId}
+          onSelectDevice={setSelectedDeviceTypeId}
+          onClose={handleToggleMode}
+        />
+      )}
+
+      <ThreeDContoller
+        isAddDeviceMode={isAddDeviceMode}
+        onToggleAddDeviceMode={handleToggleMode}
+      />
       <Canvas
       // camera={{ position: [5, 5, 5], fov: 75 }}
       >
@@ -93,7 +160,56 @@ function ThreeDViewer({
           target={[centerX, 0, centerZ]}
           minDistance={10}
           maxDistance={200}
+          enabled={!isAddDeviceMode || !selectedDeviceType} // 기기 배치 모드일 때는 컨트롤 비활성화
         />
+
+        {/* 디바이스 배치 핸들러 */}
+        {isAddDeviceMode && selectedDeviceType && (
+          <DevicePlacementHandler
+            isAddDeviceMode={isAddDeviceMode}
+            selectedDeviceType={selectedDeviceType}
+            onPlaceDevice={handlePlaceDevice}
+            onPreviewPositionChange={(pos, isValid) => {
+              setPreviewPosition(pos);
+              setIsPreviewValid(isValid);
+            }}
+            floorCenter={{ x: centerX, z: centerZ }}
+            floorSize={{ length, width }}
+          />
+        )}
+
+        {/* 디바이스 미리보기 */}
+        {isAddDeviceMode && selectedDeviceType && (
+          <DevicePreview
+            deviceType={selectedDeviceType}
+            position={previewPosition}
+            isValid={isPreviewValid}
+          />
+        )}
+
+        {/* 설치된 디바이스들 */}
+        {installedDevices.map((device) => {
+          const deviceType = AVAILABLE_DEVICE_TYPES.find(
+            (d) => d.id === device.deviceTypeId
+          );
+          if (!deviceType) return null;
+
+          return (
+            <mesh
+              key={device.id}
+              position={[device.position.x, device.position.y, device.position.z]}
+            >
+              <boxGeometry
+                args={[
+                  deviceType.size.width,
+                  deviceType.size.height,
+                  deviceType.size.depth,
+                ]}
+              />
+              <meshStandardMaterial color={deviceType.color} />
+            </mesh>
+          );
+        })}
 
         {/* 바닥: JSON의 dimensions 사용 */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[centerX, 0, centerZ]}>
