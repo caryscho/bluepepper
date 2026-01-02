@@ -3,7 +3,7 @@ import { useState } from "react";
 import warehouseData from "../../data/warehouse-example.json";
 import Contoller from "./DimContoller";
 import ThreeDViewer from "./3D/index.tsx";
-import TwoDViewer from "./2DViewer";
+import TwoDViewer from "./2D/index.tsx";
 
 function WarehouseViewer() {
   // 2차원 <-> 3차원 전환 상태
