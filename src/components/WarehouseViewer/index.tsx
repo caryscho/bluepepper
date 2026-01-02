@@ -18,14 +18,33 @@ function WarehouseViewer() {
     const [selectedDeviceSerialNumber, setSelectedDeviceSerialNumber] =
         useState<string | null>(null);
     // 설치된 디바이스 목록 (시리얼 넘버 추출용)
-    const [installedDevices, setInstalledDevices] = useState<any[]>([]);
+    const [installedDevices, setInstalledDevices] = useState<any[]>([
+        {
+            id: "device-1767337870239",
+            serialNumber: "52751318",
+            position: {
+                x: 29.526240007844812,
+                y: 8.14631127217582,
+                z: 25.017180901645762,
+            },
+            rotation: {
+                x: 0,
+                y: 2.430133527850285,
+                z: 0,
+            },
+            attachedTo: "column",
+            attachedToId: "col-10",
+            installedAt: "2026-01-02T07:11:10.239Z",
+            status: "active",
+        },
+    ]);
     // 바닥의 중심점 계산 (원점 기준으로 창고가 0,0부터 시작한다고 가정)
     const centerX = length / 2;
     const centerZ = width / 2;
     const [isDeviceListMode, setIsDeviceListMode] = useState(false);
     // 모드 토글 핸들러
     const handleToggleAddDeviceMode = () => {
-        console.log('device 더할건디')
+        console.log("device 더할건디");
         // 리스트는 꺼버림
         setIsDeviceListMode(false);
         if (isAddDeviceMode) {
@@ -87,9 +106,19 @@ function WarehouseViewer() {
                 onToggleAddDeviceMode={handleToggleAddDeviceMode}
                 onToggleDeviceListMode={handleToggleDeviceListMode}
             />
-            {isDeviceListMode && (
-                <DeviceList installedDevices={installedDevices} />
-            )}
+            {/* CSS transition으로 fade in/out 애니메이션 - 항상 렌더링하여 exit 애니메이션 보장 */}
+            <div
+                className={`absolute right-6 top-1/2 -translate-y-1/2 z-10 transition-all duration-300 ease-in-out ${
+                    isDeviceListMode
+                        ? "opacity-100 translate-x-0 pointer-events-auto"
+                        : "opacity-0 translate-x-4 pointer-events-none"
+                }`}
+            >
+                <DeviceList
+                    installedDevices={installedDevices}
+                    onClose={handleToggleDeviceListMode}
+                />
+            </div>
         </div>
     );
 }
