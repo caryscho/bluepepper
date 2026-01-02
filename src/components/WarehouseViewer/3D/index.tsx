@@ -1,8 +1,8 @@
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import warehouseData from "../../../data/warehouse-example.json";
 import * as THREE from "three";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import DevicePlacementHandler from "./DevicePlacementHandler";
 import DevicePreview from "./DevicePreview";
 import { DeviceType } from "../../../types/device";
@@ -70,6 +70,7 @@ function FloorGrid({
         </group>
     );
 }
+
 function ThreeDViewer({
     centerX,
     centerZ,
@@ -98,6 +99,8 @@ function ThreeDViewer({
         null
     );
     const [isPreviewValid, setIsPreviewValid] = useState(false);
+    // OrbitControls ref
+    const controlsRef = useRef<any>(null);
 
     // 기본 디바이스 타입 (핸드폰 사이즈)
     const defaultDeviceType: DeviceType = {
@@ -164,13 +167,25 @@ function ThreeDViewer({
                 <directionalLight position={[10, 10, 5]} intensity={1.5} />
                 <directionalLight position={[-10, 10, -5]} intensity={0.8} />
                 <hemisphereLight intensity={0.6} />‰
-                {/* 카메라 컨트롤: 마우스로 드래그해서 회전, 휠로 줌 */}
+                {/* 카메라 컨트롤: 마우스로 드래그해서 회전, 휠로 줌, Shift+드래그로 이동 */}
                 <OrbitControls
+                    ref={controlsRef}
                     target={[centerX, 0, centerZ]}
                     minDistance={10}
                     maxDistance={200}
                     enabled={!isAddDeviceMode} // 기기 배치 모드일 때는 컨트롤 비활성화
+                    enablePan={true} // Pan 기능 활성화
+                    panSpeed={1.0} // Pan 속도
+                    screenSpacePanning={false} // 카메라 평면 기준으로 pan (더 자연스러움)
+                    // 마우스 컨트롤:
+                    // - 왼쪽 버튼 드래그: 회전
+                    // - Shift + 왼쪽 버튼 드래그: Pan (이동)
+                    // - 휠: 줌
                 />
+                {/* 키보드로 카메라 이동 (WASD 또는 화살표 키) */}
+                {/* {!isAddDeviceMode && (
+                    <KeyboardControls panSpeed={2.0} controlsRef={controlsRef} />
+                )} */}
                 {/* 디바이스 배치 핸들러 */}
                 {isAddDeviceMode && selectedDeviceSerialNumber && (
                     <DevicePlacementHandler

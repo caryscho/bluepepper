@@ -1,10 +1,12 @@
+import { X } from "lucide-react";
 interface DeviceListProps {
     installedDevices: any[];
+    onClose: () => void;
 }
 
-export default function DeviceList({ installedDevices }: DeviceListProps) {
+export default function DeviceList({ installedDevices, onClose }: DeviceListProps) {
     return (
-        <div className="absolute right-8  top-1/2 -translate-y-1/2 z-10 bg-white border shadow-lg rounded-lg p-4 w-[380px]  max-h-[80vh] overflow-y-auto">
+        <div className="bg-white border shadow-lg rounded-lg p-4 w-[380px] max-h-[80vh] overflow-y-auto">
             <h3 className="mb-4 text-lg font-semibold text-black">
                 설치된 기기 목록
             </h3>
@@ -21,6 +23,9 @@ export default function DeviceList({ installedDevices }: DeviceListProps) {
                 <p className="text-sm text-gray-500">설치된 기기가 없습니다.</p>
             ) : (
                 <div className="space-y-2 cursor-pointer">
+                    <button onClick={onClose} className="absolute top-2 right-2">
+                        <X className="w-4 h-4 text-gray-500" />
+                    </button>
                     {installedDevices.map((device) => (
                         <div
                             key={device.id}
