@@ -78,6 +78,8 @@ function ThreeDViewer({
     isAddDeviceMode,
     selectedDeviceSerialNumber,
     onCloseDeviceMode,
+    installedDevices,
+    onInstalledDevicesChange,
 }: {
     centerX: number;
     centerZ: number;
@@ -86,6 +88,8 @@ function ThreeDViewer({
     isAddDeviceMode: boolean;
     selectedDeviceSerialNumber: string | null;
     onCloseDeviceMode: () => void;
+    installedDevices: any[];
+    onInstalledDevicesChange: (devices: any[]) => void;
 }) {
     // 미리보기 위치 및 회전
     const [previewPosition, setPreviewPosition] =
@@ -94,8 +98,6 @@ function ThreeDViewer({
         null
     );
     const [isPreviewValid, setIsPreviewValid] = useState(false);
-    // 설치된 디바이스 목록 (나중에 상태 관리로 이동)
-    const [installedDevices, setInstalledDevices] = useState<any[]>([]);
 
     // 기본 디바이스 타입 (핸드폰 사이즈)
     const defaultDeviceType: DeviceType = {
@@ -133,7 +135,9 @@ function ThreeDViewer({
             status: "active" as const,
         };
 
-        setInstalledDevices([...installedDevices, newDevice]);
+        const updatedDevices = [...installedDevices, newDevice];
+        // 부모에게 설치된 디바이스 목록 업데이트
+        onInstalledDevicesChange(updatedDevices);
         // 배치 완료 후 모드 해제
         onCloseDeviceMode();
         setPreviewPosition(null);

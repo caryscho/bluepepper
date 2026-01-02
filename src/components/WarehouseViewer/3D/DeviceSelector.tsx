@@ -2,25 +2,31 @@ interface DeviceSelectorProps {
     selectedDeviceTypeId: string | null;
     onSelectDevice: (deviceTypeId: string) => void;
     onClose: () => void;
+    excludedSerialNumbers?: string[]; // 제외할 시리얼 넘버 목록
 }
 
 function DeviceSelector({
     selectedDeviceTypeId,
     onSelectDevice,
     onClose,
+    excludedSerialNumbers = [],
 }: DeviceSelectorProps) {
     const SNList = [
         "52751318",
         "01234567",
-        "34900320",
-        "34900337",
-        "34900318",
-        "34900229",
         "34901753",
         "34900326",
         "VC7KR13A",
         "VC7KR18F",
     ];
+
+    // 선택된 것과 제외 목록을 합쳐서 필터링
+    const availableDevices = SNList.filter(
+        (serialNumber) =>
+            serialNumber !== selectedDeviceTypeId &&
+            !excludedSerialNumbers.includes(serialNumber)
+    );
+
     return (
         <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-10 bg-white border shadow-lg rounded-lg p-4 w-70  max-h-[80vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
@@ -42,7 +48,7 @@ function DeviceSelector({
                     className="p-2 w-full rounded-lg border"
                 >
                     <option value="">선택하세요</option>
-                    {SNList.map((serialNumber) => (
+                    {availableDevices.map((serialNumber) => (
                         <option key={serialNumber} value={serialNumber}>
                             {serialNumber}
                         </option>
