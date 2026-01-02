@@ -6,6 +6,7 @@ import ThreeDViewer from "./3D/index.tsx";
 import TwoDViewer from "./2D/index.tsx";
 import DeviceContoller from "./DeviceContoller.tsx";
 import DeviceSelector from "./3D/DeviceSelector";
+import DeviceList from "./3D/DeviceList.tsx";
 
 function WarehouseViewer() {
     // 2차원 <-> 3차원 전환 상태
@@ -16,12 +17,17 @@ function WarehouseViewer() {
     // 선택된 디바이스 시리얼 넘버
     const [selectedDeviceSerialNumber, setSelectedDeviceSerialNumber] =
         useState<string | null>(null);
+    // 설치된 디바이스 목록 (시리얼 넘버 추출용)
+    const [installedDevices, setInstalledDevices] = useState<any[]>([]);
     // 바닥의 중심점 계산 (원점 기준으로 창고가 0,0부터 시작한다고 가정)
     const centerX = length / 2;
     const centerZ = width / 2;
     const [isDeviceListMode, setIsDeviceListMode] = useState(false);
     // 모드 토글 핸들러
     const handleToggleAddDeviceMode = () => {
+        console.log('device 더할건디')
+        // 리스트는 꺼버림
+        setIsDeviceListMode(false);
         if (isAddDeviceMode) {
             // 모드 해제 시 초기화
             setSelectedDeviceSerialNumber(null);
@@ -61,6 +67,8 @@ function WarehouseViewer() {
                     isAddDeviceMode={isAddDeviceMode}
                     selectedDeviceSerialNumber={selectedDeviceSerialNumber}
                     onCloseDeviceMode={handleCloseModal}
+                    installedDevices={installedDevices}
+                    onInstalledDevicesChange={setInstalledDevices}
                 />
             )}
             {/* 기기 선택 모달 */}
@@ -69,6 +77,9 @@ function WarehouseViewer() {
                     selectedDeviceTypeId={selectedDeviceSerialNumber}
                     onSelectDevice={handleSelectDevice}
                     onClose={handleCloseModal}
+                    excludedSerialNumbers={installedDevices.map(
+                        (device) => device.serialNumber
+                    )}
                 />
             )}
             <DeviceContoller
@@ -76,6 +87,9 @@ function WarehouseViewer() {
                 onToggleAddDeviceMode={handleToggleAddDeviceMode}
                 onToggleDeviceListMode={handleToggleDeviceListMode}
             />
+            {isDeviceListMode && (
+                <DeviceList installedDevices={installedDevices} />
+            )}
         </div>
     );
 }
