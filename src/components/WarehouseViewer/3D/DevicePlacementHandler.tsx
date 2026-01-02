@@ -95,22 +95,32 @@ function DevicePlacementHandler({
                 normal.normalize();
             }
 
-            // 기기 크기 (핸드폰 사이즈: 약 0.15m x 0.07m x 0.01m)
+            // 기기 크기
             const deviceDepth = selectedDeviceType.size.depth || 0.01;
 
             // 면에서 약간 떨어진 위치 (벽/기둥 표면에서)
             const offset = normal.clone().multiplyScalar(deviceDepth / 2 + 0.01);
             const position = point.clone().add(offset);
 
-            // 회전 계산: 면의 법선 벡터에 수직으로
-            // 벽/기둥의 면에 평행하게 배치 (Y축은 위를 향함)
-            const wallNormal = normal.clone();
-            wallNormal.y = 0; // Y 성분 제거 (수평면만 고려)
-            wallNormal.normalize();
+            // 회전 계산: 면의 법선 벡터에 수직인 방향으로 기기를 배치
+            // 기기는 면에 평행하게 붙어야 하므로, 법선 벡터를 90도 회전시킨 방향
+            // 법선 벡터의 X, Z 성분만 사용 (Y는 수직이므로 무시)
+            const normalXZ = new THREE.Vector2(normal.x, normal.z);
+            
+            // 법선 벡터가 거의 수직인 경우 (위/아래 면) 처리
+            if (normalXZ.length() < 0.1) {
+                const finalRotation = new THREE.Euler(0, 0, 0);
+                onPreviewPositionChange(position, finalRotation, true);
+                return;
+            }
 
-            // Y축 회전만 계산 (기기는 항상 수직)
-            const angle = Math.atan2(wallNormal.x, wallNormal.z);
-            const finalRotation = new THREE.Euler(0, angle, 0);
+            // 법선 벡터에 수직인 방향 계산 (90도 회전)
+            // 법선이 (1,0)이면 수직은 (0,1) 또는 (0,-1)
+            // atan2를 사용하여 법선의 각도를 구하고, 90도 더함
+            const normalAngle = Math.atan2(normalXZ.x, normalXZ.y);
+            // 법선에 수직인 방향 = 법선 각도 + 90도
+            const deviceAngle = normalAngle + Math.PI / 2;
+            const finalRotation = new THREE.Euler(0, deviceAngle, 0);
 
             onPreviewPositionChange(position, finalRotation, true);
         } else {
@@ -147,12 +157,22 @@ function DevicePlacementHandler({
                 const offset = normal.clone().multiplyScalar(deviceDepth / 2 + 0.01);
                 const position = point.clone().add(offset);
 
-                // 회전 계산: 벽/기둥의 면에 평행하게
-                const wallNormal = normal.clone();
-                wallNormal.y = 0;
-                wallNormal.normalize();
-                const angle = Math.atan2(wallNormal.x, wallNormal.z);
-                const rotation = new THREE.Euler(0, angle, 0);
+                // 회전 계산: 면의 법선 벡터에 수직인 방향으로 기기를 배치
+                const normalXZ = new THREE.Vector2(normal.x, normal.z);
+                
+                // 법선 벡터가 거의 수직인 경우 처리
+                if (normalXZ.length() < 0.1) {
+                    const rotation = new THREE.Euler(0, 0, 0);
+                    const attachedToId = intersect.object.userData.id || "";
+                    const attachedTo = intersect.object.userData.type === "wall" ? "wall" : "column";
+                    onPlaceDevice(position, rotation, selectedDeviceType, attachedTo, attachedToId);
+                    return;
+                }
+
+                // 법선 벡터에 수직인 방향 계산
+                const normalAngle = Math.atan2(normalXZ.x, normalXZ.y);
+                const deviceAngle = normalAngle + Math.PI / 2;
+                const rotation = new THREE.Euler(0, deviceAngle, 0);
 
                 // 부착된 오브젝트 정보
                 const attachedToId = intersect.object.userData.id || "";

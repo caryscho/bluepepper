@@ -86,12 +86,15 @@ function ThreeDViewer({
     // 디바이스 추가 모드 상태
     const [isAddDeviceMode, setIsAddDeviceMode] = useState(false);
     // 선택된 디바이스 시리얼 넘버
-    const [selectedDeviceSerialNumber, setSelectedDeviceSerialNumber] = useState<
-        string | null
-    >(null);
+    const [selectedDeviceSerialNumber, setSelectedDeviceSerialNumber] =
+        useState<string | null>(null);
+
     // 미리보기 위치 및 회전
-    const [previewPosition, setPreviewPosition] = useState<THREE.Vector3 | null>(null);
-    const [previewRotation, setPreviewRotation] = useState<THREE.Euler | null>(null);
+    const [previewPosition, setPreviewPosition] =
+        useState<THREE.Vector3 | null>(null);
+    const [previewRotation, setPreviewRotation] = useState<THREE.Euler | null>(
+        null
+    );
     const [isPreviewValid, setIsPreviewValid] = useState(false);
     // 설치된 디바이스 목록 (나중에 상태 관리로 이동)
     const [installedDevices, setInstalledDevices] = useState<any[]>([]);
@@ -101,10 +104,9 @@ function ThreeDViewer({
         id: "phone-device",
         name: "온습도 센서",
         model: "Phone Device",
-        size: { width: 0.15, height: 0.07, depth: 0.01 },
-        color: "#4CAF50",
+        size: { width: 0.3, height: 0.2, depth: 0.05 },
+        color: "#FF9800",
     };
-
 
     // 모드 토글 시 선택 초기화
     const handleToggleMode = () => {
@@ -154,6 +156,13 @@ function ThreeDViewer({
 
     return (
         <div className="relative w-full h-full">
+            <p className="absolute top-0 left-0 z-10 text-white">
+                {isAddDeviceMode ? "isAddDeviceMode is true" : "isAddDeviceMode is false"}
+				<br />
+                {!selectedDeviceSerialNumber ?
+                    "selectedDeviceSerialNumber is null" :
+                    `selectedDeviceSerialNumber is ${selectedDeviceSerialNumber}`}
+            </p>
             {/* 기기 선택 모달 */}
             {isAddDeviceMode && !selectedDeviceSerialNumber && (
                 <DeviceSelector
@@ -174,16 +183,14 @@ function ThreeDViewer({
                 <ambientLight intensity={1.2} />
                 <directionalLight position={[10, 10, 5]} intensity={1.5} />
                 <directionalLight position={[-10, 10, -5]} intensity={0.8} />
-                <hemisphereLight intensity={0.6} />
-
+                <hemisphereLight intensity={0.6} />‰
                 {/* 카메라 컨트롤: 마우스로 드래그해서 회전, 휠로 줌 */}
                 <OrbitControls
                     target={[centerX, 0, centerZ]}
                     minDistance={10}
                     maxDistance={200}
-                    enabled={!isAddDeviceMode || !selectedDeviceSerialNumber} // 기기 배치 모드일 때는 컨트롤 비활성화
+                    enabled={!isAddDeviceMode} // 기기 배치 모드일 때는 컨트롤 비활성화
                 />
-
                 {/* 디바이스 배치 핸들러 */}
                 {isAddDeviceMode && selectedDeviceSerialNumber && (
                     <DevicePlacementHandler
@@ -201,7 +208,6 @@ function ThreeDViewer({
                         }}
                     />
                 )}
-
                 {/* 디바이스 미리보기 */}
                 {isAddDeviceMode && selectedDeviceSerialNumber && (
                     <DevicePreview
@@ -211,7 +217,6 @@ function ThreeDViewer({
                         isValid={isPreviewValid}
                     />
                 )}
-
                 {/* 설치된 디바이스들 */}
                 {installedDevices.map((device) => {
                     return (
@@ -235,11 +240,12 @@ function ThreeDViewer({
                                     defaultDeviceType.size.depth,
                                 ]}
                             />
-                            <meshStandardMaterial color={defaultDeviceType.color} />
+                            <meshStandardMaterial
+                                color={defaultDeviceType.color}
+                            />
                         </mesh>
                     );
                 })}
-
                 {/* 바닥: JSON의 dimensions 사용 */}
                 <mesh
                     rotation={[-Math.PI / 2, 0, 0]}
@@ -248,7 +254,6 @@ function ThreeDViewer({
                     <planeGeometry args={[length, width]} />
                     <meshStandardMaterial color="#cccccc" />
                 </mesh>
-
                 {/* 기둥들 (Columns) */}
                 {warehouseData.structure.columns.map((column) => (
                     <mesh
@@ -270,7 +275,6 @@ function ThreeDViewer({
                         <meshStandardMaterial color="#888888" />
                     </mesh>
                 ))}
-
                 {/* 벽 */}
                 {warehouseData.structure.walls.map((wall) => {
                     const dx = wall.end[0] - wall.start[0];
@@ -287,6 +291,7 @@ function ThreeDViewer({
                             position={[centerX, centerY, centerZ]}
                             rotation={[0, angle, 0]}
                             userData={{ type: "wall", id: wall.id }}
+                            renderOrder={0}
                         >
                             <boxGeometry
                                 args={[wallLength, wall.height, wall.thickness]}
@@ -297,11 +302,11 @@ function ThreeDViewer({
                                         ? "#666666"
                                         : "#999999"
                                 }
+                                depthWrite={true}
                             />
                         </mesh>
                     );
                 })}
-
                 {/* 문 */}
                 {warehouseData.structure.doors.map((door) => {
                     // door의 wallId로 해당 벽 찾기
@@ -345,7 +350,6 @@ function ThreeDViewer({
                         </mesh>
                     );
                 })}
-
                 {/* 창문 */}
                 {warehouseData.structure.windows.map((window) => {
                     // window의 wallId로 해당 벽 찾기
@@ -385,6 +389,7 @@ function ThreeDViewer({
                                 windowZ + offsetZ,
                             ]}
                             rotation={[0, angle, 0]}
+                            renderOrder={1}
                         >
                             <boxGeometry
                                 args={[window.width, window.height, 0.05]}
@@ -393,11 +398,11 @@ function ThreeDViewer({
                                 color="#87CEEB"
                                 opacity={0.6}
                                 transparent
+                                depthWrite={false}
                             />
                         </mesh>
                     );
                 })}
-
                 {/* 인간 사이즈 오브젝트 (첫 번째 문 앞에 배치) */}
                 {(() => {
                     const firstDoor = warehouseData.structure.doors[0]; // door-main-loading
@@ -515,7 +520,6 @@ function ThreeDViewer({
                         </group>
                     );
                 })()}
-
                 {/* 바닥 위에만 정확히 맞는 그리드 */}
                 <FloorGrid
                     length={length}
