@@ -3,8 +3,6 @@ import { OrbitControls } from "@react-three/drei";
 import warehouseData from "../../../data/warehouse-example.json";
 import * as THREE from "three";
 import { useMemo, useState } from "react";
-import ThreeDContoller from "./3DContoller";
-import DeviceSelector from "./DeviceSelector";
 import DevicePlacementHandler from "./DevicePlacementHandler";
 import DevicePreview from "./DevicePreview";
 import { DeviceType } from "../../../types/device";
@@ -77,18 +75,18 @@ function ThreeDViewer({
     centerZ,
     length,
     width,
+    isAddDeviceMode,
+    selectedDeviceSerialNumber,
+    onCloseDeviceMode,
 }: {
     centerX: number;
     centerZ: number;
     length: number;
     width: number;
+    isAddDeviceMode: boolean;
+    selectedDeviceSerialNumber: string | null;
+    onCloseDeviceMode: () => void;
 }) {
-    // 디바이스 추가 모드 상태
-    const [isAddDeviceMode, setIsAddDeviceMode] = useState(false);
-    // 선택된 디바이스 시리얼 넘버
-    const [selectedDeviceSerialNumber, setSelectedDeviceSerialNumber] =
-        useState<string | null>(null);
-
     // 미리보기 위치 및 회전
     const [previewPosition, setPreviewPosition] =
         useState<THREE.Vector3 | null>(null);
@@ -106,17 +104,6 @@ function ThreeDViewer({
         model: "Phone Device",
         size: { width: 0.3, height: 0.2, depth: 0.05 },
         color: "#FF9800",
-    };
-
-    // 모드 토글 시 선택 초기화
-    const handleToggleMode = () => {
-        if (isAddDeviceMode) {
-            // 모드 해제 시 초기화
-            setSelectedDeviceSerialNumber(null);
-            setPreviewPosition(null);
-            setPreviewRotation(null);
-        }
-        setIsAddDeviceMode(!isAddDeviceMode);
     };
 
     // 디바이스 배치 핸들러
@@ -148,8 +135,7 @@ function ThreeDViewer({
 
         setInstalledDevices([...installedDevices, newDevice]);
         // 배치 완료 후 모드 해제
-        setIsAddDeviceMode(false);
-        setSelectedDeviceSerialNumber(null);
+        onCloseDeviceMode();
         setPreviewPosition(null);
         setPreviewRotation(null);
     };
@@ -157,25 +143,15 @@ function ThreeDViewer({
     return (
         <div className="relative w-full h-full">
             <p className="absolute top-0 left-0 z-10 text-white">
-                {isAddDeviceMode ? "isAddDeviceMode is true" : "isAddDeviceMode is false"}
-				<br />
-                {!selectedDeviceSerialNumber ?
-                    "selectedDeviceSerialNumber is null" :
-                    `selectedDeviceSerialNumber is ${selectedDeviceSerialNumber}`}
+                {isAddDeviceMode
+                    ? "isAddDeviceMode is true"
+                    : "isAddDeviceMode is false"}
+                <br />
+                {!selectedDeviceSerialNumber
+                    ? "selectedDeviceSerialNumber is null"
+                    : `selectedDeviceSerialNumber is ${selectedDeviceSerialNumber}`}
             </p>
-            {/* 기기 선택 모달 */}
-            {isAddDeviceMode && !selectedDeviceSerialNumber && (
-                <DeviceSelector
-                    selectedDeviceTypeId={selectedDeviceSerialNumber}
-                    onSelectDevice={setSelectedDeviceSerialNumber}
-                    onClose={handleToggleMode}
-                />
-            )}
 
-            <ThreeDContoller
-                isAddDeviceMode={isAddDeviceMode}
-                onToggleAddDeviceMode={handleToggleMode}
-            />
             <Canvas
             // camera={{ position: [5, 5, 5], fov: 75 }}
             >
