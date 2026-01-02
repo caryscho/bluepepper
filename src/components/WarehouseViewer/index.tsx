@@ -7,6 +7,7 @@ import TwoDViewer from "./2D/index.tsx";
 import DeviceContoller from "./DeviceContoller.tsx";
 import DeviceSelector from "./3D/DeviceSelector";
 import DeviceList from "./3D/DeviceList.tsx";
+import DeviceDetailModal from "./3D/DeviceDetailModal";
 
 function WarehouseViewer() {
     // 2차원 <-> 3차원 전환 상태
@@ -28,9 +29,9 @@ function WarehouseViewer() {
                 z: 25.017180901645762,
             },
             rotation: {
-                x: 0,
-                y: 2.430133527850285,
-                z: 0,
+                x: 0, // 넓은 면이 벽에 붙도록 X축으로 90도 회전
+                y: Math.PI / 2,
+                z: Math.PI / 2,
             },
             attachedTo: "column",
             attachedToId: "col-10",
@@ -42,6 +43,8 @@ function WarehouseViewer() {
     const centerX = length / 2;
     const centerZ = width / 2;
     const [isDeviceListMode, setIsDeviceListMode] = useState(false);
+    // 선택된 디바이스 (상세 정보 모달용)
+    const [selectedDevice, setSelectedDevice] = useState<any | null>(null);
     // 모드 토글 핸들러
     const handleToggleAddDeviceMode = () => {
         console.log("device 더할건디");
@@ -72,6 +75,16 @@ function WarehouseViewer() {
         setIsDeviceListMode(!isDeviceListMode);
     };
 
+    // 디바이스 클릭 핸들러
+    const handleDeviceClick = (device: any) => {
+        setSelectedDevice(device);
+    };
+
+    // 디바이스 상세 모달 닫기
+    const handleCloseDeviceDetail = () => {
+        setSelectedDevice(null);
+    };
+
     return (
         <div className="relative" style={{ width: "100%", height: "100vh" }}>
             <Contoller is2D={is2D} onToggleDimension={() => setIs2D(!is2D)} />
@@ -88,6 +101,7 @@ function WarehouseViewer() {
                     onCloseDeviceMode={handleCloseModal}
                     installedDevices={installedDevices}
                     onInstalledDevicesChange={setInstalledDevices}
+                    onDeviceClick={handleDeviceClick}
                 />
             )}
             {/* 기기 선택 모달 */}
@@ -119,6 +133,13 @@ function WarehouseViewer() {
                     onClose={handleToggleDeviceListMode}
                 />
             </div>
+            {/* 디바이스 상세 정보 모달 */}
+            {selectedDevice && (
+                <DeviceDetailModal
+                    device={selectedDevice}
+                    onClose={handleCloseDeviceDetail}
+                />
+            )}
         </div>
     );
 }

@@ -102,8 +102,7 @@ function DevicePlacementHandler({
             const offset = normal.clone().multiplyScalar(deviceDepth / 2 + 0.01);
             const position = point.clone().add(offset);
 
-            // 회전 계산: 면의 법선 벡터에 수직인 방향으로 기기를 배치
-            // 기기는 면에 평행하게 붙어야 하므로, 법선 벡터를 90도 회전시킨 방향
+            // 회전 계산: 면의 법선 벡터에 평행하게 기기를 배치
             // 법선 벡터의 X, Z 성분만 사용 (Y는 수직이므로 무시)
             const normalXZ = new THREE.Vector2(normal.x, normal.z);
             
@@ -114,12 +113,8 @@ function DevicePlacementHandler({
                 return;
             }
 
-            // 법선 벡터에 수직인 방향 계산 (90도 회전)
-            // 법선이 (1,0)이면 수직은 (0,1) 또는 (0,-1)
-            // atan2를 사용하여 법선의 각도를 구하고, 90도 더함
-            const normalAngle = Math.atan2(normalXZ.x, normalXZ.y);
-            // 법선에 수직인 방향 = 법선 각도 + 90도
-            const deviceAngle = normalAngle + Math.PI / 2;
+            // 법선 벡터의 방향으로 기기를 회전
+            const deviceAngle = Math.atan2(normalXZ.y, normalXZ.x);
             const finalRotation = new THREE.Euler(0, deviceAngle, 0);
 
             onPreviewPositionChange(position, finalRotation, true);
@@ -157,7 +152,7 @@ function DevicePlacementHandler({
                 const offset = normal.clone().multiplyScalar(deviceDepth / 2 + 0.01);
                 const position = point.clone().add(offset);
 
-                // 회전 계산: 면의 법선 벡터에 수직인 방향으로 기기를 배치
+                // 회전 계산: 면의 법선 벡터에 평행하게 기기를 배치
                 const normalXZ = new THREE.Vector2(normal.x, normal.z);
                 
                 // 법선 벡터가 거의 수직인 경우 처리
@@ -169,9 +164,8 @@ function DevicePlacementHandler({
                     return;
                 }
 
-                // 법선 벡터에 수직인 방향 계산
-                const normalAngle = Math.atan2(normalXZ.x, normalXZ.y);
-                const deviceAngle = normalAngle + Math.PI / 2;
+                // 법선 벡터의 방향으로 기기를 회전
+                const deviceAngle = Math.atan2(normalXZ.y, normalXZ.x);
                 const rotation = new THREE.Euler(0, deviceAngle, 0);
 
                 // 부착된 오브젝트 정보

@@ -1,10 +1,11 @@
-import { Canvas, useThree } from "@react-three/fiber";
+import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import warehouseData from "../../../data/warehouse-example.json";
 import * as THREE from "three";
-import { useMemo, useState, useEffect, useRef } from "react";
+import { useMemo, useState, useRef } from "react";
 import DevicePlacementHandler from "./DevicePlacementHandler";
 import DevicePreview from "./DevicePreview";
+import InstalledDevice from "./InstalledDevice";
 import { DeviceType } from "../../../types/device";
 function FloorGrid({
     length,
@@ -81,6 +82,7 @@ function ThreeDViewer({
     onCloseDeviceMode,
     installedDevices,
     onInstalledDevicesChange,
+    onDeviceClick,
 }: {
     centerX: number;
     centerZ: number;
@@ -91,6 +93,7 @@ function ThreeDViewer({
     onCloseDeviceMode: () => void;
     installedDevices: any[];
     onInstalledDevicesChange: (devices: any[]) => void;
+    onDeviceClick?: (device: any) => void;
 }) {
     // 미리보기 위치 및 회전
     const [previewPosition, setPreviewPosition] =
@@ -212,35 +215,17 @@ function ThreeDViewer({
                         isValid={isPreviewValid}
                     />
                 )}
+
                 {/* 설치된 디바이스들 */}
-                {installedDevices.map((device) => {
-                    return (
-                        <mesh
-                            key={device.id}
-                            position={[
-                                device.position.x,
-                                device.position.y,
-                                device.position.z,
-                            ]}
-                            rotation={[
-                                device.rotation?.x || 0,
-                                device.rotation?.y || 0,
-                                device.rotation?.z || 0,
-                            ]}
-                        >
-                            <boxGeometry
-                                args={[
-                                    defaultDeviceType.size.width,
-                                    defaultDeviceType.size.height,
-                                    defaultDeviceType.size.depth,
-                                ]}
-                            />
-                            <meshStandardMaterial
-                                color={defaultDeviceType.color}
-                            />
-                        </mesh>
-                    );
-                })}
+                {installedDevices.map((device) => (
+                    <InstalledDevice
+                        key={device.id}
+                        device={device}
+                        deviceType={defaultDeviceType}
+                        onClick={onDeviceClick}
+                    />
+                ))}
+				
                 {/* 바닥: JSON의 dimensions 사용 */}
                 <mesh
                     rotation={[-Math.PI / 2, 0, 0]}
