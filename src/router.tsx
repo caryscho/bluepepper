@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import Layout from "./components/Layout";
+import Layout from "./app/ui/Layout";
 import WarehousePage from "./pages/warehouse/ui/WarehousePage";
 
 function NotFoundPage() {

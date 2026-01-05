@@ -5,12 +5,15 @@ import TwoDViewer from "@/widgets/warehouse-viewer/ui/TwoDViewer";
 // model
 import { useWarehouseViewer } from "@/widgets/warehouse-viewer/model/useWarehouseViewer.ts";
 
-// components
-import DimContoller from "@/components/WarehouseViewer/DimContoller";
-import DeviceContoller from "@/components/WarehouseViewer/DeviceContoller.tsx";
-import DeviceSelector from "@/components/WarehouseViewer/3D/DeviceSelector";
-import DeviceList from "@/components/WarehouseViewer/3D/DeviceList.tsx";
-import DeviceDetailModal from "@/components/WarehouseViewer/3D/DeviceDetailModal";
+// features ui
+import DeviceList from "@/features/device-list/ui/DeviceList";
+import DeviceSelector from "@/features/device-placement/ui/DeviceSelector";
+
+// ui components
+import DimContoller from "@/widgets/warehouse-viewer/ui/DimContoller";
+import DeviceContoller from "@/widgets/warehouse-viewer/ui/DeviceContoller";
+
+import DeviceDetailModal from "@/features/device-detail/ui/DeviceDetailModal";
 
 const WarehouseViewer = () => {
     const {
@@ -40,7 +43,15 @@ const WarehouseViewer = () => {
 
     return (
         <div className="relative" style={{ width: "100%", height: "100vh" }}>
-            <DimContoller is2D={is2D} onToggleDimension={() => setIs2D(!is2D)} />
+            <DimContoller
+                is2D={is2D}
+                onToggleDimension={() => setIs2D(!is2D)}
+            />
+            <DeviceContoller
+                isAddDeviceMode={isAddDeviceMode}
+                onToggleAddDeviceMode={handleToggleAddDeviceMode}
+                onToggleDeviceListMode={handleToggleDeviceListMode}
+            />
             {is2D ? (
                 <TwoDViewer />
             ) : (
@@ -71,11 +82,7 @@ const WarehouseViewer = () => {
                     )}
                 />
             )}
-            <DeviceContoller
-                isAddDeviceMode={isAddDeviceMode}
-                onToggleAddDeviceMode={handleToggleAddDeviceMode}
-                onToggleDeviceListMode={handleToggleDeviceListMode}
-            />
+
             {/* CSS transition으로 fade in/out 애니메이션 - 항상 렌더링하여 exit 애니메이션 보장 */}
             <div
                 className={`absolute right-6 top-1/2 -translate-y-1/2 z-10 transition-all duration-300 ease-in-out ${

@@ -8,7 +8,7 @@ import DevicePlacementHandler from "@/features/device-placement";
 import InstalledDevice from "@/entity/device/ui/InstalledDevice";
 
 // components
-import DevicePreview from "@/components/WarehouseViewer/3D/DevicePreview";
+import DevicePreview from "@/features/device-placement/ui/DevicePreview";
 
 function FloorGrid({
     length,
