@@ -1,6 +1,6 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import Layout from "./components/Layout";
-import WarehouseViewer from "./pages/warehouse/ui/WarehousePage";
+import WarehousePage from "./pages/warehouse/ui/WarehousePage";
 
 function NotFoundPage() {
   return <div>404 - Page Not Found</div>;
@@ -21,7 +21,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "warehouse",
-        element: <WarehouseViewer />,
+        element: <WarehousePage />,
       },
       {
         path: 'yay',
