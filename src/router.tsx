@@ -1,6 +1,6 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import Layout from "./components/Layout";
-import WarehouseViewer from "./components/WarehouseViewer/index";
+import WarehouseViewer from "./pages/warehouse/ui/WarehousePage";
 
 function NotFoundPage() {
   return <div>404 - Page Not Found</div>;

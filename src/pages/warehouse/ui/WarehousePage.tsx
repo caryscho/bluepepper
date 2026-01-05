@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-import warehouseData from "../../data/warehouse-example.json";
-import Contoller from "./DimContoller";
-import ThreeDViewer from "./3D/index.tsx";
-import TwoDViewer from "./2D/index.tsx";
-import DeviceContoller from "./DeviceContoller.tsx";
-import DeviceSelector from "./3D/DeviceSelector";
-import DeviceList from "./3D/DeviceList.tsx";
-import DeviceDetailModal from "./3D/DeviceDetailModal";
+import warehouseData from "@/data/warehouse-example.json";
+import Contoller from "@/components/WarehouseViewer/DimContoller";
+import ThreeDViewer from "@/components/WarehouseViewer/3D/index.tsx";
+import TwoDViewer from "@/components/WarehouseViewer/2D/index.tsx";
+import DeviceContoller from "@/components/WarehouseViewer/DeviceContoller.tsx";
+import DeviceSelector from "@/components/WarehouseViewer/3D/DeviceSelector";
+import DeviceList from "@/components/WarehouseViewer/3D/DeviceList.tsx";
+import DeviceDetailModal from "@/components/WarehouseViewer/3D/DeviceDetailModal";
 
 function WarehouseViewer() {
     // 2차원 <-> 3차원 전환 상태
@@ -49,6 +49,27 @@ function WarehouseViewer() {
     const [selectedDevice, setSelectedDevice] = useState<any | null>(null);
     // 위치 변경 중인 디바이스 ID (null이면 새로 추가, 있으면 위치 변경)
     const [editingDeviceId, setEditingDeviceId] = useState<string | null>(null);
+
+    // Apidog Mock API 호출 예시
+    useEffect(() => {
+        const requestOptions = {
+            method: "GET",
+            redirect: "follow" as RequestRedirect,
+        };
+
+        fetch(
+            "http://127.0.0.1:3658/m1/1168288-1161801-1029717/device/1234567890/status",
+            requestOptions
+        )
+            .then((response) => response.json())
+            .then((result) => {
+                console.log("API 응답:", result);
+                // 여기서 result를 사용해서 installedDevices 업데이트
+                // setInstalledDevices(result);
+            })
+            .catch((error) => console.log("error", error));
+    }, []);
+
     // 모드 토글 핸들러
     const handleToggleAddDeviceMode = () => {
         // 리스트는 꺼버림
