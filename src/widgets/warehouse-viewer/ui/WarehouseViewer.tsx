@@ -8,12 +8,12 @@ import { useWarehouseViewer } from "@/widgets/warehouse-viewer/model/useWarehous
 // features ui
 import DeviceList from "@/features/device-list/ui/DeviceList";
 import DeviceSelector from "@/features/device-placement/ui/DeviceSelector";
+import DeviceDetailModal from "@/features/device-detail/ui/DeviceDetailModal";
 
 // ui components
 import DimContoller from "@/widgets/warehouse-viewer/ui/DimContoller";
 import DeviceContoller from "@/widgets/warehouse-viewer/ui/DeviceContoller";
 
-import DeviceDetailModal from "@/features/device-detail/ui/DeviceDetailModal";
 
 const WarehouseViewer = () => {
     const {
@@ -39,6 +39,7 @@ const WarehouseViewer = () => {
         handleDeviceHover,
         handleCloseDeviceDetail,
         handleChangePosition,
+        handleDeleteDevice,
     } = useWarehouseViewer();
 
     return (
@@ -102,6 +103,7 @@ const WarehouseViewer = () => {
                     device={selectedDevice}
                     onClose={handleCloseDeviceDetail}
                     onChangePosition={handleChangePosition}
+                    onDelete={handleDeleteDevice}
                 />
             )}
         </div>

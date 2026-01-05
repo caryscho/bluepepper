@@ -137,6 +137,15 @@ export function useWarehouseViewer() {
         setSelectedDevice(null);
     };
 
+    // 디바이스 삭제 핸들러
+    const handleDeleteDevice = (deviceId: string) => {
+        const updatedDevices = installedDevices.filter(
+            (device) => device.id !== deviceId
+        );
+        setInstalledDevices(updatedDevices);
+        setSelectedDevice(null); // 삭제 후 모달 닫기
+    };
+
     return {
         // 상태
         is2D,
@@ -162,6 +171,7 @@ export function useWarehouseViewer() {
         handleDeviceHover,
         handleCloseDeviceDetail,
         handleChangePosition,
+        handleDeleteDevice,
     };
 }
 

@@ -1,3 +1,5 @@
+import { CopyIcon } from "lucide-react";
+
 interface DeviceDetailModalProps {
     device: {
         id: string;
@@ -16,12 +18,14 @@ interface DeviceDetailModalProps {
     };
     onClose: () => void;
     onChangePosition: () => void;
+    onDelete?: (deviceId: string) => void;
 }
 
 export default function DeviceDetailModal({
     device,
     onClose,
     onChangePosition,
+    onDelete,
 }: DeviceDetailModalProps) {
     // 상태별 색상
     const getStatusColor = (status: string) => {
@@ -73,6 +77,16 @@ export default function DeviceDetailModal({
                         </label>
                         <p className="text-lg text-black">
                             {device.serialNumber}
+                            <button
+                                onClick={() => {
+                                    navigator.clipboard.writeText(
+                                        device.serialNumber
+                                    );
+                                }}
+                            >
+                                <CopyIcon className="w-4 h-4 text-gray-500" />{" "}
+                                {/* copy to clipboard */}
+                            </button>
                         </p>
                     </div>
 
@@ -148,6 +162,20 @@ export default function DeviceDetailModal({
                         <p className="text-sm text-gray-600">
                             {new Date(device.installedAt).toLocaleString()}
                         </p>
+                    </div>
+
+                    {/* button area */}
+                    <div className="flex justify-end">
+                        <button
+                            onClick={() => {
+                                if (onDelete) {
+                                    onDelete(device.id);
+                                }
+                            }}
+                            className="px-4 py-2 text-white bg-red-500 rounded-lg hover:bg-red-600"
+                        >
+                            이 디바이스를 제거합니다.
+                        </button>
                     </div>
                 </div>
             </div>
