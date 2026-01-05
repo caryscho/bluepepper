@@ -1,4 +1,5 @@
 import { useThree } from "@react-three/fiber";
+import { Edges } from "@react-three/drei";
 import * as THREE from "three";
 import { DeviceType } from "../../../types/device";
 import { useEffect, useRef, useState } from "react";
@@ -35,6 +36,20 @@ export default function InstalledDevice({
     const materialRef = useRef<THREE.MeshStandardMaterial>(null);
     const { raycaster, camera, gl } = useThree();
     const [isHovered, setIsHovered] = useState(false);
+
+    // 상태별 색상 결정 함수
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case "active":
+                return "#00FF00";
+            case "inactive":
+                return "#FF0000";
+            case "error":
+                return "#FF0000";
+            default:
+                return "#000000";
+        }
+    };
 
     // 호버 감지
     useEffect(() => {
@@ -86,18 +101,13 @@ export default function InstalledDevice({
         };
     }, [onClick, device, raycaster, camera, gl]);
 
-    // 호버 시 색상 변경 및 커서 스타일 변경
+    // 호버 시 커서 스타일 변경
     useEffect(() => {
-        if (materialRef.current) {
-            materialRef.current.color.set(
-                isHovered ? "#FF0000" : deviceType.color
-            );
-        }
-        // 호버 시 커서를 pointer로 변경
         if (gl.domElement) {
             gl.domElement.style.cursor = isHovered ? "pointer" : "default";
         }
-    }, [isHovered, deviceType.color, gl]);
+    }, [isHovered, gl]);
+
 
     return (
         <mesh
@@ -119,9 +129,16 @@ export default function InstalledDevice({
             />
             <meshStandardMaterial
                 ref={materialRef}
-                color={deviceType.color}
+                color={getStatusColor(device.status)}
             />
+            {/* 호버 시 파란색 보더 표시 */}
+            {isHovered && (
+                <Edges
+                    scale={1.01}
+                    threshold={15}
+                    color="#0066FF"
+                />
+            )}
         </mesh>
     );
 }
-
