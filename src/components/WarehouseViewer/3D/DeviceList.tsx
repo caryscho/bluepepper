@@ -4,7 +4,36 @@ interface DeviceListProps {
     onClose: () => void;
 }
 
-export default function DeviceList({ installedDevices, onClose }: DeviceListProps) {
+export default function DeviceList({
+    installedDevices,
+    onClose,
+}: DeviceListProps) {
+    // 상태별 색상
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case "active":
+                return "text-green-600 bg-green-50";
+            case "inactive":
+                return "text-yellow-600 bg-yellow-50";
+            case "error":
+                return "text-red-600 bg-red-50";
+            default:
+                return "text-gray-600 bg-gray-50";
+        }
+    };
+
+    const getStatusText = (status: string) => {
+        switch (status) {
+            case "active":
+                return "정상";
+            case "inactive":
+                return "경고";
+            case "error":
+                return "오류";
+            default:
+                return status;
+        }
+    };
     return (
         <div className="bg-white border shadow-lg rounded-lg p-4 w-[380px] max-h-[80vh] overflow-y-auto">
             <h3 className="mb-4 text-lg font-semibold text-black">
@@ -23,27 +52,45 @@ export default function DeviceList({ installedDevices, onClose }: DeviceListProp
                 <p className="text-sm text-gray-500">설치된 기기가 없습니다.</p>
             ) : (
                 <div className="space-y-2 cursor-pointer">
-                    <button onClick={onClose} className="absolute top-2 right-2">
+                    <button
+                        onClick={onClose}
+                        className="absolute top-2 right-2 bg-white"
+                    >
                         <X className="w-4 h-4 text-gray-500" />
                     </button>
                     {installedDevices.map((device) => (
                         <div
                             key={device.id}
-                            className="p-3 rounded-lg border hover:bg-gray-50"
+                            className="flex justify-between items-center p-3 rounded-lg border hover:bg-gray-50"
                         >
-                            <div className="font-medium text-black">
-                                {device.serialNumber}
+                            <div>
+                                <div className="font-medium text-black">
+                                    {device.serialNumber}
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                    {device.attachedTo === "wall"
+                                        ? "벽"
+                                        : device.attachedTo === "column"
+                                        ? "기둥"
+                                        : "바닥"}
+                                    ({device.attachedToId})
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                    {new Date(
+                                        device.installedAt
+                                    ).toLocaleString()}
+                                </div>
                             </div>
-                            <div className="text-sm text-gray-600">
-                                {device.attachedTo === "wall"
-                                    ? "벽"
-                                    : device.attachedTo === "column"
-                                    ? "기둥"
-                                    : "바닥"}
-                                ({device.attachedToId})
-                            </div>
-                            <div className="text-xs text-gray-500">
-                                {new Date(device.installedAt).toLocaleString()}
+                            <div>
+                                <div className="text-xs text-gray-500">
+                                    <span
+                                        className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
+                                            device.status
+                                        )}`}
+                                    >
+                                        {getStatusText(device.status)}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     ))}
