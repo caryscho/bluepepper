@@ -1,15 +1,15 @@
 import { List } from "lucide-react";
-interface ThreeDContollerProps {
+interface DeviceContollerProps {
     isAddDeviceMode: boolean;
     onToggleAddDeviceMode: () => void;
     onToggleDeviceListMode: () => void;
 }
 
-function ThreeDContoller({
+function DeviceContoller({
     isAddDeviceMode,
     onToggleAddDeviceMode,
     onToggleDeviceListMode,
-}: ThreeDContollerProps) {
+}: DeviceContollerProps) {
     return (
         <div className="flex absolute right-8 bottom-8 z-10 gap-4 p-2">
             <button
@@ -25,4 +25,4 @@ function ThreeDContoller({
     );
 }
 
-export default ThreeDContoller;
+export default DeviceContoller;

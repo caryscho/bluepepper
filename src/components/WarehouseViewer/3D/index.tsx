@@ -7,6 +7,7 @@ import DevicePlacementHandler from "./DevicePlacementHandler";
 import DevicePreview from "./DevicePreview";
 import InstalledDevice from "./InstalledDevice";
 import { DeviceType } from "../../../types/device";
+
 function FloorGrid({
     length,
     width,
@@ -83,6 +84,8 @@ function ThreeDViewer({
     installedDevices,
     onInstalledDevicesChange,
     onDeviceClick,
+    onDeviceHover,
+    hoveredDevice,
     editingDeviceId,
 }: {
     centerX: number;
@@ -95,6 +98,8 @@ function ThreeDViewer({
     installedDevices: any[];
     onInstalledDevicesChange: (devices: any[]) => void;
     onDeviceClick?: (device: any) => void;
+    onDeviceHover?: (device: any, isHovered: boolean) => void;
+    hoveredDevice?: any | null;
     editingDeviceId?: string | null;
 }) {
     // 미리보기 위치 및 회전
@@ -183,16 +188,6 @@ function ThreeDViewer({
 
     return (
         <div className="relative w-full h-full">
-            {/* <p className="absolute top-0 left-0 z-10 text-white">
-                {isAddDeviceMode
-                    ? "isAddDeviceMode is true"
-                    : "isAddDeviceMode is false"}
-                <br />
-                {!selectedDeviceSerialNumber
-                    ? "selectedDeviceSerialNumber is null"
-                    : `selectedDeviceSerialNumber is ${selectedDeviceSerialNumber}`}
-            </p> */}
-
             <Canvas
             // camera={{ position: [5, 5, 5], fov: 75 }}
             >
@@ -246,7 +241,6 @@ function ThreeDViewer({
                         isValid={isPreviewValid}
                     />
                 )}
-
                 {/* 설치된 디바이스들 */}
                 {installedDevices.map((device) => (
                     <InstalledDevice
@@ -254,9 +248,10 @@ function ThreeDViewer({
                         device={device}
                         deviceType={defaultDeviceType}
                         onClick={onDeviceClick}
+                        onDeviceHover={onDeviceHover}
+                        isHovered={hoveredDevice?.id === device.id}
                     />
                 ))}
-				
                 {/* 바닥: JSON의 dimensions 사용 */}
                 <mesh
                     rotation={[-Math.PI / 2, 0, 0]}

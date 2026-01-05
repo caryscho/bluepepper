@@ -1,15 +1,31 @@
 import { useState, useEffect } from "react";
 import warehouseData from "@/data/warehouse-example.json";
 
+/**
+ * 
+ *  warehouse model
+ * 상태값
+ * 핸들러 
+ * 훅 반환
+ */
+
 export function useWarehouseViewer() {
+    // 창고 사이즈 가져오기
+    const { length, width } = warehouseData.structure.dimensions;
+    // 바닥의 중심점 계산
+    const centerX = length / 2;
+    const centerZ = width / 2;
+
     // 2차원 <-> 3차원 전환 상태
     const [is2D, setIs2D] = useState(false);
-    // JSON에서 dimensions 가져오기
-    const { length, width } = warehouseData.structure.dimensions;
+
+    // 기기 추가 모드 상태
     const [isAddDeviceMode, setIsAddDeviceMode] = useState(false);
+
     // 선택된 디바이스 시리얼 넘버
     const [selectedDeviceSerialNumber, setSelectedDeviceSerialNumber] =
         useState<string | null>(null);
+
     // 설치된 디바이스 목록
     const [installedDevices, setInstalledDevices] = useState<any[]>([
         {
@@ -31,14 +47,17 @@ export function useWarehouseViewer() {
             status: "active",
         },
     ]);
-    // 바닥의 중심점 계산
-    const centerX = length / 2;
-    const centerZ = width / 2;
+    
 
     // 기기 목록 모드
     const [isDeviceListMode, setIsDeviceListMode] = useState(false);
+
+    // 호버된 디바이스
+    const [hoveredDevice, setHoveredDevice] = useState<any | null>(null);
+
     // 선택된 디바이스 (상세 정보 모달용)
     const [selectedDevice, setSelectedDevice] = useState<any | null>(null);
+    
     // 위치 변경 중인 디바이스 ID
     const [editingDeviceId, setEditingDeviceId] = useState<string | null>(null);
 
@@ -94,6 +113,16 @@ export function useWarehouseViewer() {
         setSelectedDevice(device);
     };
 
+    // 디바이스 호버 핸들러
+    const handleDeviceHover = (device: any, isHovered: boolean) => {
+        console.log("isHovered", isHovered);
+        if (isHovered) {
+            setHoveredDevice(device);
+        } else {
+            setHoveredDevice(null);
+        }
+    };
+
     // 디바이스 상세 모달 닫기
     const handleCloseDeviceDetail = () => {
         setSelectedDevice(null);
@@ -122,6 +151,7 @@ export function useWarehouseViewer() {
         setInstalledDevices,
         isDeviceListMode,
         selectedDevice,
+        hoveredDevice,
         editingDeviceId,
         // 핸들러
         handleToggleAddDeviceMode,
@@ -129,6 +159,7 @@ export function useWarehouseViewer() {
         handleCloseModal,
         handleToggleDeviceListMode,
         handleDeviceClick,
+        handleDeviceHover,
         handleCloseDeviceDetail,
         handleChangePosition,
     };
