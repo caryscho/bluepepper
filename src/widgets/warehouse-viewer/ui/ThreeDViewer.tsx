@@ -1,12 +1,14 @@
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
-import warehouseData from "../../../data/warehouse-example.json";
-import * as THREE from "three";
 import { useMemo, useState, useRef } from "react";
-import DevicePlacementHandler from "./DevicePlacementHandler";
-import DevicePreview from "./DevicePreview";
-import InstalledDevice from "./InstalledDevice";
-import { DeviceType } from "../../../types/device";
+import { Canvas } from "@react-three/fiber";
+import * as THREE from "three";
+import { DeviceType } from "@/types/device";
+import { OrbitControls } from "@react-three/drei";
+import warehouseData from "@/data/warehouse-example.json";
+import DevicePlacementHandler from "@/features/device-placement";
+import InstalledDevice from "@/entity/device/ui/InstalledDevice";
+
+// components
+import DevicePreview from "@/components/WarehouseViewer/3D/DevicePreview";
 
 function FloorGrid({
     length,
@@ -121,7 +123,7 @@ function ThreeDViewer({
         color: "#FF9800",
     };
 
-    // 디바이스 배치 핸들러
+    // 디바이스 배치 핸들러 - 실제로 디바이스 정보 업데이트 하는 함수
     const handlePlaceDevice = (
         position: THREE.Vector3,
         rotation: THREE.Euler,
@@ -188,9 +190,7 @@ function ThreeDViewer({
 
     return (
         <div className="relative w-full h-full">
-            <Canvas
-            // camera={{ position: [5, 5, 5], fov: 75 }}
-            >
+            <Canvas>
                 {/* 조명: 없으면 아무것도 안 보임! */}
                 <ambientLight intensity={1.2} />
                 <directionalLight position={[10, 10, 5]} intensity={1.5} />
@@ -211,35 +211,30 @@ function ThreeDViewer({
                     // - Shift + 왼쪽 버튼 드래그: Pan (이동)
                     // - 휠: 줌
                 />
-                {/* 키보드로 카메라 이동 (WASD 또는 화살표 키) */}
-                {/* {!isAddDeviceMode && (
-                    <KeyboardControls panSpeed={2.0} controlsRef={controlsRef} />
-                )} */}
-                {/* 디바이스 배치 핸들러 */}
+                {/* 디바이스 배치 핸들러 및 미리보기 */}
                 {isAddDeviceMode && selectedDeviceSerialNumber && (
-                    <DevicePlacementHandler
-                        isAddDeviceMode={isAddDeviceMode}
-                        selectedDeviceType={defaultDeviceType}
-                        onPlaceDevice={handlePlaceDevice}
-                        onPreviewPositionChange={(
-                            pos: THREE.Vector3 | null,
-                            rot: THREE.Euler | null,
-                            isValid: boolean
-                        ) => {
-                            setPreviewPosition(pos);
-                            setPreviewRotation(rot);
-                            setIsPreviewValid(isValid);
-                        }}
-                    />
-                )}
-                {/* 디바이스 미리보기 */}
-                {isAddDeviceMode && selectedDeviceSerialNumber && (
-                    <DevicePreview
-                        deviceType={defaultDeviceType}
-                        position={previewPosition}
-                        rotation={previewRotation}
-                        isValid={isPreviewValid}
-                    />
+                    <>
+                        <DevicePlacementHandler
+                            isAddDeviceMode={isAddDeviceMode}
+                            selectedDeviceType={defaultDeviceType}
+                            onPlaceDevice={handlePlaceDevice}
+                            onPreviewPositionChange={(
+                                pos: THREE.Vector3 | null,
+                                rot: THREE.Euler | null,
+                                isValid: boolean
+                            ) => {
+                                setPreviewPosition(pos);
+                                setPreviewRotation(rot);
+                                setIsPreviewValid(isValid);
+                            }}
+                        />
+                        <DevicePreview
+                            deviceType={defaultDeviceType}
+                            position={previewPosition}
+                            rotation={previewRotation}
+                            isValid={isPreviewValid}
+                        />
+                    </>
                 )}
                 {/* 설치된 디바이스들 */}
                 {installedDevices.map((device) => (

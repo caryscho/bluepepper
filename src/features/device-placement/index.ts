@@ -1,7 +1,7 @@
 import { useThree, useFrame } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { DeviceType } from "../../../types/device";
+import { DeviceType } from "@/types/device";
 
 interface DevicePlacementHandlerProps {
     isAddDeviceMode: boolean;

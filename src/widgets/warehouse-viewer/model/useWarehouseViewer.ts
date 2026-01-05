@@ -49,8 +49,8 @@ export function useWarehouseViewer() {
     ]);
     
 
-    // 기기 목록 모드
-    const [isDeviceListMode, setIsDeviceListMode] = useState(false);
+    // 기기 목록 표시 여부
+    const [showDeviceList, setShowDeviceList] = useState(false);
 
     // 호버된 디바이스
     const [hoveredDevice, setHoveredDevice] = useState<any | null>(null);
@@ -82,7 +82,7 @@ export function useWarehouseViewer() {
 
     // 모드 토글 핸들러
     const handleToggleAddDeviceMode = () => {
-        setIsDeviceListMode(false);
+        setShowDeviceList(false);
         if (isAddDeviceMode) {
             setSelectedDeviceSerialNumber(null);
         }
@@ -105,17 +105,17 @@ export function useWarehouseViewer() {
     };
 
     const handleToggleDeviceListMode = () => {
-        setIsDeviceListMode(!isDeviceListMode);
+        setShowDeviceList(!showDeviceList);
     };
 
     // 디바이스 클릭 핸들러
     const handleDeviceClick = (device: any) => {
         setSelectedDevice(device);
+        setHoveredDevice(null); // 클릭 시 hover 상태 해제
     };
 
     // 디바이스 호버 핸들러
     const handleDeviceHover = (device: any, isHovered: boolean) => {
-        console.log("isHovered", isHovered);
         if (isHovered) {
             setHoveredDevice(device);
         } else {
@@ -149,7 +149,7 @@ export function useWarehouseViewer() {
         selectedDeviceSerialNumber,
         installedDevices,
         setInstalledDevices,
-        isDeviceListMode,
+        showDeviceList,
         selectedDevice,
         hoveredDevice,
         editingDeviceId,

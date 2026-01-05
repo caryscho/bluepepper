@@ -1,7 +1,7 @@
 import { useThree } from "@react-three/fiber";
 import { Edges, Html } from "@react-three/drei";
 import * as THREE from "three";
-import { DeviceType } from "../../../types/device";
+import { DeviceType } from "@/types/device";
 import { useEffect, useRef, useState } from "react";
 
 interface InstalledDeviceProps {
@@ -85,6 +85,7 @@ export default function InstalledDevice({
     // 클릭 이벤트
     useEffect(() => {
         if (!onClick || !meshRef.current) return;
+        setIsHovered(false);
 
         const handleClick = (event: MouseEvent) => {
             // 마우스 위치를 정규화된 좌표로 변환

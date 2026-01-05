@@ -1,13 +1,16 @@
-import DimContoller from "@/components/WarehouseViewer/DimContoller";
-import ThreeDViewer from "@/components/WarehouseViewer/3D/index.tsx";
-import TwoDViewer from "@/components/WarehouseViewer/2D/index.tsx";
+// widgets ui
+import ThreeDViewer from "@/widgets/warehouse-viewer/ui/ThreeDViewer";
+import TwoDViewer from "@/widgets/warehouse-viewer/ui/TwoDViewer";
 
+// model
+import { useWarehouseViewer } from "@/widgets/warehouse-viewer/model/useWarehouseViewer.ts";
+
+// components
+import DimContoller from "@/components/WarehouseViewer/DimContoller";
 import DeviceContoller from "@/components/WarehouseViewer/DeviceContoller.tsx";
 import DeviceSelector from "@/components/WarehouseViewer/3D/DeviceSelector";
 import DeviceList from "@/components/WarehouseViewer/3D/DeviceList.tsx";
 import DeviceDetailModal from "@/components/WarehouseViewer/3D/DeviceDetailModal";
-
-import { useWarehouseViewer } from "@/widgets/warehouse-viewer/model/useWarehouseViewer.ts";
 
 const WarehouseViewer = () => {
     const {
@@ -21,7 +24,7 @@ const WarehouseViewer = () => {
         selectedDeviceSerialNumber,
         installedDevices,
         setInstalledDevices,
-        isDeviceListMode,
+        showDeviceList,
         selectedDevice,
         hoveredDevice,
         editingDeviceId,
@@ -34,6 +37,7 @@ const WarehouseViewer = () => {
         handleCloseDeviceDetail,
         handleChangePosition,
     } = useWarehouseViewer();
+
     return (
         <div className="relative" style={{ width: "100%", height: "100vh" }}>
             <DimContoller is2D={is2D} onToggleDimension={() => setIs2D(!is2D)} />
@@ -75,7 +79,7 @@ const WarehouseViewer = () => {
             {/* CSS transition으로 fade in/out 애니메이션 - 항상 렌더링하여 exit 애니메이션 보장 */}
             <div
                 className={`absolute right-6 top-1/2 -translate-y-1/2 z-10 transition-all duration-300 ease-in-out ${
-                    isDeviceListMode
+                    showDeviceList
                         ? "opacity-100 translate-x-0 pointer-events-auto"
                         : "opacity-0 translate-x-4 pointer-events-none"
                 }`}
