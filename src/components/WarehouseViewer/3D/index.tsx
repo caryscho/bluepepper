@@ -109,9 +109,9 @@ function ThreeDViewer({
 
     // 기본 디바이스 타입 (핸드폰 사이즈)
     const defaultDeviceType: DeviceType = {
-        id: "phone-device",
-        name: "온습도 센서",
-        model: "Phone Device",
+        id: "T200-001",
+        name: "T200",
+        model: "T200",
         size: { width: 0.3, height: 0.2, depth: 0.05 },
         color: "#FF9800",
     };
@@ -183,7 +183,7 @@ function ThreeDViewer({
 
     return (
         <div className="relative w-full h-full">
-            <p className="absolute top-0 left-0 z-10 text-white">
+            {/* <p className="absolute top-0 left-0 z-10 text-white">
                 {isAddDeviceMode
                     ? "isAddDeviceMode is true"
                     : "isAddDeviceMode is false"}
@@ -191,7 +191,7 @@ function ThreeDViewer({
                 {!selectedDeviceSerialNumber
                     ? "selectedDeviceSerialNumber is null"
                     : `selectedDeviceSerialNumber is ${selectedDeviceSerialNumber}`}
-            </p>
+            </p> */}
 
             <Canvas
             // camera={{ position: [5, 5, 5], fov: 75 }}
