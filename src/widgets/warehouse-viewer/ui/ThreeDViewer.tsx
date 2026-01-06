@@ -3,12 +3,15 @@ import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
 import { DeviceType } from "@/types/device";
 import { OrbitControls } from "@react-three/drei";
-import warehouseData from "@/data/warehouse-example.json";
 import DevicePlacementHandler from "@/features/device-placement";
 import InstalledDevice from "@/entity/device/ui/InstalledDevice";
 
+// 정적 데이터 => 이 창고의 정보를 가져왔다는 가정하게 앞으로 모든 것을 진행 하겠음
+import warehouseData from "@/data/warehouse-example.json";
+
 // components
 import DevicePreview from "@/features/device-placement/ui/DevicePreview";
+import { SearchIcon } from "lucide-react";
 
 function FloorGrid({
     length,
@@ -90,6 +93,7 @@ function ThreeDViewer({
     hoveredDevice,
     editingDeviceId,
     focusTarget,
+    getDeviceType,
 }: {
     centerX: number;
     centerZ: number;
@@ -105,6 +109,7 @@ function ThreeDViewer({
     hoveredDevice?: any | null;
     editingDeviceId?: string | null;
     focusTarget?: { x: number; y: number; z: number } | null;
+    getDeviceType?: (serialNumber: string) => DeviceType | null;
 }) {
     // 미리보기 위치 및 회전
     const [previewPosition, setPreviewPosition] =
@@ -126,12 +131,12 @@ function ThreeDViewer({
                 focusTarget.y,
                 focusTarget.z
             );
-            
+
             // OrbitControls의 target을 부드럽게 이동
             const animate = () => {
                 const currentTarget = controls.target;
                 const distance = currentTarget.distanceTo(target);
-                
+
                 if (distance > 0.01) {
                     // lerp를 사용하여 부드럽게 이동
                     currentTarget.lerp(target, 0.1);
@@ -143,19 +148,10 @@ function ThreeDViewer({
                     controls.update();
                 }
             };
-            
+
             animate();
         }
     }, [focusTarget]);
-
-    // 기본 디바이스 타입 (핸드폰 사이즈)
-    const defaultDeviceType: DeviceType = {
-        id: "T200-001",
-        name: "T200",
-        model: "T200",
-        size: { width: 0.3, height: 0.2, depth: 0.05 },
-        color: "#FF9800",
-    };
 
     // 디바이스 배치 핸들러 - 실제로 디바이스 정보 업데이트 하는 함수
     const handlePlaceDevice = (
@@ -223,7 +219,18 @@ function ThreeDViewer({
     };
 
     return (
-        <div className="relative w-full h-full">
+        <div className="relative flex-1 w-full h-full">
+            {/* device 검색 */}
+            <div className="flex overflow-hidden gap-1 bg-white rounded-lg w-[240px] absolute top-6 left-1/2 -translate-x-1/2 z-10 text-black">
+                <button className="text-black">
+                    <SearchIcon className="w-4 h-4" />
+                </button>
+                <input
+                    className="mr-2 bg-white outline-none grow focus:outline-none"
+                    type="text"
+                    placeholder="Device Serial Number"
+                />
+            </div>  
             <Canvas>
                 {/* 조명: 없으면 아무것도 안 보임! */}
                 <ambientLight intensity={1.2} />
@@ -246,41 +253,57 @@ function ThreeDViewer({
                     // - 휠: 줌
                 />
                 {/* 디바이스 배치 핸들러 및 미리보기 */}
-                {isAddDeviceMode && selectedDeviceSerialNumber && (
-                    <>
-                        <DevicePlacementHandler
-                            isAddDeviceMode={isAddDeviceMode}
-                            selectedDeviceType={defaultDeviceType}
-                            onPlaceDevice={handlePlaceDevice}
-                            onPreviewPositionChange={(
-                                pos: THREE.Vector3 | null,
-                                rot: THREE.Euler | null,
-                                isValid: boolean
-                            ) => {
-                                setPreviewPosition(pos);
-                                setPreviewRotation(rot);
-                                setIsPreviewValid(isValid);
-                            }}
-                        />
-                        <DevicePreview
-                            deviceType={defaultDeviceType}
-                            position={previewPosition}
-                            rotation={previewRotation}
-                            isValid={isPreviewValid}
-                        />
-                    </>
-                )}
+                {isAddDeviceMode &&
+                    selectedDeviceSerialNumber &&
+                    getDeviceType &&
+                    (() => {
+                        const deviceType = getDeviceType(
+                            selectedDeviceSerialNumber
+                        );
+                        if (!deviceType) return null;
+
+                        return (
+                            <>
+                                <DevicePlacementHandler
+                                    isAddDeviceMode={isAddDeviceMode}
+                                    selectedDeviceType={deviceType}
+                                    onPlaceDevice={handlePlaceDevice}
+                                    onPreviewPositionChange={(
+                                        pos: THREE.Vector3 | null,
+                                        rot: THREE.Euler | null,
+                                        isValid: boolean
+                                    ) => {
+                                        setPreviewPosition(pos);
+                                        setPreviewRotation(rot);
+                                        setIsPreviewValid(isValid);
+                                    }}
+                                />
+                                <DevicePreview
+                                    deviceType={deviceType}
+                                    position={previewPosition}
+                                    rotation={previewRotation}
+                                    isValid={isPreviewValid}
+                                />
+                            </>
+                        );
+                    })()}
                 {/* 설치된 디바이스들 */}
-                {installedDevices.map((device) => (
-                    <InstalledDevice
-                        key={device.id}
-                        device={device}
-                        deviceType={defaultDeviceType}
-                        onClick={onDeviceClick}
-                        onDeviceHover={onDeviceHover}
-                        isHovered={hoveredDevice?.id === device.id}
-                    />
-                ))}
+                {installedDevices.map((device) => {
+                    const deviceType =
+                        getDeviceType?.(device.serialNumber) || null;
+                    if (!deviceType) return null;
+
+                    return (
+                        <InstalledDevice
+                            key={device.id}
+                            device={device}
+                            deviceType={deviceType}
+                            onClick={onDeviceClick}
+                            onDeviceHover={onDeviceHover}
+                            isHovered={hoveredDevice?.id === device.id}
+                        />
+                    );
+                })}
                 {/* 바닥: JSON의 dimensions 사용 */}
                 <mesh
                     rotation={[-Math.PI / 2, 0, 0]}
@@ -289,6 +312,7 @@ function ThreeDViewer({
                     <planeGeometry args={[length, width]} />
                     <meshStandardMaterial color="#cccccc" />
                 </mesh>
+                {/* 창고 데이터 MESH RENDERING */}
                 {/* 기둥들 (Columns) */}
                 {warehouseData.structure.columns.map((column) => (
                     <mesh

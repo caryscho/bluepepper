@@ -29,12 +29,30 @@ export function useWarehouseViewer() {
     // 설치된 디바이스 목록
     const [installedDevices, setInstalledDevices] = useState<any[]>([
         {
-            id: "device-1767337870239",
+            id: "device-52751318",
             serialNumber: "52751318(T70)",
             position: {
                 x: 29.526240007844812,
                 y: 8.14631127217582,
                 z: 25.017180901645762,
+            },
+            rotation: {
+                x: 0,
+                y: Math.PI / 2,
+                z: Math.PI / 2,
+            },
+            attachedTo: "column",
+            attachedToId: "col-10",
+            installedAt: "2026-01-02T07:11:10.239Z",
+            status: "active",
+        },
+        {
+            id: "device-01234567",
+            serialNumber: "01234567(T70)",
+            position: {
+                x: 19.520860339199963,
+                y: 9.133884921529493,
+                z: 24.916233830056985,
             },
             rotation: {
                 x: 0,
