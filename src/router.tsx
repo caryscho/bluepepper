@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import Layout from "./app/ui/Layout";
 import WarehousePage from "./pages/warehouse/ui/WarehousePage";
+import DiviceModel from "./entity/device/ui/DiviceModel";
 
 function NotFoundPage() {
   return <div>404 - Page Not Found</div>;
@@ -24,8 +25,8 @@ export const router = createBrowserRouter([
         element: <WarehousePage />,
       },
       {
-        path: 'yay',
-        element: <HomePage/>
+        path: 'divice-model',
+        element: <DiviceModel/>
       },
       {
         path: "*",
