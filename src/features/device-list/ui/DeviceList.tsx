@@ -2,11 +2,13 @@ import { X } from "lucide-react";
 interface DeviceListProps {
     installedDevices: any[];
     onClose: () => void;
+    onFocusDevice?: (deviceId: string) => void;
 }
 
 export default function DeviceList({
     installedDevices,
     onClose,
+    onFocusDevice,
 }: DeviceListProps) {
     // 상태별 색상
     const getStatusColor = (status: string) => {
@@ -32,6 +34,11 @@ export default function DeviceList({
                 return "오류";
             default:
                 return status;
+        }
+    };
+    const focusDevice = (deviceId: string) => {
+        if (onFocusDevice) {
+            onFocusDevice(deviceId);
         }
     };
     return (
@@ -62,6 +69,7 @@ export default function DeviceList({
                         <div
                             key={device.id}
                             className="flex justify-between items-center p-3 rounded-lg border hover:bg-gray-50"
+                            onClick={() => focusDevice(device.id)}
                         >
                             <div>
                                 <div className="font-medium text-black">

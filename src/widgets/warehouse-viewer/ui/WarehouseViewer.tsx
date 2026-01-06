@@ -31,6 +31,7 @@ const WarehouseViewer = () => {
         selectedDevice,
         hoveredDevice,
         editingDeviceId,
+        focusTarget,
         handleToggleAddDeviceMode,
         handleSelectDevice,
         handleCloseModal,
@@ -40,6 +41,7 @@ const WarehouseViewer = () => {
         handleCloseDeviceDetail,
         handleChangePosition,
         handleDeleteDevice,
+        handleFocusDevice,
     } = useWarehouseViewer();
 
     return (
@@ -70,6 +72,7 @@ const WarehouseViewer = () => {
                     onDeviceHover={handleDeviceHover}
                     hoveredDevice={hoveredDevice}
                     editingDeviceId={editingDeviceId}
+                    focusTarget={focusTarget}
                 />
             )}
             {/* 기기 선택 모달 */}
@@ -95,6 +98,7 @@ const WarehouseViewer = () => {
                 <DeviceList
                     installedDevices={installedDevices}
                     onClose={handleToggleDeviceListMode}
+                    onFocusDevice={handleFocusDevice}
                 />
             </div>
             {/* 디바이스 상세 정보 모달 */}

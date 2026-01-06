@@ -61,6 +61,13 @@ export function useWarehouseViewer() {
     // 위치 변경 중인 디바이스 ID
     const [editingDeviceId, setEditingDeviceId] = useState<string | null>(null);
 
+    // 포커스할 디바이스 위치 (카메라 이동용)
+    const [focusTarget, setFocusTarget] = useState<{
+        x: number;
+        y: number;
+        z: number;
+    } | null>(null);
+
     // Apidog Mock API 호출 예시
     useEffect(() => {
         const requestOptions = {
@@ -146,6 +153,18 @@ export function useWarehouseViewer() {
         setSelectedDevice(null); // 삭제 후 모달 닫기
     };
 
+    // 디바이스 포커스 핸들러 (카메라를 해당 디바이스 위치로 이동)
+    const handleFocusDevice = (deviceId: string) => {
+        const device = installedDevices.find((d) => d.id === deviceId);
+        if (device && device.position) {
+            setFocusTarget({
+                x: device.position.x,
+                y: device.position.y,
+                z: device.position.z,
+            });
+        }
+    };
+
     return {
         // 상태
         is2D,
@@ -162,6 +181,7 @@ export function useWarehouseViewer() {
         selectedDevice,
         hoveredDevice,
         editingDeviceId,
+        focusTarget,
         // 핸들러
         handleToggleAddDeviceMode,
         handleSelectDevice,
@@ -172,6 +192,7 @@ export function useWarehouseViewer() {
         handleCloseDeviceDetail,
         handleChangePosition,
         handleDeleteDevice,
+        handleFocusDevice,
     };
 }
 
