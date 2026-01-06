@@ -1,3 +1,3 @@
-export { default as WarehouseViewer } from "./ui/WarehouseViewer";
+export { default as WarehouseViewer } from "./ui";
 export { useWarehouseViewer } from "./model/useWarehouseViewer";
 

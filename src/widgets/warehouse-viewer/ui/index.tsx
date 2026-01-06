@@ -17,7 +17,6 @@ import DeviceContoller from "@/widgets/warehouse-viewer/ui/DeviceContoller";
 // types
 import { DeviceType } from "@/types/device";
 
-
 const WarehouseViewer = () => {
     const {
         is2D,
@@ -52,7 +51,7 @@ const WarehouseViewer = () => {
         // 임시 구현: serialNumber를 기반으로 deviceType을 반환
         // 실제로는 API나 메타정보 서비스에서 가져와야 함
         // 예: return deviceMetadataService.getDeviceType(serialNumber);
-        
+
         // 기본값 반환 (나중에 실제 구현으로 교체)
         return {
             id: "T200-001",
@@ -64,7 +63,7 @@ const WarehouseViewer = () => {
     };
 
     return (
-        <div className="relative" style={{ width: "100%", height: "100vh" }}>
+        <div className="relative" style={{ width: "100%", height: "calc(100vh - 56px)" }}>
             <DimContoller
                 is2D={is2D}
                 onToggleDimension={() => setIs2D(!is2D)}
@@ -75,7 +74,10 @@ const WarehouseViewer = () => {
                 onToggleDeviceListMode={handleToggleDeviceListMode}
             />
             {is2D ? (
-                <TwoDViewer />
+                <TwoDViewer
+                    installedDevices={installedDevices}
+                    getDeviceType={getDeviceType}
+                />
             ) : (
                 <ThreeDViewer
                     centerX={centerX}

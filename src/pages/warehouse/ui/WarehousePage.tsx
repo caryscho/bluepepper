@@ -1,4 +1,4 @@
-import WarehouseViewer from "@/widgets/warehouse-viewer/ui/WarehouseViewer";
+import WarehouseViewer from "@/widgets/warehouse-viewer/ui";
 
 function WarehousePage() {
     return <WarehouseViewer />;

@@ -3,6 +3,7 @@ import { Canvas, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { OrbitControls } from "@react-three/drei";
 import warehouseData from "@/data/warehouse-example.json";
+import { DeviceType } from "@/types/device";
 
 // 2D 그리드 컴포넌트
 function FloorGrid2D({
@@ -89,7 +90,64 @@ function CameraLock() {
     return null;
 }
 
-function TwoDViewer() {
+// 2D 디바이스 마커 컴포넌트 (삼각형 마커)
+function Device2D({
+    device,
+    deviceType,
+}: {
+    device: any;
+    deviceType: DeviceType;
+}) {
+    // 3D 위치를 2D로 변환: x, z는 그대로 사용, y는 0.05로 고정 (눈에 잘 보이도록)
+    const position = [device.position.x, 0.05, device.position.z] as [
+        number,
+        number,
+        number
+    ];
+
+    // 상태별 색상 (빨강/파랑)
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case "active":
+                return "#3b82f6"; // 파란색
+            case "inactive":
+                return "#f59e0b"; // 노란색
+            case "error":
+                return "#ef4444"; // 빨간색
+            default:
+                return "#6b7280"; // 회색
+        }
+    };
+
+    // 마커 크기 (눈에 잘 보이는 크기로 설정)
+    const markerSize = 1.0; // 1미터 크기로 충분히 크게
+    const markerHeight = 0.5; // 삼각형 높이
+
+    // 회전 각도 (디바이스의 방향에 따라)
+    const rotationY = device.rotation?.y || 0;
+
+    return (
+        <group position={position} rotation={[0, rotationY, 0]}>
+            {/* 바닥 원  */}
+            <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+                <circleGeometry args={[markerSize / 2, 32]} />
+                <meshStandardMaterial
+                    color={getStatusColor(device.status)}
+                    opacity={1}
+                    transparent
+                />
+            </mesh>
+        </group>
+    );
+}
+
+function TwoDViewer({
+    installedDevices,
+    getDeviceType,
+}: {
+    installedDevices: any[];
+    getDeviceType?: (serialNumber: string) => DeviceType | null;
+}) {
     const { length, width } = warehouseData.structure.dimensions;
     const centerX = length / 2;
     const centerZ = width / 2;
@@ -124,7 +182,7 @@ function TwoDViewer() {
                     position={[centerX, 0, centerZ]}
                 >
                     <planeGeometry args={[length, width]} />
-                    <meshStandardMaterial color="#f3f4f6" />
+                    <meshBasicMaterial color={new THREE.Color("#fd9890")} />
                 </mesh>
 
                 {/* 그리드 */}
@@ -276,6 +334,20 @@ function TwoDViewer() {
                                 transparent
                             />
                         </mesh>
+                    );
+                })}
+
+                {/* 설치된 디바이스들 (2D 뷰) */}
+                {installedDevices.map((device) => {
+                    const deviceType = getDeviceType?.(device.serialNumber) || null;
+                    if (!deviceType) return null;
+
+                    return (
+                        <Device2D
+                            key={device.id}
+                            device={device}
+                            deviceType={deviceType}
+                        />
                     );
                 })}
             </Canvas>

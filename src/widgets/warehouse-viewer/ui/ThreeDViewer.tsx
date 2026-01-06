@@ -219,7 +219,7 @@ function ThreeDViewer({
     };
 
     return (
-        <div className="relative flex-1 w-full h-full">
+        <div className="relative flex-1 w-full h-full bg-[#EFEFEF] overflow-hidden">
             {/* device 검색 */}
             <div className="flex overflow-hidden gap-1 bg-white rounded-lg w-[240px] absolute top-6 left-1/2 -translate-x-1/2 z-10 text-black">
                 <button className="text-black">
