@@ -22,6 +22,8 @@ interface InstalledDeviceProps {
         attachedToId?: string;
         installedAt: Date | string;
         status: "active" | "inactive" | "error";
+        temperature?: number;
+        humidity?: number;
     };
     deviceType: DeviceType;
     onClick?: (device: InstalledDeviceProps["device"]) => void;
@@ -167,10 +169,10 @@ export default function InstalledDevice({
                             {device.serialNumber}
                         </div>
                         <div className="mt-1 text-xs text-gray-600">
-                            온도: {device.temperature !== undefined ? `${device.temperature}°C` : "N/A"}
+                            온도: {device?.temperature !== undefined ? `${device?.temperature}°C` : "N/A"}
                         </div>
                         <div className="text-xs text-gray-600">
-                            습도: {device.humidity !== undefined ? `${device.humidity}%` : "N/A"}
+                            습도: {device?.humidity !== undefined ? `${device?.humidity}%` : "N/A"}
                         </div>
                     </div>
                 </Html>

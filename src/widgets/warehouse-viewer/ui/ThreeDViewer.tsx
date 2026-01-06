@@ -1,5 +1,5 @@
 import { useMemo, useState, useRef, useEffect } from "react";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { DeviceType } from "@/types/device";
 import { OrbitControls } from "@react-three/drei";
@@ -12,6 +12,24 @@ import warehouseData from "@/data/warehouse-example.json";
 // components
 import DevicePreview from "@/features/device-placement/ui/DevicePreview";
 import { SearchIcon } from "lucide-react";
+
+interface ThreeDViewerProps {
+    centerX: number;
+    centerZ: number;
+    length: number;
+    width: number;
+    isAddDeviceMode: boolean;
+    selectedDeviceSerialNumber: string | null;
+    onCloseDeviceMode: () => void;
+    installedDevices: any[];
+    onInstalledDevicesChange: (devices: any[]) => void;
+    onDeviceClick?: (device: any) => void;
+    onDeviceHover?: (device: any, isHovered: boolean) => void;
+    hoveredDevice?: any | null;
+    editingDeviceId?: string | null;
+    focusTarget?: { x: number; y: number; z: number } | null;
+    getDeviceType?: (serialNumber: string) => DeviceType | null;
+}
 
 function FloorGrid({
     length,
@@ -78,6 +96,92 @@ function FloorGrid({
     );
 }
 
+// 초기 카메라 설정 컴포넌트 (위에서 내려다보는 각도로 강제 설정)
+function InitialCameraSetup({
+    controlsRef,
+    centerX,
+    centerZ,
+    cameraHeight,
+}: {
+    controlsRef: React.RefObject<any>;
+    centerX: number;
+    centerZ: number;
+    cameraHeight: number;
+}) {
+    const { camera } = useThree();
+    const initialized = useRef(false);
+
+    useFrame(() => {
+        if (initialized.current) return;
+        if (!controlsRef.current) return;
+
+        const controls = controlsRef.current;
+        
+        // OrbitControls의 타겟 설정
+        controls.target.set(centerX, 0, centerZ);
+        
+        // 카메라 위치를 위쪽에 설정
+        camera.position.set(centerX, cameraHeight, centerZ);
+        
+        // 카메라가 정확히 아래를 보도록 설정 (Rotation: -90°, 0°, 0°)
+        camera.lookAt(centerX, 0, centerZ);
+        
+        // OrbitControls 업데이트
+        controls.update();
+        
+        initialized.current = true;
+    });
+
+    return null;
+}
+
+// 카메라 디버그 정보 컴포넌트
+function CameraDebugInfo({
+    controlsRef,
+    onUpdate,
+}: {
+    controlsRef: React.RefObject<any>;
+    onUpdate: (info: {
+        position: { x: number; y: number; z: number };
+        rotation: { x: number; y: number; z: number };
+        target: { x: number; y: number; z: number };
+        fov: number;
+    }) => void;
+}) {
+    const { camera } = useThree();
+
+    useFrame(() => {
+        if (!controlsRef.current) return;
+
+        const controls = controlsRef.current;
+        const position = camera.position;
+        const rotation = camera.rotation;
+        const target = controls.target || new THREE.Vector3(0, 0, 0);
+        const fov = (camera as THREE.PerspectiveCamera).fov || 0;
+
+        onUpdate({
+            position: {
+                x: Math.round(position.x * 100) / 100,
+                y: Math.round(position.y * 100) / 100,
+                z: Math.round(position.z * 100) / 100,
+            },
+            rotation: {
+                x: Math.round((rotation.x * 180) / Math.PI * 100) / 100,
+                y: Math.round((rotation.y * 180) / Math.PI * 100) / 100,
+                z: Math.round((rotation.z * 180) / Math.PI * 100) / 100,
+            },
+            target: {
+                x: Math.round(target.x * 100) / 100,
+                y: Math.round(target.y * 100) / 100,
+                z: Math.round(target.z * 100) / 100,
+            },
+            fov: Math.round(fov * 100) / 100,
+        });
+    });
+
+    return null;
+}
+
 function ThreeDViewer({
     centerX,
     centerZ,
@@ -94,23 +198,7 @@ function ThreeDViewer({
     editingDeviceId,
     focusTarget,
     getDeviceType,
-}: {
-    centerX: number;
-    centerZ: number;
-    length: number;
-    width: number;
-    isAddDeviceMode: boolean;
-    selectedDeviceSerialNumber: string | null;
-    onCloseDeviceMode: () => void;
-    installedDevices: any[];
-    onInstalledDevicesChange: (devices: any[]) => void;
-    onDeviceClick?: (device: any) => void;
-    onDeviceHover?: (device: any, isHovered: boolean) => void;
-    hoveredDevice?: any | null;
-    editingDeviceId?: string | null;
-    focusTarget?: { x: number; y: number; z: number } | null;
-    getDeviceType?: (serialNumber: string) => DeviceType | null;
-}) {
+}: ThreeDViewerProps) {
     // 미리보기 위치 및 회전
     const [previewPosition, setPreviewPosition] =
         useState<THREE.Vector3 | null>(null);
@@ -120,6 +208,16 @@ function ThreeDViewer({
     const [isPreviewValid, setIsPreviewValid] = useState(false);
     // OrbitControls ref
     const controlsRef = useRef<any>(null);
+    // 카메라 디버그 정보 상태
+    const [cameraDebug, setCameraDebug] = useState<{
+        position: { x: number; y: number; z: number };
+        rotation: { x: number; y: number; z: number };
+        target: { x: number; y: number; z: number };
+        fov: number;
+    } | null>(null);
+
+    // 카메라 높이 계산
+    const cameraHeight = useMemo(() => Math.max(length, width) * 1.5, [length, width]);
 
     // focusTarget이 변경되면 카메라를 해당 위치로 이동
     useEffect(() => {
@@ -220,6 +318,16 @@ function ThreeDViewer({
 
     return (
         <div className="relative flex-1 w-full h-full bg-[#EFEFEF] overflow-hidden">
+            {/* 카메라 디버그 정보 */}
+            {cameraDebug && (
+                <div className="absolute top-6 right-6 z-20 p-4 font-mono text-xs text-white rounded-lg bg-black/80 w-[300px]">
+                    <p className="mb-2 font-bold">Camera Debug Info</p>
+                    <p>Position: ({cameraDebug.position.x}, {cameraDebug.position.y}, {cameraDebug.position.z})</p>
+                    <p>Rotation: ({cameraDebug.rotation.x}°, {cameraDebug.rotation.y}°, {cameraDebug.rotation.z}°)</p>
+                    <p>Target: ({cameraDebug.target.x}, {cameraDebug.target.y}, {cameraDebug.target.z})</p>
+                    <p>FOV: {cameraDebug.fov}°</p>
+                </div>
+            )}
             {/* device 검색 */}
             <div className="flex overflow-hidden gap-1 bg-white rounded-lg w-[240px] absolute top-6 left-1/2 -translate-x-1/2 z-10 text-black">
                 <button className="text-black">
@@ -231,7 +339,12 @@ function ThreeDViewer({
                     placeholder="Device Serial Number"
                 />
             </div>  
-            <Canvas>
+            <Canvas
+                camera={{
+                    position: [centerX, Math.max(length, width) * 1.5, centerZ],
+                    fov: 50,
+                }}
+            >
                 {/* 조명: 없으면 아무것도 안 보임! */}
                 <ambientLight intensity={1.2} />
                 <directionalLight position={[10, 10, 5]} intensity={1.5} />
@@ -252,6 +365,13 @@ function ThreeDViewer({
                     // - Shift + 왼쪽 버튼 드래그: Pan (이동)
                     // - 휠: 줌
                 />
+                <InitialCameraSetup
+                    controlsRef={controlsRef}
+                    centerX={centerX}
+                    centerZ={centerZ}
+                    cameraHeight={cameraHeight}
+                />
+                <CameraDebugInfo controlsRef={controlsRef} onUpdate={setCameraDebug} />
                 {/* 디바이스 배치 핸들러 및 미리보기 */}
                 {isAddDeviceMode &&
                     selectedDeviceSerialNumber &&
