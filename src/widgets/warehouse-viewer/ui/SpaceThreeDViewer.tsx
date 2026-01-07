@@ -5,6 +5,7 @@ import { OrbitControls } from "@react-three/drei";
 
 import DevicePlacementHandler from "@/features/device-placement";
 import InstalledDevice from "@/entity/device/ui/InstalledDevice";
+import { Wall } from "@/types/warehouse";
 
 // 정적 데이터 => 이 창고의 정보를 가져왔다는 가정하게 앞으로 모든 것을 진행 하겠음
 import warehouseData from "@/data/warehouse-example.json";
@@ -14,7 +15,7 @@ import warehouseData from "@/data/warehouse-example.json";
 import DevicePreview from "@/features/device-placement/ui/DevicePreview";
 import { SearchIcon } from "lucide-react";
 // 구조물
-import { Column } from "./structures";
+import { Column, Human, Walls } from "./structures";
 
 interface ThreeDViewerProps {
     centerX: number;
@@ -448,35 +449,14 @@ function SpaceThreeDViewer({
                 ))}
                 {/* 벽 */}
                 {warehouseData.structure.walls.map((wall) => {
-                    const dx = wall.end[0] - wall.start[0];
-                    const dz = wall.end[1] - wall.start[1];
-                    const wallLength = Math.sqrt(dx * dx + dz * dz);
-                    const angle = Math.atan2(dz, dx);
-                    const centerX = (wall.start[0] + wall.end[0]) / 2;
-                    const centerZ = (wall.start[1] + wall.end[1]) / 2;
-                    const centerY = wall.height / 2;
-
-                    return (
-                        <mesh
-                            key={wall.id}
-                            position={[centerX, centerY, centerZ]}
-                            rotation={[0, angle, 0]}
-                            userData={{ type: "wall", id: wall.id }}
-                            renderOrder={0}
-                        >
-                            <boxGeometry
-                                args={[wallLength, wall.height, wall.thickness]}
-                            />
-                            <meshStandardMaterial
-                                color={
-                                    wall.type === "exterior"
-                                        ? "#EFEFEF"
-                                        : "#999999"
-                                }
-                                depthWrite={true}
-                            />
-                        </mesh>
-                    );
+                    // 타입 변환: number[]를 [number, number]로, type을 올바른 타입으로
+                    const wallWithTuple: Wall = {
+                        ...wall,
+                        start: [wall.start[0], wall.start[1]] as [number, number],
+                        end: [wall.end[0], wall.end[1]] as [number, number],
+                        type: wall.type as "exterior" | "interior",
+                    };
+                    return <Walls key={wall.id} wall={wallWithTuple} />;
                 })}
                 {/* 문 */}
                 {warehouseData.structure.doors.map((door) => {
@@ -489,7 +469,6 @@ function SpaceThreeDViewer({
                     // 벽의 방향 벡터 계산
                     const dx = wall.end[0] - wall.start[0];
                     const dz = wall.end[1] - wall.start[1];
-                    const wallLength = Math.sqrt(dx * dx + dz * dz);
                     const angle = Math.atan2(dz, dx);
 
                     // 문의 위치 계산 (벽을 따라 position(0-1)을 실제 좌표로 변환)
@@ -531,112 +510,15 @@ function SpaceThreeDViewer({
                     );
                     if (!wall) return null;
 
-                    const dx = wall.end[0] - wall.start[0];
-                    const dz = wall.end[1] - wall.start[1];
-                    const angle = Math.atan2(dz, dx);
+                    // 타입 변환: number[]를 [number, number]로, type을 올바른 타입으로
+                    const wallWithTuple: Wall = {
+                        ...wall,
+                        start: [wall.start[0], wall.start[1]] as [number, number],
+                        end: [wall.end[0], wall.end[1]] as [number, number],
+                        type: wall.type as "exterior" | "interior",
+                    };
 
-                    // 문의 위치 계산
-                    const doorX =
-                        wall.start[0] +
-                        (wall.end[0] - wall.start[0]) * firstDoor.position;
-                    const doorZ =
-                        wall.start[1] +
-                        (wall.end[1] - wall.start[1]) * firstDoor.position;
-
-                    // 벽의 두께를 고려한 문의 위치
-                    const offsetDistance = wall.thickness / 2 + 0.01;
-                    const offsetX =
-                        Math.cos(angle + Math.PI / 2) * offsetDistance;
-                    const offsetZ =
-                        Math.sin(angle + Math.PI / 2) * offsetDistance;
-
-                    // 문 앞에 사람 배치 (문에서 1.5m 떨어진 위치)
-                    const personDistance = 1.5;
-                    const personOffsetX =
-                        Math.cos(angle + Math.PI / 2) * personDistance;
-                    const personOffsetZ =
-                        Math.sin(angle + Math.PI / 2) * personDistance;
-
-                    // 두 명의 사람 (1.8m와 1.6m, 몸통+머리 합쳐서)
-                    const headHeight = 0.2; // 머리 높이
-                    const people = [
-                        {
-                            totalHeight: 1.8,
-                            bodyHeight: 1.8 - headHeight,
-                            offset: -0.8,
-                        }, // 왼쪽
-                        {
-                            totalHeight: 1.6,
-                            bodyHeight: 1.6 - headHeight,
-                            offset: 0.8,
-                        }, // 오른쪽
-                    ];
-
-                    return (
-                        <group>
-                            {people.map((person, index) => {
-                                // 사람을 나란히 배치 (문의 방향에 수직으로)
-                                const sideOffsetX =
-                                    Math.cos(angle) * person.offset;
-                                const sideOffsetZ =
-                                    Math.sin(angle) * person.offset;
-
-                                return (
-                                    <group
-                                        key={`person-${index}`}
-                                        position={[
-                                            doorX +
-                                                offsetX +
-                                                personOffsetX +
-                                                sideOffsetX,
-                                            person.totalHeight / 2,
-                                            doorZ +
-                                                offsetZ +
-                                                personOffsetZ +
-                                                sideOffsetZ,
-                                        ]}
-                                        rotation={[0, angle + Math.PI / 2, 0]}
-                                    >
-                                        {/* 몸통 */}
-                                        <mesh
-                                            position={[
-                                                0,
-                                                -(
-                                                    person.totalHeight -
-                                                    person.bodyHeight
-                                                ) / 2,
-                                                0,
-                                            ]}
-                                        >
-                                            <cylinderGeometry
-                                                args={[
-                                                    0.2,
-                                                    0.2,
-                                                    person.bodyHeight,
-                                                    16,
-                                                ]}
-                                            />
-                                            <meshStandardMaterial color="#FFDBAC" />
-                                        </mesh>
-                                        {/* 머리 */}
-                                        <mesh
-                                            position={[
-                                                0,
-                                                person.bodyHeight / 2 +
-                                                    headHeight / 2,
-                                                0,
-                                            ]}
-                                        >
-                                            <sphereGeometry
-                                                args={[0.15, 16, 16]}
-                                            />
-                                            <meshStandardMaterial color="#FFDBAC" />
-                                        </mesh>
-                                    </group>
-                                );
-                            })}
-                        </group>
-                    );
+                    return <Human door={firstDoor} wall={wallWithTuple} />;
                 })()}
             </Canvas>
         </div>
