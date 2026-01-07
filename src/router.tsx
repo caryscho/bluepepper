@@ -23,10 +23,16 @@ export const router = createBrowserRouter([
       {
         path: "warehouse",
         element: <WarehousePage />,
+        handle: {
+          title: "Warehouse Viewer"
+        }
       },
       {
         path: 'divice-model',
-        element: <DevicemodelPage/>
+        element: <DevicemodelPage/>,
+        handle: {
+          title: "Device Model"
+        }
       },
       {
         path: "*",
