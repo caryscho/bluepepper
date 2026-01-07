@@ -14,7 +14,7 @@ export default function DevicemodelPage() {
             <h1 className="mb-6 text-3xl font-bold text-gray-800">
                 Device Models
             </h1>
-            {/* 개발 단일 */}
+            {/* 개발용 */}
             {/* <Canvas
                 camera={{
                     position: [0.15, 0.15, 0.15],
@@ -33,12 +33,11 @@ export default function DevicemodelPage() {
                     maxDistance={0.5}
                 />
                 <DeviceModel3D
-                    deviceType={AVAILABLE_DEVICE_TYPES[0]}
+                    deviceType={AVAILABLE_DEVICE_TYPES[1]}
                     diveSize={{ width: 0.065, height: 0.115, depth: 0.02 }}
                     autoRotate={false}
                 />
-            </Canvas> 
-            */}
+            </Canvas> */}
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
                 {AVAILABLE_DEVICE_TYPES.map((deviceType) => (
                     <DeviceModelCard
@@ -59,7 +58,7 @@ interface DeviceModelCardProps {
 function DeviceModelCard({ deviceType }: DeviceModelCardProps) {
     return (
         <div className="flex flex-col p-4 bg-white rounded-lg shadow-md">
-            <div className="overflow-hidden mb-4 h-72 bg-gray-100 rounded-lg">
+            <div className="overflow-hidden mb-4 h-72 bg-gradient-to-b from-gray-100 to-gray-300 rounded-lg">
                 <Canvas
                     camera={{
                         position: [0.15, 0.15, 0.15],
@@ -82,15 +81,15 @@ function DeviceModelCard({ deviceType }: DeviceModelCardProps) {
                 </Canvas>
             </div>
             {/* info */}
-            <div className="flex-1 bg-red-100">
+            <div className="flex-1">
                 <h3 className="mb-1 text-lg font-semibold text-gray-800">
                     {deviceType.name}
                 </h3>
                 <p className="mb-2 text-sm text-gray-600">{deviceType.model}</p>
-                <div className="text-xs text-gray-500">
+                <div className="space-y-1 text-xs text-gray-500">
                     <p>
-                        Size: {deviceType.size.width} × {deviceType.size.height}{" "}
-                        × {deviceType.size.depth}
+                        규격: {deviceType.size.width * 100} × {deviceType.size.height * 100}{" "}
+                        × {deviceType.size.depth * 100}
                     </p>
                     <p>배터리 수명: {deviceType.battery}</p>
                 </div>

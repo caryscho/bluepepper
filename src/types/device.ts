@@ -50,18 +50,6 @@ export const AVAILABLE_DEVICE_TYPES: DeviceType[] = [
     battery: "60일"
   },
   {
-    id: "s1",
-    name: "S1",
-    model: "일회용 실시간 디바이스",
-    size: { 
-      width: 0.0613,  // 61.3mm
-      height: 0.103,  // 103mm
-      depth: 0.023    // 23mm
-    },
-    color: "#10b981", // Green
-    battery: "60일"
-  },
-  {
     id: "v2",
     name: "V2",
     model: "다회용 비실시간 디바이스",

@@ -383,28 +383,28 @@ function ThreeDViewer({
                         if (!deviceType) return null;
 
                         return (
-                            <>
-                                <DevicePlacementHandler
-                                    isAddDeviceMode={isAddDeviceMode}
+                    <>
+                        <DevicePlacementHandler
+                            isAddDeviceMode={isAddDeviceMode}
                                     selectedDeviceType={deviceType}
-                                    onPlaceDevice={handlePlaceDevice}
-                                    onPreviewPositionChange={(
-                                        pos: THREE.Vector3 | null,
-                                        rot: THREE.Euler | null,
-                                        isValid: boolean
-                                    ) => {
-                                        setPreviewPosition(pos);
-                                        setPreviewRotation(rot);
-                                        setIsPreviewValid(isValid);
-                                    }}
-                                />
-                                <DevicePreview
+                            onPlaceDevice={handlePlaceDevice}
+                            onPreviewPositionChange={(
+                                pos: THREE.Vector3 | null,
+                                rot: THREE.Euler | null,
+                                isValid: boolean
+                            ) => {
+                                setPreviewPosition(pos);
+                                setPreviewRotation(rot);
+                                setIsPreviewValid(isValid);
+                            }}
+                        />
+                        <DevicePreview
                                     deviceType={deviceType}
-                                    position={previewPosition}
-                                    rotation={previewRotation}
-                                    isValid={isPreviewValid}
-                                />
-                            </>
+                            position={previewPosition}
+                            rotation={previewRotation}
+                            isValid={isPreviewValid}
+                        />
+                    </>
                         );
                     })()}
                 {/* 설치된 디바이스들 */}
@@ -414,14 +414,14 @@ function ThreeDViewer({
                     if (!deviceType) return null;
 
                     return (
-                        <InstalledDevice
-                            key={device.id}
-                            device={device}
+                    <InstalledDevice
+                        key={device.id}
+                        device={device}
                             deviceType={deviceType}
-                            onClick={onDeviceClick}
-                            onDeviceHover={onDeviceHover}
-                            isHovered={hoveredDevice?.id === device.id}
-                        />
+                        onClick={onDeviceClick}
+                        onDeviceHover={onDeviceHover}
+                        isHovered={hoveredDevice?.id === device.id}
+                    />
                     );
                 })}
                 {/* 바닥: JSON의 dimensions 사용 */}
