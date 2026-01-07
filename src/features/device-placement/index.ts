@@ -1,6 +1,7 @@
-import { useThree, useFrame } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import { useThree, useFrame } from "@react-three/fiber";
+
 import { DeviceType } from "@/types/device";
 
 interface DevicePlacementHandlerProps {
@@ -26,6 +27,7 @@ function DevicePlacementHandler({
     onPlaceDevice,
     onPreviewPositionChange,
 }: DevicePlacementHandlerProps) {
+    
     const { camera, raycaster, gl, scene } = useThree();
     const [mousePosition, setMousePosition] = useState(new THREE.Vector2());
     const wallsRef = useRef<THREE.Mesh[]>([]);

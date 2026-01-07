@@ -69,6 +69,7 @@ const WarehouseViewer = () => {
                 onToggleDimension={() => setIs2D(!is2D)}
             />
             <DeviceContoller
+                is2D={is2D}
                 isAddDeviceMode={isAddDeviceMode}
                 onToggleAddDeviceMode={handleToggleAddDeviceMode}
                 onToggleDeviceListMode={handleToggleDeviceListMode}
