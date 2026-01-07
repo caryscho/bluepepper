@@ -1,6 +1,6 @@
 // widgets ui
-import ThreeDViewer from "@/widgets/warehouse-viewer/ui/ThreeDViewer";
-import TwoDViewer from "@/widgets/warehouse-viewer/ui/TwoDViewer";
+import SpaceThreeDViewer from "@/widgets/warehouse-viewer/ui/SpaceThreeDViewer";
+import TwoDViewer from "@/widgets/warehouse-viewer/ui/SpaceTwoDViewer";
 
 // model
 import { useWarehouseViewer } from "@/widgets/warehouse-viewer/model/useWarehouseViewer.ts";
@@ -81,7 +81,7 @@ const WarehouseViewer = () => {
                     getDeviceType={getDeviceType}
                 />
             ) : (
-                <ThreeDViewer
+                <SpaceThreeDViewer
                     centerX={centerX}
                     centerZ={centerZ}
                     length={length}

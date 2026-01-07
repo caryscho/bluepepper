@@ -1,4 +1,4 @@
-import { Outlet, NavLink } from "react-router-dom";
+import { Outlet, NavLink, useMatches } from "react-router-dom";
 import "../../App.css";
 
 export default function Layout() {
@@ -13,7 +13,13 @@ export default function Layout() {
                 </nav>
             </header>
             <div className="flex flex-col w-full h-screen">
-                <div className="flex items-center p-2 px-5 w-full h-14 border-b shrink-0">sub header area</div>
+                <div className="flex items-center p-2 px-5 w-full h-14 border-b shrink-0">
+                    {useMatches().map((match) => (
+                        <div key={match.id}>
+                            {(match.handle as { title?: string })?.title}
+                        </div>
+                    ))}
+                </div>
                 <div className="overflow-hidden flex-1">
                     <Outlet />
                 </div>
