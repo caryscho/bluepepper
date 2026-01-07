@@ -1,14 +1,13 @@
 import * as THREE from "three";
+import { DEVICE_SIZE } from "../constants";
 
 interface DevicePreviewProps {
-  deviceSize: { width: number; height: number; depth: number };
   position: THREE.Vector3 | null;
   rotation: THREE.Euler | null;
   isValid: boolean; // 배치 가능한 위치인지
 }
 
 function DevicePreview({
-  deviceSize,
   position,
   rotation,
   isValid,
@@ -24,9 +23,9 @@ function DevicePreview({
       <mesh>
         <boxGeometry
           args={[
-            deviceSize.width,
-            deviceSize.height,
-            deviceSize.depth,
+            DEVICE_SIZE.width,
+            DEVICE_SIZE.height,
+            DEVICE_SIZE.depth,
           ]}
         />
         <meshStandardMaterial
@@ -39,7 +38,7 @@ function DevicePreview({
         />
       </mesh>
       {/* 배치 가능 여부 표시 (원형 인디케이터) */}
-      <mesh position={[0, deviceSize.height / 2 + 0.15, 0]}>
+      <mesh position={[0, DEVICE_SIZE.height / 2 + 0.15, 0]}>
         <ringGeometry args={[0.1, 0.15, 32]} />
         <meshBasicMaterial
           color={isValid ? "#00ff00" : "#ff0000"}
@@ -48,7 +47,7 @@ function DevicePreview({
         />
       </mesh>
       {/* 화살표 포인터 추가 */}
-      <mesh position={[0, deviceSize.height / 2 + 0.3, 0]}>
+      <mesh position={[0, DEVICE_SIZE.height / 2 + 0.3, 0]}>
         <coneGeometry args={[0.08, 0.15, 8]} />
         <meshBasicMaterial
           color={isValid ? "#00ff00" : "#ff0000"}

@@ -1,6 +1,7 @@
 import { Edges, Html } from "@react-three/drei";
 import * as THREE from "three";
 import { useEffect, useRef, useState } from "react";
+import { DEVICE_SIZE } from "@/features/device-placement/constants";
 
 // 모든 디바이스가 공유하는 Geometry (성냥갑 형태 = 박스)
 const deviceGeometry = new THREE.BoxGeometry(1, 1, 1);
@@ -96,10 +97,9 @@ export default function InstalledDevice({
     // 호버에 따른 스케일 계산
     const baseScale = isCurrentlyHovered ? 1.3 : 1.2;
     const finalScale: [number, number, number] = [
-        // size: { width: 0.3, height: 0.2, depth: 0.05 },
-        0.3 * baseScale,
-        0.2 * baseScale,
-        0.05 * baseScale,
+        DEVICE_SIZE.width * baseScale,
+        DEVICE_SIZE.height * baseScale,
+        DEVICE_SIZE.depth * baseScale,
     ];
 
     return (
@@ -129,8 +129,8 @@ export default function InstalledDevice({
             {isCurrentlyHovered && (
                 <Html
                     position={[
-                        0.3 * baseScale / 2 + 0.1,  // 오른쪽 끝 + 여유
-                        0.2 * baseScale / 2 + 0.1,  // 위쪽 끝 + 여유
+                        DEVICE_SIZE.width * baseScale / 2 + 0.1,  // 오른쪽 끝 + 여유
+                        DEVICE_SIZE.height * baseScale / 2 + 0.1,  // 위쪽 끝 + 여유
                         0
                     ]}
                     distanceFactor={10}

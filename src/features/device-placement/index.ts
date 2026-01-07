@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { useThree, useFrame } from "@react-three/fiber";
+import { DEVICE_SIZE } from "./constants";
 
 interface DevicePlacementHandlerProps {
     isAddDeviceMode: boolean;
-    deviceSize: { width: number; height: number; depth: number };
     onPlaceDevice: (
         position: THREE.Vector3,
         rotation: THREE.Euler,
@@ -20,7 +20,6 @@ interface DevicePlacementHandlerProps {
 
 function DevicePlacementHandler({
     isAddDeviceMode,
-    deviceSize,
     onPlaceDevice,
     onPreviewPositionChange,
 }: DevicePlacementHandlerProps) {
@@ -95,26 +94,14 @@ function DevicePlacementHandler({
             }
 
             // 기기 크기
-            const deviceDepth = deviceSize.depth || 0.01;
+            const deviceDepth = DEVICE_SIZE.depth || 0.01;
 
             // 면에서 약간 떨어진 위치 (벽/기둥 표면에서)
             const offset = normal.clone().multiplyScalar(deviceDepth / 2 + 0.01);
             const position = point.clone().add(offset);
 
-            // 회전 계산: 면의 법선 벡터에 평행하게 기기를 배치
-            // 법선 벡터의 X, Z 성분만 사용 (Y는 수직이므로 무시)
-            const normalXZ = new THREE.Vector2(normal.x, normal.z);
-            
-            // 법선 벡터가 거의 수직인 경우 (위/아래 면) 처리
-            if (normalXZ.length() < 0.1) {
-                const finalRotation = new THREE.Euler(0, 0, 0);
-                onPreviewPositionChange(position, finalRotation, true);
-                return;
-            }
-
-            // 법선 벡터의 방향으로 기기를 회전
-            const deviceAngle = Math.atan2(normalXZ.y, normalXZ.x);
-            const finalRotation = new THREE.Euler(0, deviceAngle, 0);
+            // 성냥갑의 얇은 부분(depth)이 앞을 향하도록 Y축 기준 90도 회전
+            const finalRotation = new THREE.Euler(0, Math.PI / 2, 0);
 
             onPreviewPositionChange(position, finalRotation, true);
         } else {
@@ -147,25 +134,12 @@ function DevicePlacementHandler({
                     normal.normalize();
                 }
 
-                const deviceDepth = deviceSize.depth || 0.01;
+                const deviceDepth = DEVICE_SIZE.depth || 0.01;
                 const offset = normal.clone().multiplyScalar(deviceDepth / 2 + 0.01);
                 const position = point.clone().add(offset);
 
-                // 회전 계산: 면의 법선 벡터에 평행하게 기기를 배치
-                const normalXZ = new THREE.Vector2(normal.x, normal.z);
-                
-                // 법선 벡터가 거의 수직인 경우 처리
-                if (normalXZ.length() < 0.1) {
-                    const rotation = new THREE.Euler(0, 0, 0);
-                    const attachedToId = intersect.object.userData.id || "";
-                    const attachedTo = intersect.object.userData.type === "wall" ? "wall" : "column";
-                    onPlaceDevice(position, rotation, attachedTo, attachedToId);
-                    return;
-                }
-
-                // 법선 벡터의 방향으로 기기를 회전
-                const deviceAngle = Math.atan2(normalXZ.y, normalXZ.x);
-                const rotation = new THREE.Euler(0, deviceAngle, 0);
+                // 성냥갑의 얇은 부분(depth)이 앞을 향하도록 Y축 기준 90도 회전
+                const rotation = new THREE.Euler(0, Math.PI / 2, 0);
 
                 // 부착된 오브젝트 정보
                 const attachedToId = intersect.object.userData.id || "";
@@ -181,7 +155,6 @@ function DevicePlacementHandler({
         };
     }, [
         isAddDeviceMode,
-        deviceSize,
         camera,
         raycaster,
         mousePosition,

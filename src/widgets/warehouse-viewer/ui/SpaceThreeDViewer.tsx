@@ -184,9 +184,6 @@ function CameraDebugInfo({
     return null;
 }
 
-// 설치 표시 디바이스 사이즈 (고정값)
-const DEVICE_SIZE = { width: 0.3, height: 0.2, depth: 0.05 };
-
 function SpaceThreeDViewer({
     centerX,
     centerZ,
@@ -355,10 +352,10 @@ function SpaceThreeDViewer({
                 />
             </div>
             <Canvas
-                camera={{
-                    position: [centerX, Math.max(length, width) * 1.5, centerZ],
-                    fov: 50,
-                }}
+                // camera={{
+                //     position: [centerX, Math.max(length, width) * 1.5, centerZ],
+                //     fov: 50,
+                // }}
             >
                 {/* 조명: 없으면 아무것도 안 보임! */}
                 <ambientLight intensity={1.2} />
@@ -380,12 +377,12 @@ function SpaceThreeDViewer({
                     // - Shift + 왼쪽 버튼 드래그: Pan (이동)
                     // - 휠: 줌
                 />
-                <InitialCameraSetup
+                {/* <InitialCameraSetup
                     controlsRef={controlsRef}
                     centerX={centerX}
                     centerZ={centerZ}
                     cameraHeight={cameraHeight}
-                />
+                /> */}
                 <CameraDebugInfo
                     controlsRef={controlsRef}
                     onUpdate={setCameraDebug}
@@ -398,7 +395,6 @@ function SpaceThreeDViewer({
                             <>
                                 <DevicePlacementHandler
                                     isAddDeviceMode={isAddDeviceMode}
-                                    deviceSize={DEVICE_SIZE}
                                     onPlaceDevice={handlePlaceDevice}
                                     onPreviewPositionChange={(
                                         pos: THREE.Vector3 | null,
@@ -411,7 +407,6 @@ function SpaceThreeDViewer({
                                     }}
                                 />
                                 <DevicePreview
-                                    deviceSize={DEVICE_SIZE}
                                     position={previewPosition}
                                     rotation={previewRotation}
                                     isValid={isPreviewValid}

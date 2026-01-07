@@ -39,7 +39,7 @@ export function useWarehouseViewer() {
             rotation: {
                 x: 0,
                 y: Math.PI / 2,
-                z: Math.PI / 2,
+                z: 0,
             },
             attachedTo: "column",
             attachedToId: "col-10",
@@ -57,7 +57,7 @@ export function useWarehouseViewer() {
             rotation: {
                 x: 0,
                 y: Math.PI / 2,
-                z: Math.PI / 2,
+                z: 0,
             },
             attachedTo: "column",
             attachedToId: "col-10",
