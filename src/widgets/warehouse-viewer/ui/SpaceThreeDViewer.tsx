@@ -11,8 +11,11 @@ import InstalledDevice from "@/entity/device/ui/InstalledDevice";
 import warehouseData from "@/data/warehouse-example.json";
 
 // components
+
 import DevicePreview from "@/features/device-placement/ui/DevicePreview";
 import { SearchIcon } from "lucide-react";
+// 구조물
+import { Column } from "./structures";
 
 interface ThreeDViewerProps {
     centerX: number;
@@ -223,17 +226,6 @@ function SpaceThreeDViewer({
         [length, width]
     );
 
-    // 기둥용 재사용 가능한 Geometry와 Material (한 번만 생성)
-    // BoxGeometry는 내부적으로 BufferGeometry를 사용하므로 최적화됨
-    const columnGeometry = useMemo(
-        () => new THREE.BoxGeometry(1, 1, 1),
-        []
-    );
-    const columnMaterial = useMemo(
-        () => new THREE.MeshStandardMaterial({ color: "#CDCDCD" }),
-        []
-    );
-
     // focusTarget이 변경되면 카메라를 해당 위치로 이동
     useEffect(() => {
         if (focusTarget && controlsRef.current) {
@@ -389,12 +381,12 @@ function SpaceThreeDViewer({
                     // - Shift + 왼쪽 버튼 드래그: Pan (이동)
                     // - 휠: 줌
                 />
-                {/* <InitialCameraSetup
+                <InitialCameraSetup
                     controlsRef={controlsRef}
                     centerX={centerX}
                     centerZ={centerZ}
                     cameraHeight={cameraHeight}
-                /> */}
+                />
                 <CameraDebugInfo
                     controlsRef={controlsRef}
                     onUpdate={setCameraDebug}
@@ -434,6 +426,7 @@ function SpaceThreeDViewer({
                             </>
                         );
                     })()}
+
                 {/* 설치된 디바이스들 */}
                 {installedDevices.map((device) => {
                     const deviceType =
@@ -467,25 +460,10 @@ function SpaceThreeDViewer({
                     centerZ={centerZ}
                     divisions={20}
                 />
-                {/* 창고 데이터 MESH RENDERING */}
-                {/* 기둥들 (Columns) - 재사용된 Geometry/Material 사용 */}
+                
+                {/* 기둥들 (Columns) */}
                 {warehouseData.structure.columns.map((column) => (
-                    <mesh
-                        key={column.id}
-                        geometry={columnGeometry}
-                        material={columnMaterial}
-                        position={[
-                            column.position.x,
-                            column.height / 2,
-                            column.position.z,
-                        ]}
-                        scale={[
-                            column.size.width,
-                            column.height,
-                            column.size.depth,
-                        ]}
-                        userData={{ type: "column", id: column.id }}
-                    />
+                    <Column key={column.id} column={column} />
                 ))}
                 {/* 벽 */}
                 {warehouseData.structure.walls.map((wall) => {

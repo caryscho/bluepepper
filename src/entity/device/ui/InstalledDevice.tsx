@@ -1,8 +1,16 @@
-import { useThree } from "@react-three/fiber";
 import { Edges, Html } from "@react-three/drei";
 import * as THREE from "three";
 import { DeviceType } from "@/types/device";
 import { useEffect, useRef, useState } from "react";
+
+// 모든 디바이스가 공유하는 Geometry (성냥갑 형태 = 박스)
+const deviceGeometry = new THREE.BoxGeometry(1, 1, 1);
+
+// 상태별 Material (색상만 다름)
+const activeMaterial = new THREE.MeshStandardMaterial({ color: "#61C10E" });
+const inactiveMaterial = new THREE.MeshStandardMaterial({ color: "#FF0000" });
+const errorMaterial = new THREE.MeshStandardMaterial({ color: "#FF0000" });
+const defaultMaterial = new THREE.MeshStandardMaterial({ color: "#000000" });
 
 interface InstalledDeviceProps {
     device: {
@@ -39,130 +47,100 @@ export default function InstalledDevice({
     isHovered: isHoveredProp,
 }: InstalledDeviceProps) {
     const meshRef = useRef<THREE.Mesh>(null);
-    const materialRef = useRef<THREE.MeshStandardMaterial>(null);
-    const { raycaster, camera, gl } = useThree();
     const [isHovered, setIsHovered] = useState(false);
     
     // prop으로 받은 isHovered와 내부 상태를 병합
     const isCurrentlyHovered = isHoveredProp ?? isHovered;
 
-    // 상태별 색상 결정 함수
-    const getStatusColor = (status: string) => {
+    // 상태별 Material 선택
+    const getStatusMaterial = (status: string) => {
         switch (status) {
             case "active":
-                return "#00FF00";
+                return activeMaterial;
             case "inactive":
-                return "#FF0000";
+                return inactiveMaterial;
             case "error":
-                return "#FF0000";
+                return errorMaterial;
             default:
-                return "#000000";
+                return defaultMaterial;
         }
     };
 
-    // 호버 감지
-    useEffect(() => {
-        if (!meshRef.current) return;
-
-        const handleMouseMove = (event: MouseEvent) => {
-            // 마우스 위치를 정규화된 좌표로 변환
-            const rect = gl.domElement.getBoundingClientRect();
-            const mouse = new THREE.Vector2();
-            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-            // Raycasting으로 호버된 오브젝트 확인
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObject(meshRef.current!);
-
-            setIsHovered(intersects.length > 0);
-        };
-
-        gl.domElement.addEventListener("mousemove", handleMouseMove);
-        return () => {
-            gl.domElement.removeEventListener("mousemove", handleMouseMove);
-        };
-    }, [raycaster, camera, gl]);
-
-    // 클릭 이벤트
-    useEffect(() => {
-        if (!onClick || !meshRef.current) return;
-        setIsHovered(false);
-
-        const handleClick = (event: MouseEvent) => {
-            // 마우스 위치를 정규화된 좌표로 변환
-            const rect = gl.domElement.getBoundingClientRect();
-            const mouse = new THREE.Vector2();
-            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-            // Raycasting으로 클릭된 오브젝트 확인
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObject(meshRef.current!);
-
-            if (intersects.length > 0) {
-                onClick(device);
-            }
-        };
-
-        gl.domElement.addEventListener("click", handleClick);
-        return () => {
-            gl.domElement.removeEventListener("click", handleClick);
-        };
-    }, [onClick, device, raycaster, camera, gl]);
-
-    // 호버 시 커서 스타일 변경 및 이벤트 전파
-    useEffect(() => {
-        if (gl.domElement) {
-            gl.domElement.style.cursor = isHovered ? "pointer" : "default";
-        }
-        // 상위로 호버 이벤트 전파
+    // 호버 이벤트 핸들러 (React Three Fiber 내장 이벤트 사용)
+    const handlePointerEnter = () => {
+        setIsHovered(true);
         if (onDeviceHover) {
-            onDeviceHover(device, isHovered);
+            onDeviceHover(device, true);
         }
-    }, [isHovered, gl, device, onDeviceHover]);
+    };
 
+    const handlePointerLeave = () => {
+        setIsHovered(false);
+        if (onDeviceHover) {
+            onDeviceHover(device, false);
+        }
+    };
+
+    const handleClick = () => {
+        if (onClick) {
+            onClick(device);
+        }
+    };
+
+    // 커서 스타일 변경
+    useEffect(() => {
+        if (meshRef.current) {
+            const element = document.body;
+            element.style.cursor = isHovered ? "pointer" : "default";
+        }
+    }, [isHovered]);
+
+
+    // 호버에 따른 스케일 계산
+    const baseScale = isCurrentlyHovered ? 1.3 : 1.2;
+    const finalScale: [number, number, number] = [
+        deviceType.size.width * baseScale,
+        deviceType.size.height * baseScale,
+        deviceType.size.depth * baseScale,
+    ];
 
     return (
         <mesh
             ref={meshRef}
+            geometry={deviceGeometry}
+            material={getStatusMaterial(device.status)}
             position={[device.position.x, device.position.y, device.position.z]}
             rotation={[
                 device.rotation?.x || 0,
                 device.rotation?.y || 0,
                 device.rotation?.z || 0,
             ]}
-            scale={isCurrentlyHovered ? 1.3 : 1.2} // 기본 크기 1.2배, 호버 시 1.3배
+            scale={finalScale}
+            onPointerEnter={handlePointerEnter}
+            onPointerLeave={handlePointerLeave}
+            onClick={handleClick}
         >
-            <boxGeometry
-                args={[
-                    deviceType.size.width,
-                    deviceType.size.height,
-                    deviceType.size.depth,
-                ]}
-            />
-            <meshStandardMaterial
-                ref={materialRef}
-                color={getStatusColor(device.status)}
-            />
-            {/* 호버 시 파란색 보더 표시 */}
+            {/* 호버 시 파란색 보더 표시 - scale 제거하여 호버 영역 안정화 */}
             {isCurrentlyHovered && (
                 <Edges
-                    scale={1.01}
                     threshold={15}
                     color="#0066FF"
                 />
             )}
-            {/* 호버 시 Tooltip 표시 */}
+            {/* 호버 시 Tooltip 표시 - 디바이스 오른쪽 위 모서리 기준 */}
             {isCurrentlyHovered && (
                 <Html
-                    position={[deviceType.size.width / 2 + 0.2, deviceType.size.height / 2 + 0.1, 0]}
+                    position={[
+                        (deviceType.size.width * baseScale) / 2 + 0.1,  // 오른쪽 끝 + 여유
+                        (deviceType.size.height * baseScale) / 2 + 0.1,  // 위쪽 끝 + 여유
+                        0
+                    ]}
                     distanceFactor={10}
                     style={{
                         pointerEvents: "none",
                         userSelect: "none",
+                        transform: "translate(0, -100%)", // 왼쪽 위 정렬
                     }}
-                    center
                 >
                     <div className="bg-white border shadow-lg rounded-lg p-2 min-w-[150px]">
                         <div className="text-sm font-semibold text-black">
