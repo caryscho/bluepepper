@@ -14,6 +14,31 @@ export default function DevicemodelPage() {
             <h1 className="mb-6 text-3xl font-bold text-gray-800">
                 Device Models
             </h1>
+            {/* 개발 단일 */}
+            {/* <Canvas
+                camera={{
+                    position: [0.15, 0.15, 0.15],
+                    fov: 50,
+                }}
+                gl={{ antialias: true }}
+            >
+                <ambientLight intensity={0.8} />
+                <directionalLight position={[5, 5, 5]} intensity={1} />
+                <pointLight position={[-5, -5, -5]} intensity={0.5} />
+                <OrbitControls
+                    enableZoom={true}
+                    enablePan={false}
+                    enableRotate={true}
+                    minDistance={0.05}
+                    maxDistance={0.5}
+                />
+                <DeviceModel3D
+                    deviceType={AVAILABLE_DEVICE_TYPES[0]}
+                    diveSize={{ width: 0.065, height: 0.115, depth: 0.02 }}
+                    autoRotate={false}
+                />
+            </Canvas> 
+            */}
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
                 {AVAILABLE_DEVICE_TYPES.map((deviceType) => (
                     <DeviceModelCard
@@ -27,7 +52,7 @@ export default function DevicemodelPage() {
 }
 
 interface DeviceModelCardProps {
-    deviceType: typeof AVAILABLE_DEVICE_TYPES[number];
+    deviceType: (typeof AVAILABLE_DEVICE_TYPES)[number];
 }
 
 /* 일단 여기다 구현 카드 아이템 */
@@ -67,9 +92,7 @@ function DeviceModelCard({ deviceType }: DeviceModelCardProps) {
                         Size: {deviceType.size.width} × {deviceType.size.height}{" "}
                         × {deviceType.size.depth}
                     </p>
-                    <p>
-                        배터리 수명: {deviceType.battery}
-                    </p>
+                    <p>배터리 수명: {deviceType.battery}</p>
                 </div>
             </div>
         </div>

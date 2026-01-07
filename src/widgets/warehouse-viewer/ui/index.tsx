@@ -59,6 +59,7 @@ const WarehouseViewer = () => {
             model: "T200",
             size: { width: 0.3, height: 0.2, depth: 0.05 },
             color: "#FF9800",
+            battery: "100일",
         };
     };
 
