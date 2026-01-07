@@ -14,9 +14,6 @@ import DeviceDetailModal from "@/features/device-detail/ui/DeviceDetailModal";
 import DimContoller from "@/widgets/warehouse-viewer/ui/DimContoller";
 import DeviceContoller from "@/widgets/warehouse-viewer/ui/DeviceContoller";
 
-// types
-import { DeviceType } from "@/types/device";
-
 const WarehouseViewer = () => {
     const {
         is2D,
@@ -46,25 +43,11 @@ const WarehouseViewer = () => {
         handleFocusDevice,
     } = useWarehouseViewer();
 
-    // TODO: 실제 메타정보 소스에서 deviceType을 가져오도록 구현 필요
-    const getDeviceType = (serialNumber: string): DeviceType | null => {
-        // 임시 구현: serialNumber를 기반으로 deviceType을 반환
-        // 실제로는 API나 메타정보 서비스에서 가져와야 함
-        // 예: return deviceMetadataService.getDeviceType(serialNumber);
-
-        // 기본값 반환 (나중에 실제 구현으로 교체)
-        return {
-            id: "T200-001",
-            name: "T200",
-            model: "T200",
-            size: { width: 0.3, height: 0.2, depth: 0.05 },
-            color: "#FF9800",
-            battery: "100일",
-        };
-    };
-
     return (
-        <div className="relative" style={{ width: "100%", height: "calc(100vh - 56px)" }}>
+        <div
+            className="relative"
+            style={{ width: "100%", height: "calc(100vh - 56px)" }}
+        >
             <DimContoller
                 is2D={is2D}
                 onToggleDimension={() => setIs2D(!is2D)}
@@ -76,10 +59,7 @@ const WarehouseViewer = () => {
                 onToggleDeviceListMode={handleToggleDeviceListMode}
             />
             {is2D ? (
-                <TwoDViewer
-                    installedDevices={installedDevices}
-                    getDeviceType={getDeviceType}
-                />
+                <TwoDViewer installedDevices={installedDevices} />
             ) : (
                 <SpaceThreeDViewer
                     centerX={centerX}
@@ -96,7 +76,6 @@ const WarehouseViewer = () => {
                     hoveredDevice={hoveredDevice}
                     editingDeviceId={editingDeviceId}
                     focusTarget={focusTarget}
-                    getDeviceType={getDeviceType}
                 />
             )}
             {/* 기기 선택 모달 */}

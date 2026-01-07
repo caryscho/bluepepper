@@ -3,7 +3,6 @@ import * as THREE from "three";
 import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 
-import { DeviceType } from "@/types/device";
 import DevicePlacementHandler from "@/features/device-placement";
 import InstalledDevice from "@/entity/device/ui/InstalledDevice";
 
@@ -32,7 +31,6 @@ interface ThreeDViewerProps {
     hoveredDevice?: any | null;
     editingDeviceId?: string | null;
     focusTarget?: { x: number; y: number; z: number } | null;
-    getDeviceType?: (serialNumber: string) => DeviceType | null;
 }
 
 function FloorGrid({
@@ -186,6 +184,9 @@ function CameraDebugInfo({
     return null;
 }
 
+// 설치 표시 디바이스 사이즈 (고정값)
+const DEVICE_SIZE = { width: 0.3, height: 0.2, depth: 0.05 };
+
 function SpaceThreeDViewer({
     centerX,
     centerZ,
@@ -201,7 +202,6 @@ function SpaceThreeDViewer({
     hoveredDevice,
     editingDeviceId,
     focusTarget,
-    getDeviceType,
 }: ThreeDViewerProps) {
     // 미리보기 위치 및 회전
     const [previewPosition, setPreviewPosition] =
@@ -262,7 +262,6 @@ function SpaceThreeDViewer({
     const handlePlaceDevice = (
         position: THREE.Vector3,
         rotation: THREE.Euler,
-        deviceType: DeviceType | null,
         attachedTo: "wall" | "column",
         attachedToId: string
     ) => {
@@ -394,18 +393,12 @@ function SpaceThreeDViewer({
                 {/* 디바이스 배치 핸들러 및 미리보기 */}
                 {isAddDeviceMode &&
                     selectedDeviceSerialNumber &&
-                    getDeviceType &&
                     (() => {
-                        const deviceType = getDeviceType(
-                            selectedDeviceSerialNumber
-                        );
-                        if (!deviceType) return null;
-
                         return (
                             <>
                                 <DevicePlacementHandler
                                     isAddDeviceMode={isAddDeviceMode}
-                                    selectedDeviceType={deviceType}
+                                    deviceSize={DEVICE_SIZE}
                                     onPlaceDevice={handlePlaceDevice}
                                     onPreviewPositionChange={(
                                         pos: THREE.Vector3 | null,
@@ -418,7 +411,7 @@ function SpaceThreeDViewer({
                                     }}
                                 />
                                 <DevicePreview
-                                    deviceType={deviceType}
+                                    deviceSize={DEVICE_SIZE}
                                     position={previewPosition}
                                     rotation={previewRotation}
                                     isValid={isPreviewValid}
@@ -426,18 +419,12 @@ function SpaceThreeDViewer({
                             </>
                         );
                     })()}
-
                 {/* 설치된 디바이스들 */}
                 {installedDevices.map((device) => {
-                    const deviceType =
-                        getDeviceType?.(device.serialNumber) || null;
-                    if (!deviceType) return null;
-
                     return (
                         <InstalledDevice
                             key={device.id}
                             device={device}
-                            deviceType={deviceType}
                             onClick={onDeviceClick}
                             onDeviceHover={onDeviceHover}
                             isHovered={hoveredDevice?.id === device.id}
@@ -460,7 +447,6 @@ function SpaceThreeDViewer({
                     centerZ={centerZ}
                     divisions={20}
                 />
-                
                 {/* 기둥들 (Columns) */}
                 {warehouseData.structure.columns.map((column) => (
                     <Column key={column.id} column={column} />
@@ -537,59 +523,6 @@ function SpaceThreeDViewer({
                                 args={[door.width, door.height, 0.1]}
                             />
                             <meshStandardMaterial color="#8B4513" />
-                        </mesh>
-                    );
-                })}
-                {/* 창문 */}
-                {warehouseData.structure.windows.map((window) => {
-                    // window의 wallId로 해당 벽 찾기
-                    const wall = warehouseData.structure.walls.find(
-                        (w) => w.id === window.wallId
-                    );
-                    if (!wall) return null;
-
-                    // 벽의 방향 벡터 계산
-                    const dx = wall.end[0] - wall.start[0];
-                    const dz = wall.end[1] - wall.start[1];
-                    const angle = Math.atan2(dz, dx);
-
-                    // 창문의 위치 계산 (벽을 따라 position(0-1)을 실제 좌표로 변환)
-                    const windowX =
-                        wall.start[0] +
-                        (wall.end[0] - wall.start[0]) * window.position;
-                    const windowZ =
-                        wall.start[1] +
-                        (wall.end[1] - wall.start[1]) * window.position;
-                    // yPosition은 바닥에서의 높이, 창문의 중심은 yPosition + height/2
-                    const windowY = window.yPosition + window.height / 2;
-
-                    // 벽의 두께를 고려해서 창문을 벽 앞에 배치 (벽의 두께/2 + 약간의 여유)
-                    const offsetDistance = wall.thickness / 2 + 0.01;
-                    const offsetX =
-                        Math.cos(angle + Math.PI / 2) * offsetDistance;
-                    const offsetZ =
-                        Math.sin(angle + Math.PI / 2) * offsetDistance;
-
-                    return (
-                        <mesh
-                            key={window.id}
-                            position={[
-                                windowX + offsetX,
-                                windowY,
-                                windowZ + offsetZ,
-                            ]}
-                            rotation={[0, angle, 0]}
-                            renderOrder={1}
-                        >
-                            <boxGeometry
-                                args={[window.width, window.height, 0.05]}
-                            />
-                            <meshStandardMaterial
-                                color="#87CEEB"
-                                opacity={0.6}
-                                transparent
-                                depthWrite={false}
-                            />
                         </mesh>
                     );
                 })}

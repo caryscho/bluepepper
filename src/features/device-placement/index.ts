@@ -2,15 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { useThree, useFrame } from "@react-three/fiber";
 
-import { DeviceType } from "@/types/device";
-
 interface DevicePlacementHandlerProps {
     isAddDeviceMode: boolean;
-    selectedDeviceType: DeviceType | null;
+    deviceSize: { width: number; height: number; depth: number };
     onPlaceDevice: (
         position: THREE.Vector3,
         rotation: THREE.Euler,
-        deviceType: DeviceType,
         attachedTo: "wall" | "column",
         attachedToId: string
     ) => void;
@@ -23,7 +20,7 @@ interface DevicePlacementHandlerProps {
 
 function DevicePlacementHandler({
     isAddDeviceMode,
-    selectedDeviceType,
+    deviceSize,
     onPlaceDevice,
     onPreviewPositionChange,
 }: DevicePlacementHandlerProps) {
@@ -35,7 +32,7 @@ function DevicePlacementHandler({
 
     // 마우스 위치 업데이트
     useEffect(() => {
-            if (!isAddDeviceMode || !selectedDeviceType) {
+            if (!isAddDeviceMode) {
                 onPreviewPositionChange(null, null, false);
                 return;
             }
@@ -51,7 +48,7 @@ function DevicePlacementHandler({
         return () => {
             gl.domElement.removeEventListener("mousemove", handleMouseMove);
         };
-    }, [isAddDeviceMode, selectedDeviceType, gl, onPreviewPositionChange]);
+    }, [isAddDeviceMode, gl, onPreviewPositionChange]);
 
     // 벽과 기둥 mesh 참조 수집
     useEffect(() => {
@@ -76,7 +73,7 @@ function DevicePlacementHandler({
 
     // Raycasting으로 벽/기둥 위치 계산
     useFrame(() => {
-        if (!isAddDeviceMode || !selectedDeviceType) {
+        if (!isAddDeviceMode) {
             return;
         }
 
@@ -98,7 +95,7 @@ function DevicePlacementHandler({
             }
 
             // 기기 크기
-            const deviceDepth = selectedDeviceType.size.depth || 0.01;
+            const deviceDepth = deviceSize.depth || 0.01;
 
             // 면에서 약간 떨어진 위치 (벽/기둥 표면에서)
             const offset = normal.clone().multiplyScalar(deviceDepth / 2 + 0.01);
@@ -127,7 +124,7 @@ function DevicePlacementHandler({
 
     // 클릭 이벤트 처리
     useEffect(() => {
-        if (!isAddDeviceMode || !selectedDeviceType) return;
+        if (!isAddDeviceMode) return;
 
         const handleClick = (event: MouseEvent) => {
             // UI 요소 클릭은 무시 (사이드바 등)
@@ -150,7 +147,7 @@ function DevicePlacementHandler({
                     normal.normalize();
                 }
 
-                const deviceDepth = selectedDeviceType.size.depth || 0.01;
+                const deviceDepth = deviceSize.depth || 0.01;
                 const offset = normal.clone().multiplyScalar(deviceDepth / 2 + 0.01);
                 const position = point.clone().add(offset);
 
@@ -162,7 +159,7 @@ function DevicePlacementHandler({
                     const rotation = new THREE.Euler(0, 0, 0);
                     const attachedToId = intersect.object.userData.id || "";
                     const attachedTo = intersect.object.userData.type === "wall" ? "wall" : "column";
-                    onPlaceDevice(position, rotation, selectedDeviceType, attachedTo, attachedToId);
+                    onPlaceDevice(position, rotation, attachedTo, attachedToId);
                     return;
                 }
 
@@ -174,7 +171,7 @@ function DevicePlacementHandler({
                 const attachedToId = intersect.object.userData.id || "";
                 const attachedTo = intersect.object.userData.type === "wall" ? "wall" : "column";
 
-                onPlaceDevice(position, rotation, selectedDeviceType, attachedTo, attachedToId);
+                onPlaceDevice(position, rotation, attachedTo, attachedToId);
             }
         };
 
@@ -184,7 +181,7 @@ function DevicePlacementHandler({
         };
     }, [
         isAddDeviceMode,
-        selectedDeviceType,
+        deviceSize,
         camera,
         raycaster,
         mousePosition,

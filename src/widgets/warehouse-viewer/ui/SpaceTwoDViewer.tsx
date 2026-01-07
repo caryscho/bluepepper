@@ -48,7 +48,9 @@ function FloorGrid2D({
     return (
         <group position={[centerX, 0, centerZ]}>
             {gridLines.map((points, index) => {
-                const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                const geometry = new THREE.BufferGeometry().setFromPoints(
+                    points
+                );
                 return (
                     <primitive
                         key={index}
@@ -77,10 +79,11 @@ function CameraLock() {
         // 위에서 정확히 내려다보는 각도로 카메라 고정
         const centerX = warehouseData.structure.dimensions.length / 2;
         const centerZ = warehouseData.structure.dimensions.width / 2;
-        const cameraHeight = Math.max(
-            warehouseData.structure.dimensions.length,
-            warehouseData.structure.dimensions.width
-        ) * 1.5;
+        const cameraHeight =
+            Math.max(
+                warehouseData.structure.dimensions.length,
+                warehouseData.structure.dimensions.width
+            ) * 1.5;
 
         camera.position.set(centerX, cameraHeight, centerZ);
         camera.lookAt(centerX, 0, centerZ);
@@ -91,13 +94,7 @@ function CameraLock() {
 }
 
 // 2D 디바이스 마커 컴포넌트 (삼각형 마커)
-function Device2D({
-    device,
-    deviceType,
-}: {
-    device: any;
-    deviceType: DeviceType;
-}) {
+function Device2D({ device }: { device: any }) {
     // 3D 위치를 2D로 변환: x, z는 그대로 사용, y는 0.05로 고정 (눈에 잘 보이도록)
     const position = [device.position.x, 0.05, device.position.z] as [
         number,
@@ -141,13 +138,7 @@ function Device2D({
     );
 }
 
-function TwoDViewer({
-    installedDevices,
-    getDeviceType,
-}: {
-    installedDevices: any[];
-    getDeviceType?: (serialNumber: string) => DeviceType | null;
-}) {
+function TwoDViewer({ installedDevices }: { installedDevices: any[] }) {
     const { length, width } = warehouseData.structure.dimensions;
     const centerX = length / 2;
     const centerZ = width / 2;
@@ -198,18 +189,10 @@ function TwoDViewer({
                 {warehouseData.structure.columns.map((column) => (
                     <mesh
                         key={column.id}
-                        position={[
-                            column.position.x,
-                            0.02,
-                            column.position.z,
-                        ]}
+                        position={[column.position.x, 0.02, column.position.z]}
                     >
                         <boxGeometry
-                            args={[
-                                column.size.width,
-                                0.01,
-                                column.size.depth,
-                            ]}
+                            args={[column.size.width, 0.01, column.size.depth]}
                         />
                         <meshStandardMaterial color="#6b7280" />
                     </mesh>
@@ -235,7 +218,9 @@ function TwoDViewer({
                             />
                             <meshStandardMaterial
                                 color={
-                                    wall.type === "exterior" ? "#374151" : "#9ca3af"
+                                    wall.type === "exterior"
+                                        ? "#374151"
+                                        : "#9ca3af"
                                 }
                             />
                         </mesh>
@@ -245,14 +230,19 @@ function TwoDViewer({
                 {/* 선반들 */}
                 {warehouseData.structure.shelves.map((shelf) => {
                     const angle =
-                        shelf.orientation === "north" || shelf.orientation === "south"
+                        shelf.orientation === "north" ||
+                        shelf.orientation === "south"
                             ? 0
                             : Math.PI / 2;
 
                     return (
                         <mesh
                             key={shelf.id}
-                            position={[shelf.position.x, 0.01, shelf.position.z]}
+                            position={[
+                                shelf.position.x,
+                                0.01,
+                                shelf.position.z,
+                            ]}
                             rotation={[0, angle, 0]}
                         >
                             <boxGeometry
@@ -283,9 +273,11 @@ function TwoDViewer({
                     const angle = Math.atan2(dz, dx);
 
                     const doorX =
-                        wall.start[0] + (wall.end[0] - wall.start[0]) * door.position;
+                        wall.start[0] +
+                        (wall.end[0] - wall.start[0]) * door.position;
                     const doorZ =
-                        wall.start[1] + (wall.end[1] - wall.start[1]) * door.position;
+                        wall.start[1] +
+                        (wall.end[1] - wall.start[1]) * door.position;
 
                     return (
                         <mesh
@@ -303,52 +295,9 @@ function TwoDViewer({
                     );
                 })}
 
-                {/* 창문들 */}
-                {warehouseData.structure.windows.map((window) => {
-                    const wall = warehouseData.structure.walls.find(
-                        (w) => w.id === window.wallId
-                    );
-                    if (!wall) return null;
-
-                    const dx = wall.end[0] - wall.start[0];
-                    const dz = wall.end[1] - wall.start[1];
-                    const angle = Math.atan2(dz, dx);
-
-                    const windowX =
-                        wall.start[0] +
-                        (wall.end[0] - wall.start[0]) * window.position;
-                    const windowZ =
-                        wall.start[1] +
-                        (wall.end[1] - wall.start[1]) * window.position;
-
-                    return (
-                        <mesh
-                            key={window.id}
-                            position={[windowX, 0.015, windowZ]}
-                            rotation={[0, angle + Math.PI / 2, 0]}
-                        >
-                            <boxGeometry args={[window.width, 0.01, 0.1]} />
-                            <meshStandardMaterial
-                                color="#0284c7"
-                                opacity={0.7}
-                                transparent
-                            />
-                        </mesh>
-                    );
-                })}
-
                 {/* 설치된 디바이스들 (2D 뷰) */}
                 {installedDevices.map((device) => {
-                    const deviceType = getDeviceType?.(device.serialNumber) || null;
-                    if (!deviceType) return null;
-
-                    return (
-                        <Device2D
-                            key={device.id}
-                            device={device}
-                            deviceType={deviceType}
-                        />
-                    );
+                    return <Device2D key={device.id} device={device} />;
                 })}
             </Canvas>
         </div>
