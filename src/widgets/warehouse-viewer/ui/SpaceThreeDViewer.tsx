@@ -1,8 +1,9 @@
 import { useMemo, useState, useRef, useEffect } from "react";
-import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { DeviceType } from "@/types/device";
+import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
+
+import { DeviceType } from "@/types/device";
 import DevicePlacementHandler from "@/features/device-placement";
 import InstalledDevice from "@/entity/device/ui/InstalledDevice";
 
@@ -83,7 +84,7 @@ function FloorGrid({
                             new THREE.Line(
                                 geometry,
                                 new THREE.LineBasicMaterial({
-                                    color: "#888888",
+                                    color: "#999",
                                     opacity: 0.5,
                                     transparent: true,
                                 })
@@ -116,19 +117,19 @@ function InitialCameraSetup({
         if (!controlsRef.current) return;
 
         const controls = controlsRef.current;
-        
+
         // OrbitControls의 타겟 설정
         controls.target.set(centerX, 0, centerZ);
-        
+
         // 카메라 위치를 위쪽에 설정
         camera.position.set(centerX, cameraHeight, centerZ);
-        
+
         // 카메라가 정확히 아래를 보도록 설정 (Rotation: -90°, 0°, 0°)
         camera.lookAt(centerX, 0, centerZ);
-        
+
         // OrbitControls 업데이트
         controls.update();
-        
+
         initialized.current = true;
     });
 
@@ -166,9 +167,9 @@ function CameraDebugInfo({
                 z: Math.round(position.z * 100) / 100,
             },
             rotation: {
-                x: Math.round((rotation.x * 180) / Math.PI * 100) / 100,
-                y: Math.round((rotation.y * 180) / Math.PI * 100) / 100,
-                z: Math.round((rotation.z * 180) / Math.PI * 100) / 100,
+                x: Math.round(((rotation.x * 180) / Math.PI) * 100) / 100,
+                y: Math.round(((rotation.y * 180) / Math.PI) * 100) / 100,
+                z: Math.round(((rotation.z * 180) / Math.PI) * 100) / 100,
             },
             target: {
                 x: Math.round(target.x * 100) / 100,
@@ -182,7 +183,7 @@ function CameraDebugInfo({
     return null;
 }
 
-function ThreeDViewer({
+function SpaceThreeDViewer({
     centerX,
     centerZ,
     length,
@@ -217,7 +218,21 @@ function ThreeDViewer({
     } | null>(null);
 
     // 카메라 높이 계산
-    const cameraHeight = useMemo(() => Math.max(length, width) * 1.5, [length, width]);
+    const cameraHeight = useMemo(
+        () => Math.max(length, width) * 1.5,
+        [length, width]
+    );
+
+    // 기둥용 재사용 가능한 Geometry와 Material (한 번만 생성)
+    // BoxGeometry는 내부적으로 BufferGeometry를 사용하므로 최적화됨
+    const columnGeometry = useMemo(
+        () => new THREE.BoxGeometry(1, 1, 1),
+        []
+    );
+    const columnMaterial = useMemo(
+        () => new THREE.MeshStandardMaterial({ color: "#CDCDCD" }),
+        []
+    );
 
     // focusTarget이 변경되면 카메라를 해당 위치로 이동
     useEffect(() => {
@@ -320,11 +335,20 @@ function ThreeDViewer({
         <div className="relative flex-1 w-full h-full bg-[#EFEFEF] overflow-hidden">
             {/* 카메라 디버그 정보 */}
             {cameraDebug && (
-                <div className="absolute top-6 right-6 z-20 p-4 font-mono text-xs text-white rounded-lg bg-black/80 w-[300px]">
+                <div className=" hidden absolute top-6 right-6 z-20 p-4 font-mono text-xs text-white rounded-lg bg-black/80 w-[300px]">
                     <p className="mb-2 font-bold">Camera Debug Info</p>
-                    <p>Position: ({cameraDebug.position.x}, {cameraDebug.position.y}, {cameraDebug.position.z})</p>
-                    <p>Rotation: ({cameraDebug.rotation.x}°, {cameraDebug.rotation.y}°, {cameraDebug.rotation.z}°)</p>
-                    <p>Target: ({cameraDebug.target.x}, {cameraDebug.target.y}, {cameraDebug.target.z})</p>
+                    <p>
+                        Position: ({cameraDebug.position.x},{" "}
+                        {cameraDebug.position.y}, {cameraDebug.position.z})
+                    </p>
+                    <p>
+                        Rotation: ({cameraDebug.rotation.x}°,{" "}
+                        {cameraDebug.rotation.y}°, {cameraDebug.rotation.z}°)
+                    </p>
+                    <p>
+                        Target: ({cameraDebug.target.x}, {cameraDebug.target.y},{" "}
+                        {cameraDebug.target.z})
+                    </p>
                     <p>FOV: {cameraDebug.fov}°</p>
                 </div>
             )}
@@ -338,7 +362,7 @@ function ThreeDViewer({
                     type="text"
                     placeholder="Device Serial Number"
                 />
-            </div>  
+            </div>
             <Canvas
                 camera={{
                     position: [centerX, Math.max(length, width) * 1.5, centerZ],
@@ -365,13 +389,16 @@ function ThreeDViewer({
                     // - Shift + 왼쪽 버튼 드래그: Pan (이동)
                     // - 휠: 줌
                 />
-                <InitialCameraSetup
+                {/* <InitialCameraSetup
                     controlsRef={controlsRef}
                     centerX={centerX}
                     centerZ={centerZ}
                     cameraHeight={cameraHeight}
+                /> */}
+                <CameraDebugInfo
+                    controlsRef={controlsRef}
+                    onUpdate={setCameraDebug}
                 />
-                <CameraDebugInfo controlsRef={controlsRef} onUpdate={setCameraDebug} />
                 {/* 디바이스 배치 핸들러 및 미리보기 */}
                 {isAddDeviceMode &&
                     selectedDeviceSerialNumber &&
@@ -383,28 +410,28 @@ function ThreeDViewer({
                         if (!deviceType) return null;
 
                         return (
-                    <>
-                        <DevicePlacementHandler
-                            isAddDeviceMode={isAddDeviceMode}
+                            <>
+                                <DevicePlacementHandler
+                                    isAddDeviceMode={isAddDeviceMode}
                                     selectedDeviceType={deviceType}
-                            onPlaceDevice={handlePlaceDevice}
-                            onPreviewPositionChange={(
-                                pos: THREE.Vector3 | null,
-                                rot: THREE.Euler | null,
-                                isValid: boolean
-                            ) => {
-                                setPreviewPosition(pos);
-                                setPreviewRotation(rot);
-                                setIsPreviewValid(isValid);
-                            }}
-                        />
-                        <DevicePreview
+                                    onPlaceDevice={handlePlaceDevice}
+                                    onPreviewPositionChange={(
+                                        pos: THREE.Vector3 | null,
+                                        rot: THREE.Euler | null,
+                                        isValid: boolean
+                                    ) => {
+                                        setPreviewPosition(pos);
+                                        setPreviewRotation(rot);
+                                        setIsPreviewValid(isValid);
+                                    }}
+                                />
+                                <DevicePreview
                                     deviceType={deviceType}
-                            position={previewPosition}
-                            rotation={previewRotation}
-                            isValid={isPreviewValid}
-                        />
-                    </>
+                                    position={previewPosition}
+                                    rotation={previewRotation}
+                                    isValid={isPreviewValid}
+                                />
+                            </>
                         );
                     })()}
                 {/* 설치된 디바이스들 */}
@@ -414,14 +441,14 @@ function ThreeDViewer({
                     if (!deviceType) return null;
 
                     return (
-                    <InstalledDevice
-                        key={device.id}
-                        device={device}
+                        <InstalledDevice
+                            key={device.id}
+                            device={device}
                             deviceType={deviceType}
-                        onClick={onDeviceClick}
-                        onDeviceHover={onDeviceHover}
-                        isHovered={hoveredDevice?.id === device.id}
-                    />
+                            onClick={onDeviceClick}
+                            onDeviceHover={onDeviceHover}
+                            isHovered={hoveredDevice?.id === device.id}
+                        />
                     );
                 })}
                 {/* 바닥: JSON의 dimensions 사용 */}
@@ -430,29 +457,35 @@ function ThreeDViewer({
                     position={[centerX, 0, centerZ]}
                 >
                     <planeGeometry args={[length, width]} />
-                    <meshStandardMaterial color="#cccccc" />
+                    <meshStandardMaterial color="#C1C0C0" />
                 </mesh>
+                {/* 바닥 위에만 정확히 맞는 그리드 */}
+                <FloorGrid
+                    length={length}
+                    width={width}
+                    centerX={centerX}
+                    centerZ={centerZ}
+                    divisions={20}
+                />
                 {/* 창고 데이터 MESH RENDERING */}
-                {/* 기둥들 (Columns) */}
+                {/* 기둥들 (Columns) - 재사용된 Geometry/Material 사용 */}
                 {warehouseData.structure.columns.map((column) => (
                     <mesh
                         key={column.id}
+                        geometry={columnGeometry}
+                        material={columnMaterial}
                         position={[
                             column.position.x,
                             column.height / 2,
                             column.position.z,
                         ]}
+                        scale={[
+                            column.size.width,
+                            column.height,
+                            column.size.depth,
+                        ]}
                         userData={{ type: "column", id: column.id }}
-                    >
-                        <boxGeometry
-                            args={[
-                                column.size.width,
-                                column.height,
-                                column.size.depth,
-                            ]}
-                        />
-                        <meshStandardMaterial color="#888888" />
-                    </mesh>
+                    />
                 ))}
                 {/* 벽 */}
                 {warehouseData.structure.walls.map((wall) => {
@@ -478,7 +511,7 @@ function ThreeDViewer({
                             <meshStandardMaterial
                                 color={
                                     wall.type === "exterior"
-                                        ? "#666666"
+                                        ? "#EFEFEF"
                                         : "#999999"
                                 }
                                 depthWrite={true}
@@ -699,17 +732,9 @@ function ThreeDViewer({
                         </group>
                     );
                 })()}
-                {/* 바닥 위에만 정확히 맞는 그리드 */}
-                <FloorGrid
-                    length={length}
-                    width={width}
-                    centerX={centerX}
-                    centerZ={centerZ}
-                    divisions={20}
-                />
             </Canvas>
         </div>
     );
 }
 
-export default ThreeDViewer;
+export default SpaceThreeDViewer;
