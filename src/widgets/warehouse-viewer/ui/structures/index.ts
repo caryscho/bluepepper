@@ -5,5 +5,6 @@
 import Column from "./Column";
 import Human from "./Human";
 import Walls from "./Walls";
+import Shelf from "./Shelf";
     
-export { Column, Human, Walls };
+export { Column, Human, Walls, Shelf };

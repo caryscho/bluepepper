@@ -164,7 +164,7 @@
                 "start": [40, 0],
                 "end": [40, 25],
                 "height": 11,
-                "thickness": 0.2,
+                "thickness": 0.4,
                 "type": "interior"
             },
             {
@@ -172,7 +172,7 @@
                 "start": [40, 25],
                 "end": [40, 50],
                 "height": 11,
-                "thickness": 0.2,
+                "thickness": 0.4,
                 "type": "interior"
             }
         ],

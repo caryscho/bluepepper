@@ -15,7 +15,7 @@ import warehouseData from "@/data/warehouse-example.json";
 import DevicePreview from "@/features/device-placement/ui/DevicePreview";
 import { SearchIcon } from "lucide-react";
 // 구조물
-import { Column, Human, Walls } from "./structures";
+import { Column, Human, Walls, Shelf } from "./structures";
 
 interface ThreeDViewerProps {
     centerX: number;
@@ -388,6 +388,13 @@ function SpaceThreeDViewer({
                     controlsRef={controlsRef}
                     onUpdate={setCameraDebug}
                 />
+                <Shelf shelf={{
+                    id: "shelf-1",
+                    position: { x: 0, z: 0 },
+                    size: { length: 1, width: 1, height: 1 },
+                    tiers: 1,
+                    orientation: "north",
+                }} />
                 {/* 디바이스 배치 핸들러 및 미리보기 */}
                 {isAddDeviceMode &&
                     selectedDeviceSerialNumber &&
@@ -447,6 +454,15 @@ function SpaceThreeDViewer({
                 {warehouseData.structure.columns.map((column) => (
                     <Column key={column.id} column={column} />
                 ))}
+                {/* 선반들 (Shelves) */}
+                {warehouseData.structure.shelves.map((shelf) => {
+                    // 타입 변환: orientation을 올바른 타입으로
+                    const shelfWithType = {
+                        ...shelf,
+                        orientation: shelf.orientation as "north" | "south" | "east" | "west",
+                    };
+                    return <Shelf key={shelf.id} shelf={shelfWithType} />;
+                })}
                 {/* 벽 */}
                 {warehouseData.structure.walls.map((wall) => {
                     // 타입 변환: number[]를 [number, number]로, type을 올바른 타입으로
