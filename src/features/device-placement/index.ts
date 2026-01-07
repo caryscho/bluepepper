@@ -92,7 +92,7 @@ function DevicePlacementHandler({
             return;
         }
 
-        // Raycasting 설정 (threshold 조정으로 성능 향상)
+        // Raycasting 설정 (threshold 조정으로 성능 향상) 카메라 위치에서 광선검을 쏨 충돌하는 객체가 있는가 확인함
         raycaster.setFromCamera(mousePosition, camera);
         raycaster.params.Line = { threshold: 0.1 };
         
@@ -105,6 +105,7 @@ function DevicePlacementHandler({
             
             // 재사용 가능한 객체 사용
             const normal = tempNormal.current;
+
             if (intersect.face?.normal) {
                 normal.copy(intersect.face.normal);
             } else {
