@@ -24,7 +24,7 @@ export default function DevicemodelPage() {
             >
                 <ambientLight intensity={0.8} />
                 <directionalLight position={[5, 5, 5]} intensity={1} />
-                <pointLight position={[-5, -5, -5]} intensity={0.5} />
+                <pointLight position={[-5, -5, -5]} intensity={0.8} />
                 <OrbitControls
                     enableZoom={true}
                     enablePan={false}
@@ -33,7 +33,7 @@ export default function DevicemodelPage() {
                     maxDistance={0.5}
                 />
                 <DeviceModel3D
-                    deviceType={AVAILABLE_DEVICE_TYPES[1]}
+                    deviceType={AVAILABLE_DEVICE_TYPES[0]}
                     diveSize={{ width: 0.065, height: 0.115, depth: 0.02 }}
                     autoRotate={false}
                 />

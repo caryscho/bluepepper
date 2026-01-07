@@ -34,6 +34,7 @@ function TargetDeviceModel({
             return <DeviceModelT1 {...props} />;
     }
 
+    console.log(deviceType, "deviceType");
 }
 /**
  * 재사용 가능한 디바이스 3D 모델 컴포넌트

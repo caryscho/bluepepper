@@ -83,6 +83,51 @@ export default function DeviceModel3D({
         return new THREE.ShapeGeometry(shape);
     }, [panelWidth, panelHeight, panelRadius]);
 
+    // 스티커/라벨 텍스처 생성
+    const labelTexture = useMemo(() => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return null;
+
+        // Canvas 크기 설정 (고해상도)
+        const canvasWidth = 256;
+        const canvasHeight = 64;
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+
+        // 흰색 배경
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+        // 텍스트 (왼쪽)
+        ctx.fillStyle = "#000000";
+        ctx.font = "bold 18px monospace";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillText(deviceType.name, 26, canvasHeight / 2);
+
+        // 바코드 패턴 (오른쪽)
+        const barcodeX = canvasWidth - 150;
+        const barcodeY = canvasHeight / 2 - 12;
+        const barcodeHeight = 24;
+
+        ctx.fillStyle = "#000000";
+        const bars = [
+            1, 1, 2, 1, 2, 1, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 3, 1, 1, 2, 1, 2, 1,
+            1, 2, 3, 1, 2, 3, 1, 1, 2,
+        ];
+        let x = barcodeX;
+
+        bars.forEach((width) => {
+            ctx.fillRect(x, barcodeY, width, barcodeHeight);
+            x += width + 1;
+        });
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.needsUpdate = true;
+        return texture;
+    }, [deviceType.name]);
+
     return (
         <group ref={groupRef}>
             {/* 메인 흰색 케이스 (둥근 모서리) */}
@@ -107,34 +152,32 @@ export default function DeviceModel3D({
             {/* 검은색 화면 (직사각형, 회색 패널 위에 위치) */}
             <mesh
                 position={[
-                    0,                          // X: 중앙
-                    height * 0.2,               // Y: 약간 위 (높이의 20% 위치)
-                    depth / 2 + 0.001           // Z: 패널보다 확실히 앞으로
+                    0, // X: 중앙
+                    height * 0.16, // Y: 약간 위 (높이의 20% 위치)
+                    depth / 2 + 0.001, // Z: 패널보다 확실히 앞으로
                 ]}
                 rotation={[0, 0, 0]}
                 renderOrder={2}
             >
-                <planeGeometry args={[panelWidth * 0.7, panelHeight * 0.4]} />
-                <meshStandardMaterial 
-                    color="#000000" 
-                    depthWrite={false} 
-                />
+                <planeGeometry args={[panelWidth * 0.65, panelHeight * 0.42]} />
+                <meshStandardMaterial color="#000000" depthWrite={false} />
             </mesh>
 
-            {/* 스티커/라벨 (회색 패널 위에 붙인 것처럼) */}
+            {/* 스티커/라벨 (회색 패널 위에 붙인 것처럼 바코드 스티커) */}
             <mesh
                 position={[
-                    0,                          // X: 중앙
-                    -height * 0.1,              // Y: 아래쪽 (라벨 위치)
-                    depth / 2 + 0.001           // Z: 패널보다 확실히 앞으로
+                    0, // X: 중앙
+                    -height * 0.18, // Y: 아래쪽 (라벨 위치)
+                    depth / 2 + 0.001, // Z: 패널보다 확실히 앞으로
                 ]}
                 rotation={[0, 0, 0]}
                 renderOrder={3}
             >
-                <planeGeometry args={[panelWidth * 0.8, panelHeight * 0.1]} />
-                <meshStandardMaterial 
-                    color="#ffffff" 
-                    depthWrite={false} 
+                <planeGeometry args={[panelWidth * 1, panelHeight * 0.1]} />
+                <meshBasicMaterial
+                    map={labelTexture}
+                    transparent={false}
+                    depthWrite={false}
                 />
             </mesh>
         </group>
