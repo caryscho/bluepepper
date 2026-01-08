@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import warehouseData from "@/data/warehouse-example.json";
 
 /**
- * 
+ *
  *  warehouse model
  * 상태값
- * 핸들러 
+ * 핸들러
  * 훅 반환
  */
 
@@ -18,6 +18,9 @@ export function useWarehouseViewer() {
 
     // 2차원 <-> 3차원 전환 상태
     const [is2D, setIs2D] = useState(false);
+    
+    // 2D/3D 전환 로딩 상태
+    const [isDimensionLoading, setIsDimensionLoading] = useState(false);
 
     // 기기 추가 모드 상태
     const [isAddDeviceMode, setIsAddDeviceMode] = useState(false);
@@ -65,7 +68,6 @@ export function useWarehouseViewer() {
             status: "active",
         },
     ]);
-    
 
     // 기기 목록 표시 여부
     const [showDeviceList, setShowDeviceList] = useState(false);
@@ -75,7 +77,7 @@ export function useWarehouseViewer() {
 
     // 선택된 디바이스 (상세 정보 모달용)
     const [selectedDevice, setSelectedDevice] = useState<any | null>(null);
-    
+
     // 위치 변경 중인 디바이스 ID
     const [editingDeviceId, setEditingDeviceId] = useState<string | null>(null);
 
@@ -89,24 +91,21 @@ export function useWarehouseViewer() {
     // 카메라 리셋 트리거
     const [resetCameraTrigger, setResetCameraTrigger] = useState(0);
 
-    // Apidog Mock API 호출 예시
-    useEffect(() => {
-        const requestOptions = {
-            method: "GET",
-            redirect: "follow" as RequestRedirect,
-        };
-
-        fetch(
-            "http://127.0.0.1:3658/m1/1168288-1161801-1029717/device/1234567890/status",
-            requestOptions
-        )
-            .then((response) => response.json())
-            .then((result) => {
-                console.log("API 응답:", result);
-                // setInstalledDevices(result);
-            })
-            .catch((error) => console.log("error", error));
-    }, []);
+    const handleToggleDimension = () => {
+        // 이미 로딩 중이면 무시 (연속 클릭 방지)
+        if (isDimensionLoading) return;
+        
+        setIsDimensionLoading(true);
+        
+        // Fiber 크래시 방지를 위한 딜레이
+        setTimeout(() => {
+            setIs2D(!is2D);
+            // 전환 후 로딩 해제
+            setTimeout(() => {
+                setIsDimensionLoading(false);
+            }, 300); // 전환 후 추가 딜레이
+        }, 100); // 전환 전 딜레이
+    };
 
     // 모드 토글 핸들러
     const handleToggleAddDeviceMode = () => {
@@ -195,6 +194,7 @@ export function useWarehouseViewer() {
         // 상태
         is2D,
         setIs2D,
+        isDimensionLoading,
         length,
         width,
         centerX,
@@ -210,6 +210,7 @@ export function useWarehouseViewer() {
         focusTarget,
         resetCameraTrigger,
         // 핸들러
+        handleToggleDimension,
         handleToggleAddDeviceMode,
         handleSelectDevice,
         handleCloseModal,
@@ -223,4 +224,3 @@ export function useWarehouseViewer() {
         handleResetCamera,
     };
 }
-

@@ -17,6 +17,7 @@ const WarehouseViewer = () => {
     const {
         is2D,
         setIs2D,
+        isDimensionLoading,
         length,
         width,
         centerX,
@@ -42,6 +43,7 @@ const WarehouseViewer = () => {
         handleDeleteDevice,
         handleFocusDevice,
         handleResetCamera,
+        handleToggleDimension,
     } = useWarehouseViewer();
 
     return (
@@ -51,8 +53,9 @@ const WarehouseViewer = () => {
         >
             <Controls
                 is2D={is2D}
+                isDimensionLoading={isDimensionLoading}
                 isAddDeviceMode={isAddDeviceMode}
-                onToggleDimension={() => setIs2D(!is2D)}
+                onToggleDimension={handleToggleDimension}
                 onToggleAddDeviceMode={handleToggleAddDeviceMode}
                 onToggleDeviceListMode={handleToggleDeviceListMode}
                 onResetCamera={handleResetCamera}
