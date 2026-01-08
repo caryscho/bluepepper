@@ -10,9 +10,9 @@ const poleGeometry = new THREE.BoxGeometry(1, 1, 1); // 기둥
 const shelfPlateGeometry = new THREE.BoxGeometry(1, 1, 1); // 선반판
 const dividerGeometry = new THREE.BoxGeometry(1, 1, 1); // 중간 구분판
 
-const poleMaterial = new THREE.MeshStandardMaterial({ color: "#4A4A4A" }); // 기둥 - 짙은 회색
-const shelfPlateMaterial = new THREE.MeshStandardMaterial({ color: "#8B7355" }); // 선반판 - 목재색
-const dividerMaterial = new THREE.MeshStandardMaterial({ color: "#8B7355" }); // 구분판 - 회색
+const poleMaterial = new THREE.MeshStandardMaterial({ color: "#CDCDCD" }); // 기둥 - 짙은 회색 4A4A4A
+const shelfPlateMaterial = new THREE.MeshStandardMaterial({ color: "#CDCDCD" }); // 선반판 - 목재색8B7355
+const dividerMaterial = new THREE.MeshStandardMaterial({ color: "#CDCDCD" }); // 구분판 - 8B7355 
 
 export default function Shelf({ shelf }: ShelfProps) {
     // orientation에 따른 회전 각도 (north = 0°, east = 90°, south = 180°, west = 270°)

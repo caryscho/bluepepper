@@ -11,8 +11,7 @@ import DeviceSelector from "@/features/device-placement/ui/DeviceSelector";
 import DeviceDetailModal from "@/features/device-detail/ui/DeviceDetailModal";
 
 // ui components
-import DimContoller from "@/widgets/warehouse-viewer/ui/DimContoller";
-import DeviceContoller from "@/widgets/warehouse-viewer/ui/DeviceContoller";
+import Controls from "@/widgets/warehouse-viewer/ui/controls";
 
 const WarehouseViewer = () => {
     const {
@@ -48,13 +47,10 @@ const WarehouseViewer = () => {
             className="relative"
             style={{ width: "100%", height: "calc(100vh - 56px)" }}
         >
-            <DimContoller
-                is2D={is2D}
-                onToggleDimension={() => setIs2D(!is2D)}
-            />
-            <DeviceContoller
+            <Controls
                 is2D={is2D}
                 isAddDeviceMode={isAddDeviceMode}
+                onToggleDimension={() => setIs2D(!is2D)}
                 onToggleAddDeviceMode={handleToggleAddDeviceMode}
                 onToggleDeviceListMode={handleToggleDeviceListMode}
             />

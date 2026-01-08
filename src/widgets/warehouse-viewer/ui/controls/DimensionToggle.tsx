@@ -1,8 +1,8 @@
-interface ContollerProps {
+interface DimensionToggleProps {
     is2D: boolean;
     onToggleDimension: () => void;
 }
-export default function Contoller({ is2D, onToggleDimension }: ContollerProps) {
+export default function DimensionToggle({ is2D, onToggleDimension }: DimensionToggleProps) {
     return (
         <>
             <div className="flex absolute top-8 left-8 z-10 flex-col gap-2 p-2 text-xs">
