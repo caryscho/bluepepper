@@ -32,6 +32,7 @@ interface ThreeDViewerProps {
     hoveredDevice?: any | null;
     editingDeviceId?: string | null;
     focusTarget?: { x: number; y: number; z: number } | null;
+    resetCameraTrigger?: number;
 }
 
 function FloorGrid({
@@ -200,6 +201,7 @@ function SpaceThreeDViewer({
     hoveredDevice,
     editingDeviceId,
     focusTarget,
+    resetCameraTrigger,
 }: ThreeDViewerProps) {
     // 미리보기 위치 및 회전
     const [previewPosition, setPreviewPosition] =
@@ -255,6 +257,42 @@ function SpaceThreeDViewer({
             animate();
         }
     }, [focusTarget]);
+
+    // resetCameraTrigger가 변경되면 카메라를 위로 이동 (회전 유지)
+    useEffect(() => {
+        if (resetCameraTrigger && resetCameraTrigger > 0 && controlsRef.current) {
+            const controls = controlsRef.current;
+            const camera = controls.object;
+            
+            // 현재 타겟 위치는 그대로 유지 (회전 유지를 위해)
+            // 카메라만 위로 이동
+            const targetHeight = Math.max(length, width) * 1.5;
+            const targetPosition = new THREE.Vector3(
+                centerX,
+                targetHeight,
+                centerZ
+            );
+
+            // 부드러운 애니메이션으로 위로 이동
+            const animate = () => {
+                const currentPosition = camera.position;
+                const distance = currentPosition.distanceTo(targetPosition);
+
+                if (distance > 0.1) {
+                    // position만 lerp (타겟은 그대로 = 회전 유지)
+                    currentPosition.lerp(targetPosition, 0.1);
+                    controls.update();
+                    requestAnimationFrame(animate);
+                } else {
+                    // 목표 위치에 도달
+                    camera.position.copy(targetPosition);
+                    controls.update();
+                }
+            };
+
+            animate();
+        }
+    }, [resetCameraTrigger, centerX, centerZ, length, width]);
 
     // 디바이스 배치 핸들러 - 실제로 디바이스 정보 업데이트 하는 함수
     const handlePlaceDevice = (
@@ -324,7 +362,7 @@ function SpaceThreeDViewer({
         <div className="relative flex-1 w-full h-full bg-[#EFEFEF] overflow-hidden">
             {/* 카메라 디버그 정보 */}
             {cameraDebug && (
-                <div className=" hidden absolute top-6 right-6 z-20 p-4 font-mono text-xs text-white rounded-lg bg-black/80 w-[300px]">
+                <div className="  absolute top-6 right-6 z-20 p-4 font-mono text-xs text-white rounded-lg bg-black/80 w-[300px]">
                     <p className="mb-2 font-bold">Camera Debug Info</p>
                     <p>
                         Position: ({cameraDebug.position.x},{" "}
@@ -353,10 +391,10 @@ function SpaceThreeDViewer({
                 />
             </div>
             <Canvas
-                // camera={{
-                //     position: [centerX, Math.max(length, width) * 1.5, centerZ],
-                //     fov: 50,
-                // }}
+                camera={{
+                    position: [centerX, Math.max(length, width) * 1.5, centerZ],
+                    fov: 50,
+                }}
             >
                 {/* 조명: 없으면 아무것도 안 보임! */}
                 <ambientLight intensity={1.2} />
@@ -378,23 +416,17 @@ function SpaceThreeDViewer({
                     // - Shift + 왼쪽 버튼 드래그: Pan (이동)
                     // - 휠: 줌
                 />
-                {/* <InitialCameraSetup
+                <InitialCameraSetup
                     controlsRef={controlsRef}
                     centerX={centerX}
                     centerZ={centerZ}
                     cameraHeight={cameraHeight}
-                /> */}
+                />
                 <CameraDebugInfo
                     controlsRef={controlsRef}
                     onUpdate={setCameraDebug}
                 />
-                <Shelf shelf={{
-                    id: "shelf-1",
-                    position: { x: 0, z: 0 },
-                    size: { length: 1, width: 1, height: 1 },
-                    tiers: 1,
-                    orientation: "north",
-                }} />
+                
                 {/* 디바이스 배치 핸들러 및 미리보기 */}
                 {isAddDeviceMode &&
                     selectedDeviceSerialNumber &&

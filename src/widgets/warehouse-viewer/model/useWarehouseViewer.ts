@@ -86,6 +86,9 @@ export function useWarehouseViewer() {
         z: number;
     } | null>(null);
 
+    // 카메라 리셋 트리거
+    const [resetCameraTrigger, setResetCameraTrigger] = useState(0);
+
     // Apidog Mock API 호출 예시
     useEffect(() => {
         const requestOptions = {
@@ -183,6 +186,11 @@ export function useWarehouseViewer() {
         }
     };
 
+    // 카메라 리셋 핸들러
+    const handleResetCamera = () => {
+        setResetCameraTrigger((prev) => prev + 1);
+    };
+
     return {
         // 상태
         is2D,
@@ -200,6 +208,7 @@ export function useWarehouseViewer() {
         hoveredDevice,
         editingDeviceId,
         focusTarget,
+        resetCameraTrigger,
         // 핸들러
         handleToggleAddDeviceMode,
         handleSelectDevice,
@@ -211,6 +220,7 @@ export function useWarehouseViewer() {
         handleChangePosition,
         handleDeleteDevice,
         handleFocusDevice,
+        handleResetCamera,
     };
 }
 

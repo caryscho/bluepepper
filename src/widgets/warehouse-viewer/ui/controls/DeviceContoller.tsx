@@ -13,20 +13,20 @@ function DeviceContoller({
     onToggleDeviceListMode,
 }: DeviceContollerProps) {
     return (
-        <div className="flex absolute right-8 bottom-8 z-10 gap-4 p-2">
+        <div className="flex absolute right-8 bottom-8 z-10 gap-4 p-2 text-xs text-black shadow-me">
             {!is2D && (
                 <button
                     onClick={onToggleAddDeviceMode}
-                    className="px-4 py-2 text-white bg-blue-500 rounded-lg"
+                    className="hover:bg-blue-200"
                 >
-                    {isAddDeviceMode ? "Cancel" : "Add Device"}
+                    {isAddDeviceMode ? "Cancel" : "Install Device"}
                 </button>
             )}
             <button
-                className="px-4 py-2 text-white bg-blue-500 rounded-lg"
+                className="hover:bg-blue-200"
                 onClick={onToggleDeviceListMode}
             >
-                <List />
+                <List className="w-4 h-4" />
             </button>
         </div>
     );

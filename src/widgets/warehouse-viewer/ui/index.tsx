@@ -30,6 +30,7 @@ const WarehouseViewer = () => {
         hoveredDevice,
         editingDeviceId,
         focusTarget,
+        resetCameraTrigger,
         handleToggleAddDeviceMode,
         handleSelectDevice,
         handleCloseModal,
@@ -40,6 +41,7 @@ const WarehouseViewer = () => {
         handleChangePosition,
         handleDeleteDevice,
         handleFocusDevice,
+        handleResetCamera,
     } = useWarehouseViewer();
 
     return (
@@ -53,6 +55,7 @@ const WarehouseViewer = () => {
                 onToggleDimension={() => setIs2D(!is2D)}
                 onToggleAddDeviceMode={handleToggleAddDeviceMode}
                 onToggleDeviceListMode={handleToggleDeviceListMode}
+                onResetCamera={handleResetCamera}
             />
             {is2D ? (
                 <TwoDViewer installedDevices={installedDevices} />
@@ -72,6 +75,7 @@ const WarehouseViewer = () => {
                     hoveredDevice={hoveredDevice}
                     editingDeviceId={editingDeviceId}
                     focusTarget={focusTarget}
+                    resetCameraTrigger={resetCameraTrigger}
                 />
             )}
             {/* 기기 선택 모달 */}
