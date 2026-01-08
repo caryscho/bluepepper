@@ -3,7 +3,6 @@ import { Canvas, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { OrbitControls } from "@react-three/drei";
 import warehouseData from "@/data/warehouse-example.json";
-import { DeviceType } from "@/types/device";
 
 // 2D 그리드 컴포넌트
 function FloorGrid2D({
@@ -106,7 +105,7 @@ function Device2D({ device }: { device: any }) {
     const getStatusColor = (status: string) => {
         switch (status) {
             case "active":
-                return "#3b82f6"; // 파란색
+                return "#52a0ff"; // 파란색
             case "inactive":
                 return "#f59e0b"; // 노란색
             case "error":
@@ -117,7 +116,7 @@ function Device2D({ device }: { device: any }) {
     };
 
     // 마커 크기 (눈에 잘 보이는 크기로 설정)
-    const markerSize = 1.0; // 1미터 크기로 충분히 크게
+    const markerSize = 1.5; // 1미터 크기로 충분히 크게
     const markerHeight = 0.5; // 삼각형 높이
 
     // 회전 각도 (디바이스의 방향에 따라)
@@ -144,7 +143,7 @@ function TwoDViewer({ installedDevices }: { installedDevices: any[] }) {
     const centerZ = width / 2;
 
     return (
-        <div className="relative w-full h-full">
+        <div className="relative w-full h-full bg-[#EFEFEF]">
             <Canvas camera={{ position: [centerX, 100, centerZ], fov: 50 }}>
                 {/* 조명 */}
                 <ambientLight intensity={1.5} />
@@ -173,7 +172,10 @@ function TwoDViewer({ installedDevices }: { installedDevices: any[] }) {
                     position={[centerX, 0, centerZ]}
                 >
                     <planeGeometry args={[length, width]} />
-                    <meshBasicMaterial color={new THREE.Color("#fd9890")} />
+                    <meshBasicMaterial 
+                        color={new THREE.Color("#FFFFFF")} 
+                        toneMapped={false}
+                    />
                 </mesh>
 
                 {/* 그리드 */}
@@ -194,7 +196,7 @@ function TwoDViewer({ installedDevices }: { installedDevices: any[] }) {
                         <boxGeometry
                             args={[column.size.width, 0.01, column.size.depth]}
                         />
-                        <meshStandardMaterial color="#6b7280" />
+                        <meshStandardMaterial color="#807e7e" />
                     </mesh>
                 ))}
 
@@ -214,15 +216,9 @@ function TwoDViewer({ installedDevices }: { installedDevices: any[] }) {
                             rotation={[0, angle, 0]}
                         >
                             <boxGeometry
-                                args={[wallLength, 0.01, wall.thickness]}
+                                args={[wallLength, 0.01, wall.thickness * 0.2]}
                             />
-                            <meshStandardMaterial
-                                color={
-                                    wall.type === "exterior"
-                                        ? "#374151"
-                                        : "#9ca3af"
-                                }
-                            />
+                            <meshStandardMaterial color={"#CCC"} />
                         </mesh>
                     );
                 })}
@@ -253,7 +249,7 @@ function TwoDViewer({ installedDevices }: { installedDevices: any[] }) {
                                 ]}
                             />
                             <meshStandardMaterial
-                                color="#d97706"
+                                color="#CCC"
                                 opacity={0.5}
                                 transparent
                             />

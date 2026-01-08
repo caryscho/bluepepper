@@ -10,12 +10,15 @@ import { Wall } from "@/types/warehouse";
 // 정적 데이터 => 이 창고의 정보를 가져왔다는 가정하게 앞으로 모든 것을 진행 하겠음
 import warehouseData from "@/data/warehouse-example.json";
 
-// components
+// hooks
+import { useCameraReset } from "@/shared/hooks/useCameraReset";
+import { useFocusTarget } from "@/shared/hooks/useFocusTarget";
 
+// components
 import DevicePreview from "@/features/device-placement/ui/DevicePreview";
 import { SearchIcon } from "lucide-react";
 // 구조물
-import { Column, Human, Walls, Shelf } from "./structures";
+import { Column, Human, Walls, Shelf, Door } from "./structures";
 
 interface ThreeDViewerProps {
     centerX: number;
@@ -226,73 +229,19 @@ function SpaceThreeDViewer({
         [length, width]
     );
 
+    
     // focusTarget이 변경되면 카메라를 해당 위치로 이동
-    useEffect(() => {
-        if (focusTarget && controlsRef.current) {
-            const controls = controlsRef.current;
-            // 부드러운 애니메이션을 위해 lerp 사용
-            const target = new THREE.Vector3(
-                focusTarget.x,
-                focusTarget.y,
-                focusTarget.z
-            );
+    useFocusTarget(focusTarget, controlsRef);
 
-            // OrbitControls의 target을 부드럽게 이동
-            const animate = () => {
-                const currentTarget = controls.target;
-                const distance = currentTarget.distanceTo(target);
-
-                if (distance > 0.01) {
-                    // lerp를 사용하여 부드럽게 이동
-                    currentTarget.lerp(target, 0.1);
-                    controls.update();
-                    requestAnimationFrame(animate);
-                } else {
-                    // 목표 위치에 도달
-                    controls.target.copy(target);
-                    controls.update();
-                }
-            };
-
-            animate();
-        }
-    }, [focusTarget]);
-
-    // resetCameraTrigger가 변경되면 카메라를 위로 이동 (회전 유지)
-    useEffect(() => {
-        if (resetCameraTrigger && resetCameraTrigger > 0 && controlsRef.current) {
-            const controls = controlsRef.current;
-            const camera = controls.object;
-            
-            // 현재 타겟 위치는 그대로 유지 (회전 유지를 위해)
-            // 카메라만 위로 이동
-            const targetHeight = Math.max(length, width) * 1.5;
-            const targetPosition = new THREE.Vector3(
-                centerX,
-                targetHeight,
-                centerZ
-            );
-
-            // 부드러운 애니메이션으로 위로 이동
-            const animate = () => {
-                const currentPosition = camera.position;
-                const distance = currentPosition.distanceTo(targetPosition);
-
-                if (distance > 0.1) {
-                    // position만 lerp (타겟은 그대로 = 회전 유지)
-                    currentPosition.lerp(targetPosition, 0.1);
-                    controls.update();
-                    requestAnimationFrame(animate);
-                } else {
-                    // 목표 위치에 도달
-                    camera.position.copy(targetPosition);
-                    controls.update();
-                }
-            };
-
-            animate();
-        }
-    }, [resetCameraTrigger, centerX, centerZ, length, width]);
+    // 카메라 리셋 hook 사용
+    useCameraReset(
+        resetCameraTrigger,
+        controlsRef,
+        centerX,
+        centerZ,
+        length,
+        width
+    );
 
     // 디바이스 배치 핸들러 - 실제로 디바이스 정보 업데이트 하는 함수
     const handlePlaceDevice = (
@@ -361,7 +310,7 @@ function SpaceThreeDViewer({
     return (
         <div className="relative flex-1 w-full h-full bg-[#EFEFEF] overflow-hidden">
             {/* 카메라 디버그 정보 */}
-            {cameraDebug && (
+            {/* {cameraDebug && (
                 <div className="  absolute top-6 right-6 z-20 p-4 font-mono text-xs text-white rounded-lg bg-black/80 w-[300px]">
                     <p className="mb-2 font-bold">Camera Debug Info</p>
                     <p>
@@ -378,7 +327,7 @@ function SpaceThreeDViewer({
                     </p>
                     <p>FOV: {cameraDebug.fov}°</p>
                 </div>
-            )}
+            )} */}
             {/* device 검색 */}
             <div className="flex overflow-hidden gap-1 bg-white rounded-lg w-[240px] absolute top-6 left-1/2 -translate-x-1/2 z-10 text-black">
                 <button className="text-black">
@@ -426,7 +375,6 @@ function SpaceThreeDViewer({
                     controlsRef={controlsRef}
                     onUpdate={setCameraDebug}
                 />
-                
                 {/* 디바이스 배치 핸들러 및 미리보기 */}
                 {isAddDeviceMode &&
                     selectedDeviceSerialNumber &&
@@ -491,7 +439,11 @@ function SpaceThreeDViewer({
                     // 타입 변환: orientation을 올바른 타입으로
                     const shelfWithType = {
                         ...shelf,
-                        orientation: shelf.orientation as "north" | "south" | "east" | "west",
+                        orientation: shelf.orientation as
+                            | "north"
+                            | "south"
+                            | "east"
+                            | "west",
                     };
                     return <Shelf key={shelf.id} shelf={shelfWithType} />;
                 })}
@@ -500,54 +452,19 @@ function SpaceThreeDViewer({
                     // 타입 변환: number[]를 [number, number]로, type을 올바른 타입으로
                     const wallWithTuple: Wall = {
                         ...wall,
-                        start: [wall.start[0], wall.start[1]] as [number, number],
+                        start: [wall.start[0], wall.start[1]] as [
+                            number,
+                            number
+                        ],
                         end: [wall.end[0], wall.end[1]] as [number, number],
                         type: wall.type as "exterior" | "interior",
                     };
                     return <Walls key={wall.id} wall={wallWithTuple} />;
                 })}
                 {/* 문 */}
-                {warehouseData.structure.doors.map((door) => {
-                    // door의 wallId로 해당 벽 찾기
-                    const wall = warehouseData.structure.walls.find(
-                        (w) => w.id === door.wallId
-                    );
-                    if (!wall) return null;
-
-                    // 벽의 방향 벡터 계산
-                    const dx = wall.end[0] - wall.start[0];
-                    const dz = wall.end[1] - wall.start[1];
-                    const angle = Math.atan2(dz, dx);
-
-                    // 문의 위치 계산 (벽을 따라 position(0-1)을 실제 좌표로 변환)
-                    const doorX =
-                        wall.start[0] +
-                        (wall.end[0] - wall.start[0]) * door.position;
-                    const doorZ =
-                        wall.start[1] +
-                        (wall.end[1] - wall.start[1]) * door.position;
-                    const doorY = door.height / 2;
-
-                    // 벽의 두께를 고려해서 문을 벽 앞에 배치 (벽의 두께/2 + 약간의 여유)
-                    const offsetDistance = wall.thickness / 2 + 0.01;
-                    const offsetX =
-                        Math.cos(angle + Math.PI / 2) * offsetDistance;
-                    const offsetZ =
-                        Math.sin(angle + Math.PI / 2) * offsetDistance;
-
-                    return (
-                        <mesh
-                            key={door.id}
-                            position={[doorX + offsetX, doorY, doorZ + offsetZ]}
-                            rotation={[0, angle, 0]}
-                        >
-                            <boxGeometry
-                                args={[door.width, door.height, 0.1]}
-                            />
-                            <meshStandardMaterial color="#8B4513" />
-                        </mesh>
-                    );
-                })}
+                {warehouseData.structure.doors.map((door) => (
+                    <Door key={door.id} door={door} />
+                ))}
                 {/* 인간 사이즈 오브젝트 (첫 번째 문 앞에 배치) */}
                 {(() => {
                     const firstDoor = warehouseData.structure.doors[0]; // door-main-loading
@@ -561,7 +478,10 @@ function SpaceThreeDViewer({
                     // 타입 변환: number[]를 [number, number]로, type을 올바른 타입으로
                     const wallWithTuple: Wall = {
                         ...wall,
-                        start: [wall.start[0], wall.start[1]] as [number, number],
+                        start: [wall.start[0], wall.start[1]] as [
+                            number,
+                            number
+                        ],
                         end: [wall.end[0], wall.end[1]] as [number, number],
                         type: wall.type as "exterior" | "interior",
                     };
