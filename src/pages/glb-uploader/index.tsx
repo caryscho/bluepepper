@@ -397,6 +397,8 @@ export default function GlbUploaderPage() {
             attachedToId,
             installedAt: new Date().toISOString(),
             status: "active" as const,
+            temperature: 20 + Math.random() * 15, // POC: 20-35°C 랜덤
+            humidity: 45 + Math.random() * 30, // POC: 45-75% 랜덤
         };
 
         const updatedDevices = [...installedDevices, newDevice];
@@ -427,12 +429,12 @@ export default function GlbUploaderPage() {
                 >
                     Upload GLB File
                 </button>
-                <button
+                {/* <button
                     onClick={handleSampleGLBFile}
                     className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600"
                 >
                     sample glb file
-                </button>
+                </button> */}
 
                 {/* 목표 건물 크기 설정 */}
                 <div className="flex gap-2 items-center ml-4">
@@ -595,7 +597,7 @@ export default function GlbUploaderPage() {
                 )}
             </div>
             {modelUrl && modelInfo && (
-                <div className="absolute right-6 top-20 z-10 p-4 rounded-lg shadow-lg bg-black/80">
+                <div className="absolute right-6 top-52 z-10 p-4 rounded-lg shadow-lg bg-black/80">
                     <div className="pb-2 mb-3 text-lg font-bold text-white border-b border-white/30">
                         📦 GLB 파일 정보
                     </div>

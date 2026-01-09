@@ -36,7 +36,6 @@ interface InstalledDeviceProps {
     onClick?: (device: InstalledDeviceProps["device"]) => void;
     onDeviceHover?: (device: InstalledDeviceProps["device"], isHovered: boolean) => void;
     isHovered?: boolean;
-    deviceSize?: { width: number; height: number; depth: number }; // 커스텀 크기
 }
 
 export default function InstalledDevice({
@@ -44,7 +43,6 @@ export default function InstalledDevice({
     onClick,
     onDeviceHover,
     isHovered: isHoveredProp,
-    deviceSize = DEVICE_SIZE, // 기본값은 표준 크기
 }: InstalledDeviceProps) {
     const meshRef = useRef<THREE.Mesh>(null);
     const [isHovered, setIsHovered] = useState(false);
@@ -99,9 +97,9 @@ export default function InstalledDevice({
     // 호버에 따른 스케일 계산
     const baseScale = isCurrentlyHovered ? 1.3 : 1.2;
     const finalScale: [number, number, number] = [
-        deviceSize.width * baseScale,
-        deviceSize.height * baseScale,
-        deviceSize.depth * baseScale,
+        DEVICE_SIZE.width * baseScale,
+        DEVICE_SIZE.height * baseScale,
+        DEVICE_SIZE.depth * baseScale,
     ];
 
     return (
@@ -131,8 +129,8 @@ export default function InstalledDevice({
             {isCurrentlyHovered && (
                 <Html
                     position={[
-                        deviceSize.width * baseScale / 2 + 0.1,  // 오른쪽 끝 + 여유
-                        deviceSize.height * baseScale / 2 + 0.1,  // 위쪽 끝 + 여유
+                        DEVICE_SIZE.width * baseScale / 2 + 0.1,  // 오른쪽 끝 + 여유
+                        DEVICE_SIZE.height * baseScale / 2 + 0.1,  // 위쪽 끝 + 여유
                         0
                     ]}
                     distanceFactor={10}

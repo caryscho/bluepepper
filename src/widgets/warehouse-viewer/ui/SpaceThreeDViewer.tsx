@@ -16,7 +16,8 @@ import { useFocusTarget } from "@/shared/hooks/useFocusTarget";
 
 // components
 import DevicePreview from "@/features/device-placement/ui/DevicePreview";
-import { SearchIcon } from "lucide-react";
+import HeatmapLayer from "@/widgets/warehouse-viewer/ui/controls/HeatmapLayer";
+
 // 구조물
 import { Column, Human, Walls, Shelf, Door } from "./structures";
 
@@ -36,6 +37,7 @@ interface ThreeDViewerProps {
     editingDeviceId?: string | null;
     focusTarget?: { x: number; y: number; z: number } | null;
     resetCameraTrigger?: number;
+    isHeatmap: boolean;
 }
 
 function FloorGrid({
@@ -205,6 +207,7 @@ function SpaceThreeDViewer({
     editingDeviceId,
     focusTarget,
     resetCameraTrigger,
+    isHeatmap,
 }: ThreeDViewerProps) {
     // 미리보기 위치 및 회전
     const [previewPosition, setPreviewPosition] =
@@ -229,7 +232,6 @@ function SpaceThreeDViewer({
         [length, width]
     );
 
-    
     // focusTarget이 변경되면 카메라를 해당 위치로 이동
     useFocusTarget(focusTarget, controlsRef);
 
@@ -295,6 +297,8 @@ function SpaceThreeDViewer({
                 attachedToId,
                 installedAt: new Date(),
                 status: "active" as const,
+                temperature: 20 + Math.random() * 15, // POC: 20-35°C 랜덤
+                humidity: 45 + Math.random() * 30, // POC: 45-75% 랜덤
             };
 
             const updatedDevices = [...installedDevices, newDevice];
@@ -403,6 +407,17 @@ function SpaceThreeDViewer({
                         />
                     );
                 })}
+                {/* 히트맵 레이어 */}
+                {
+                    isHeatmap && (
+                        <HeatmapLayer
+                            installedDevices={installedDevices}
+                            position={[centerX, 0, centerZ]}
+                            size={{ length, width }}
+                            ceilingHeight={warehouseData.structure.dimensions.height}
+                        />
+                    )
+                }
                 {/* 바닥: JSON의 dimensions 사용 */}
                 <mesh
                     rotation={[-Math.PI / 2, 0, 0]}
@@ -455,7 +470,7 @@ function SpaceThreeDViewer({
                     <Door key={door.id} door={door} />
                 ))}
                 {/* 인간 사이즈 오브젝트 (첫 번째 문 앞에 배치) */}
-                {(() => {
+                {/* {(() => {
                     const firstDoor = warehouseData.structure.doors[0]; // door-main-loading
                     if (!firstDoor) return null;
 
@@ -476,7 +491,7 @@ function SpaceThreeDViewer({
                     };
 
                     return <Human door={firstDoor} wall={wallWithTuple} />;
-                })()}
+                })()} */}
             </Canvas>
         </div>
     );

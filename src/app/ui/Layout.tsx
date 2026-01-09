@@ -22,7 +22,7 @@ export default function Layout() {
                         </div>
                     ))}
                 </div>
-                <div className="overflow-hidden flex-1">
+                <div className="overflow-y-auto flex-1">
                     <Outlet />
                 </div>
             </div>

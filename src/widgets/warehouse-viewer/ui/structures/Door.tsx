@@ -38,7 +38,7 @@ export default function Door({ door }: DoorProps) {
             rotation={[0, angle, 0]}
         >
             <boxGeometry args={[door.width, door.height, 0.1]} />
-            <meshStandardMaterial color="#8B4513" />
+            <meshStandardMaterial color="#CCC" />
         </mesh>
     );
 }

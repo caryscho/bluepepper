@@ -85,6 +85,7 @@ const WarehouseViewer = () => {
                     editingDeviceId={editingDeviceId}
                     focusTarget={focusTarget}
                     resetCameraTrigger={resetCameraTrigger}
+                    isHeatmap={isHeatmap}   
                 />
             )}
             {/* 기기 선택 모달 */}
