@@ -3,7 +3,16 @@ import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Center, Bounds } from "@react-three/drei";
 import { Suspense } from "react";
 import * as THREE from "three";
+import { useWarehouseViewer } from "@/widgets/warehouse-viewer/model/useWarehouseViewer";
+import Controls from "@/widgets/warehouse-viewer/ui/controls";
 import glb01 from "@/data/glb_01.glb";
+import DevicePlacementHandlerGLB from "@/features/device-placement-glb";
+import DevicePreview from "@/features/device-placement/ui/DevicePreview";
+import InstalledDevice from "@/entity/device/ui/InstalledDevice";
+import DeviceSelector from "@/features/device-placement/ui/DeviceSelector";
+import DeviceDetailModal from "@/features/device-detail/ui/DeviceDetailModal";
+import DeviceList from "@/features/device-list/ui/DeviceList";
+import { DEVICE_SIZE } from "@/features/device-placement/constants";
 
 // GLB 모델 컴포넌트 (자동 스케일 & 카메라 조정)
 function Model({ url }: { url: string }) {
@@ -17,8 +26,16 @@ function Model({ url }: { url: string }) {
         const center = box.getCenter(new THREE.Vector3());
 
         console.log("Model Info:", {
-            size: { x: size.x.toFixed(2), y: size.y.toFixed(2), z: size.z.toFixed(2) },
-            center: { x: center.x.toFixed(2), y: center.y.toFixed(2), z: center.z.toFixed(2) }
+            size: {
+                x: size.x.toFixed(2),
+                y: size.y.toFixed(2),
+                z: size.z.toFixed(2),
+            },
+            center: {
+                x: center.x.toFixed(2),
+                y: center.y.toFixed(2),
+                z: center.z.toFixed(2),
+            },
         });
 
         // GLB 파일 내부 구조 탐색 (모든 메시의 이름 출력)
@@ -40,22 +57,23 @@ function Model({ url }: { url: string }) {
 
         // 카메라 거리를 모델 크기에 맞춰 자동 조정
         const maxDim = Math.max(size.x, size.y, size.z);
-        const fov = camera.fov * (Math.PI / 180);
-        let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-        cameraZ *= 2.5; // 여유 공간
+        if (camera instanceof THREE.PerspectiveCamera) {
+            const fov = camera.fov * (Math.PI / 180);
+            let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+            cameraZ *= 2.5; // 여유 공간
 
-        camera.position.set(cameraZ, cameraZ * 0.7, cameraZ);
-        camera.lookAt(0, 0, 0);
-        camera.updateProjectionMatrix();
-
+            camera.position.set(cameraZ, cameraZ * 0.7, cameraZ);
+            camera.lookAt(0, 0, 0);
+            camera.updateProjectionMatrix();
+        }
     }, [scene, camera]);
 
     // GLB 모델의 메시를 클릭했을 때 처리
     const handleClick = (event: any) => {
         event.stopPropagation();
-        
+
         const clickedObject = event.object;
-        
+
         console.log("클릭한 객체 정보:", {
             name: clickedObject.name || "이름 없음",
             type: clickedObject.type,
@@ -88,47 +106,141 @@ function Model({ url }: { url: string }) {
 }
 
 // 클릭 가능한 GLB 모델 컴포넌트 (각 메시를 개별적으로 클릭 가능하게)
-function ClickableGLBModel({ url, onObjectClick }: { url: string; onObjectClick: (name: string) => void }) {
+function ClickableGLBModel({
+    url,
+    onObjectClick,
+    onModelInfoUpdate,
+    targetSize,
+}: {
+    url: string;
+    onObjectClick: (name: string) => void;
+    onModelInfoUpdate: (info: {
+        fileName: string;
+        meshCount: number;
+        triangleCount: number;
+        size: { x: number; y: number; z: number };
+        originalSize: { x: number; y: number; z: number };
+        scale: number;
+    }) => void;
+    targetSize: number; // 목표 건물 크기 (미터)
+}) {
     const { scene } = useGLTF(url);
     const { camera } = useThree();
-    const [hoveredObject, setHoveredObject] = useState<THREE.Object3D | null>(null);
+    const [hoveredObject, setHoveredObject] = useState<THREE.Object3D | null>(
+        null
+    );
 
     useEffect(() => {
-        // 바운딩 박스 계산 및 카메라 조정
+        // 바운딩 박스 계산 (원본 크기)
         const box = new THREE.Box3().setFromObject(scene);
-        const size = box.getSize(new THREE.Vector3());
+        const originalSize = box.getSize(new THREE.Vector3());
         const center = box.getCenter(new THREE.Vector3());
 
+        // 모델을 중앙으로 이동
         scene.position.sub(center);
 
-        const maxDim = Math.max(size.x, size.y, size.z);
-        const fov = camera.fov * (Math.PI / 180);
-        let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-        cameraZ *= 2.5;
+        // 자동 스케일링: 가장 긴 변을 목표 크기에 맞춤
+        const maxOriginalDim = Math.max(
+            originalSize.x,
+            originalSize.y,
+            originalSize.z
+        );
+        const autoScale = targetSize / maxOriginalDim;
 
-        camera.position.set(cameraZ, cameraZ * 0.7, cameraZ);
-        camera.lookAt(0, 0, 0);
-        camera.updateProjectionMatrix();
+        // 씬 전체에 스케일 적용
+        scene.scale.set(autoScale, autoScale, autoScale);
+
+        // 스케일 적용 후 실제 크기 계산
+        const scaledSize = new THREE.Vector3(
+            originalSize.x * autoScale,
+            originalSize.y * autoScale,
+            originalSize.z * autoScale
+        );
+
+        console.log("📐 모델 스케일 정보:", {
+            원본크기: {
+                x: originalSize.x.toFixed(3),
+                y: originalSize.y.toFixed(3),
+                z: originalSize.z.toFixed(3),
+            },
+            목표크기: targetSize + "m",
+            적용스케일: autoScale.toFixed(2) + "x",
+            최종크기: {
+                x: scaledSize.x.toFixed(2) + "m",
+                y: scaledSize.y.toFixed(2) + "m",
+                z: scaledSize.z.toFixed(2) + "m",
+            },
+        });
+
+        // 카메라 위치 조정 (스케일된 크기 기준)
+        const maxDim = Math.max(scaledSize.x, scaledSize.y, scaledSize.z);
+        if (camera instanceof THREE.PerspectiveCamera) {
+            const fov = camera.fov * (Math.PI / 180);
+            let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+            cameraZ *= 2.5;
+
+            camera.position.set(cameraZ, cameraZ * 0.7, cameraZ);
+            camera.lookAt(0, 0, 0);
+            camera.updateProjectionMatrix();
+        }
+
+        // 모델 정보 수집
+        let meshCount = 0;
+        let triangleCount = 0;
 
         // 각 메시를 클릭 가능하게 설정
         scene.traverse((child) => {
             if (child instanceof THREE.Mesh) {
+                meshCount++;
+
+                // 삼각형 개수 계산
+                if (child.geometry) {
+                    const geometry = child.geometry;
+                    if (geometry.index) {
+                        triangleCount += geometry.index.count / 3;
+                    } else if (geometry.attributes.position) {
+                        triangleCount += geometry.attributes.position.count / 3;
+                    }
+                }
+
                 // 클릭 이벤트를 받을 수 있도록 설정
                 child.userData.clickable = true;
-                
+
                 // 원본 색상 저장 (hover 효과용)
                 if (child.material instanceof THREE.Material) {
-                    child.userData.originalColor = (child.material as any).color?.clone();
+                    child.userData.originalColor = (
+                        child.material as any
+                    ).color?.clone();
                 }
             }
         });
 
-    }, [scene, camera]);
+        // 모델 정보 업데이트
+        onModelInfoUpdate({
+            fileName: url.includes("blob:")
+                ? "Uploaded File"
+                : url.split("/").pop() || "Unknown",
+            meshCount,
+            triangleCount: Math.round(triangleCount),
+            originalSize: {
+                x: Math.round(originalSize.x * 1000) / 1000,
+                y: Math.round(originalSize.y * 1000) / 1000,
+                z: Math.round(originalSize.z * 1000) / 1000,
+            },
+            size: {
+                x: Math.round(scaledSize.x * 100) / 100,
+                y: Math.round(scaledSize.y * 100) / 100,
+                z: Math.round(scaledSize.z * 100) / 100,
+            },
+            scale: Math.round(autoScale * 100) / 100,
+        });
+    }, [scene, camera, url, onModelInfoUpdate, targetSize]);
 
     // 호버 효과
     useEffect(() => {
         if (hoveredObject && hoveredObject instanceof THREE.Mesh) {
-            const material = hoveredObject.material as THREE.MeshStandardMaterial;
+            const material =
+                hoveredObject.material as THREE.MeshStandardMaterial;
             if (material.color) {
                 material.color.setHex(0xffff00); // 노란색으로 변경
             }
@@ -136,7 +248,8 @@ function ClickableGLBModel({ url, onObjectClick }: { url: string; onObjectClick:
 
         return () => {
             if (hoveredObject && hoveredObject instanceof THREE.Mesh) {
-                const material = hoveredObject.material as THREE.MeshStandardMaterial;
+                const material =
+                    hoveredObject.material as THREE.MeshStandardMaterial;
                 const originalColor = hoveredObject.userData.originalColor;
                 if (material.color && originalColor) {
                     material.color.copy(originalColor);
@@ -148,21 +261,23 @@ function ClickableGLBModel({ url, onObjectClick }: { url: string; onObjectClick:
     const handlePointerOver = (event: any) => {
         event.stopPropagation();
         setHoveredObject(event.object);
-        document.body.style.cursor = 'pointer';
+        document.body.style.cursor = "pointer";
     };
 
     const handlePointerOut = () => {
         setHoveredObject(null);
-        document.body.style.cursor = 'default';
+        document.body.style.cursor = "default";
     };
 
     const handleClick = (event: any) => {
         event.stopPropagation();
         const clickedObject = event.object;
-        
-        const objectInfo = `${clickedObject.name || "이름없음"} (타입: ${clickedObject.type})`;
+
+        const objectInfo = `${clickedObject.name || "이름없음"} (타입: ${
+            clickedObject.type
+        })`;
         onObjectClick(objectInfo);
-        
+
         console.log("클릭한 객체 상세 정보:", {
             name: clickedObject.name,
             type: clickedObject.type,
@@ -174,8 +289,8 @@ function ClickableGLBModel({ url, onObjectClick }: { url: string; onObjectClick:
     };
 
     return (
-        <primitive 
-            object={scene} 
+        <primitive
+            object={scene}
             onClick={handleClick}
             onPointerOver={handlePointerOver}
             onPointerOut={handlePointerOut}
@@ -184,9 +299,54 @@ function ClickableGLBModel({ url, onObjectClick }: { url: string; onObjectClick:
 }
 
 export default function GlbUploaderPage() {
+    const {
+        is2D,
+        isDimensionLoading,
+        isAddDeviceMode,
+        selectedDeviceSerialNumber,
+        installedDevices,
+        setInstalledDevices,
+        selectedDevice,
+        hoveredDevice,
+        isHeatmap,
+        showDeviceList,
+        handleToggleAddDeviceMode,
+        handleSelectDevice,
+        handleCloseModal,
+        handleToggleDeviceListMode,
+        handleDeviceClick,
+        handleDeviceHover,
+        handleCloseDeviceDetail,
+        handleChangePosition,
+        handleDeleteDevice,
+        handleFocusDevice,
+        handleResetCamera,
+        handleToggleDimension,
+        handleToggleHeatmap,
+        handleSearchDeviceWithText,
+    } = useWarehouseViewer();
+
     const fileInput = useRef<HTMLInputElement>(null);
     const [modelUrl, setModelUrl] = useState<string | null>(null);
+    const [fileName, setFileName] = useState<string | null>(null);
     const [selectedObject, setSelectedObject] = useState<string | null>(null);
+    const [targetModelSize, setTargetModelSize] = useState<number>(50); // 목표 건물 크기 (미터)
+    const [modelInfo, setModelInfo] = useState<{
+        fileName: string;
+        meshCount: number;
+        triangleCount: number;
+        size: { x: number; y: number; z: number };
+        originalSize: { x: number; y: number; z: number };
+        scale: number;
+    } | null>(null);
+
+    // 디바이스 배치 미리보기 상태
+    const [previewPosition, setPreviewPosition] =
+        useState<THREE.Vector3 | null>(null);
+    const [previewRotation, setPreviewRotation] = useState<THREE.Euler | null>(
+        null
+    );
+    const [isPreviewValid, setIsPreviewValid] = useState(false);
 
     const handleClick = () => {
         fileInput.current?.click();
@@ -204,11 +364,50 @@ export default function GlbUploaderPage() {
         // Blob URL 생성
         const url = URL.createObjectURL(file);
         setModelUrl(url);
+        setFileName(file.name);
         console.log("GLB file loaded:", file.name);
     };
 
     const handleSampleGLBFile = () => {
         setModelUrl(glb01);
+        setFileName("glb_01.glb");
+    };
+
+    // 디바이스 배치 핸들러
+    const handlePlaceDevice = (
+        position: THREE.Vector3,
+        rotation: THREE.Euler,
+        attachedTo: string,
+        attachedToId: string
+    ) => {
+        const newDevice = {
+            id: `device-${Date.now()}`,
+            serialNumber: selectedDeviceSerialNumber,
+            position: {
+                x: position.x,
+                y: position.y,
+                z: position.z,
+            },
+            rotation: {
+                x: rotation.x,
+                y: rotation.y,
+                z: rotation.z,
+            },
+            attachedTo,
+            attachedToId,
+            installedAt: new Date().toISOString(),
+            status: "active" as const,
+        };
+
+        const updatedDevices = [...installedDevices, newDevice];
+        setInstalledDevices(updatedDevices);
+
+        console.log("디바이스 배치 완료:", newDevice);
+
+        // 배치 완료 후 모드 해제
+        handleCloseModal();
+        setPreviewPosition(null);
+        setPreviewRotation(null);
     };
 
     return (
@@ -228,7 +427,29 @@ export default function GlbUploaderPage() {
                 >
                     Upload GLB File
                 </button>
-                <button onClick={handleSampleGLBFile} className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600">sample glb file</button>
+                <button
+                    onClick={handleSampleGLBFile}
+                    className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600"
+                >
+                    sample glb file
+                </button>
+
+                {/* 목표 건물 크기 설정 */}
+                <div className="flex gap-2 items-center ml-4">
+                    <label className="text-sm text-gray-700">건물 크기:</label>
+                    <input
+                        type="number"
+                        value={targetModelSize}
+                        onChange={(e) =>
+                            setTargetModelSize(Number(e.target.value))
+                        }
+                        className="px-2 py-1 w-20 text-sm rounded border"
+                        min="1"
+                        max="500"
+                    />
+                    <span className="text-sm text-gray-600">m</span>
+                </div>
+
                 {modelUrl && (
                     <span className="ml-4 text-sm text-gray-600">
                         Model loaded ✓
@@ -242,22 +463,90 @@ export default function GlbUploaderPage() {
             </div>
 
             {/* 3D 뷰어 */}
-            <div className="flex-1 bg-red-200">
+            <div className="relative flex-1 bg-red-200">
+                <Controls
+                    is2D={is2D}
+                    isHeatmap={isHeatmap}
+                    isDimensionLoading={isDimensionLoading}
+                    isAddDeviceMode={isAddDeviceMode}
+                    onToggleDimension={handleToggleDimension}
+                    onToggleAddDeviceMode={handleToggleAddDeviceMode}
+                    onToggleDeviceListMode={handleToggleDeviceListMode}
+                    onToggleHeatmap={handleToggleHeatmap}
+                    onResetCamera={handleResetCamera}
+                    onSearchDeviceWithText={handleSearchDeviceWithText}
+                />
                 {modelUrl ? (
-                    <Canvas camera={{ position: [5, 5, 5], fov: 50, near: 0.01, far: 10000 }}>
+                    <Canvas
+                        camera={{
+                            position: [5, 5, 5],
+                            fov: 50,
+                            near: 0.01,
+                            far: 10000,
+                        }}
+                    >
                         <ambientLight intensity={0.8} />
-                        <directionalLight position={[10, 10, 5]} intensity={1} />
-                        <directionalLight position={[-10, 10, -5]} intensity={0.5} />
+                        <directionalLight
+                            position={[10, 10, 5]}
+                            intensity={1}
+                        />
+                        <directionalLight
+                            position={[-10, 10, -5]}
+                            intensity={0.5}
+                        />
                         <hemisphereLight intensity={0.4} />
-                        
+
                         <Suspense fallback={null}>
-                            <ClickableGLBModel url={modelUrl} onObjectClick={setSelectedObject} />
+                            <ClickableGLBModel
+                                url={modelUrl}
+                                onObjectClick={setSelectedObject}
+                                onModelInfoUpdate={setModelInfo}
+                                targetSize={targetModelSize}
+                            />
                         </Suspense>
+
+                        {/* 디바이스 배치 핸들러 및 미리보기 */}
+                        {isAddDeviceMode && selectedDeviceSerialNumber && (
+                            <>
+                                <DevicePlacementHandlerGLB
+                                    isAddDeviceMode={isAddDeviceMode}
+                                    onPlaceDevice={handlePlaceDevice}
+                                    onPreviewPositionChange={(
+                                        pos: THREE.Vector3 | null,
+                                        rot: THREE.Euler | null,
+                                        isValid: boolean
+                                    ) => {
+                                        setPreviewPosition(pos);
+                                        setPreviewRotation(rot);
+                                        setIsPreviewValid(isValid);
+                                    }}
+                                />
+                                <DevicePreview
+                                    position={previewPosition}
+                                    rotation={previewRotation}
+                                    isValid={isPreviewValid}
+                                    deviceSize={DEVICE_SIZE}
+                                />
+                            </>
+                        )}
+
+                        {/* 설치된 디바이스들 - 일반 크기 (건물이 스케일되었으므로) */}
+                        {installedDevices.map((device) => (
+                            <InstalledDevice
+                                key={device.id}
+                                device={device}
+                                onClick={handleDeviceClick}
+                                onDeviceHover={handleDeviceHover}
+                                isHovered={hoveredDevice?.id === device.id}
+                                deviceSize={DEVICE_SIZE}
+                            />
+                        ))}
 
                         <OrbitControls
                             minDistance={0.1}
                             maxDistance={1000}
                             enablePan={true}
+                            enabled={!isAddDeviceMode}
                         />
                         <gridHelper args={[100, 20]} />
                     </Canvas>
@@ -266,7 +555,108 @@ export default function GlbUploaderPage() {
                         Upload a GLB file to view
                     </div>
                 )}
+
+                {/* 기기 선택 모달 */}
+                {isAddDeviceMode && !selectedDeviceSerialNumber && (
+                    <DeviceSelector
+                        selectedDeviceTypeId={selectedDeviceSerialNumber}
+                        onSelectDevice={handleSelectDevice}
+                        onClose={handleCloseModal}
+                        excludedSerialNumbers={installedDevices.map(
+                            (device) => device.serialNumber
+                        )}
+                    />
+                )}
+
+                {/* 디바이스 상세 정보 모달 */}
+                {selectedDevice && (
+                    <DeviceDetailModal
+                        device={selectedDevice}
+                        onClose={handleCloseDeviceDetail}
+                        onChangePosition={handleChangePosition}
+                        onDelete={handleDeleteDevice}
+                    />
+                )}
+
+                {installedDevices.length > 0 && (
+                    <div
+                        className={`absolute right-6 top-1/2 -translate-y-1/2 z-10 transition-all duration-300 ease-in-out ${
+                            showDeviceList
+                                ? "opacity-100 translate-x-0 pointer-events-auto"
+                                : "opacity-0 translate-x-4 pointer-events-none"
+                        }`}
+                    >
+                        <DeviceList
+                            installedDevices={installedDevices}
+                            onClose={handleToggleDeviceListMode}
+                            onFocusDevice={handleFocusDevice}
+                        />
+                    </div>
+                )}
             </div>
+            {modelUrl && modelInfo && (
+                <div className="absolute right-6 top-20 z-10 p-4 rounded-lg shadow-lg bg-black/80">
+                    <div className="pb-2 mb-3 text-lg font-bold text-white border-b border-white/30">
+                        📦 GLB 파일 정보
+                    </div>
+                    <div className="space-y-2 text-sm text-white/90">
+                        <div className="flex gap-4 justify-between">
+                            <span className="text-white/70">파일명:</span>
+                            <span className="font-mono text-blue-300">
+                                {fileName || modelInfo.fileName}
+                            </span>
+                        </div>
+                        <div className="flex gap-4 justify-between">
+                            <span className="text-white/70">메시 개수:</span>
+                            <span className="font-mono text-green-300">
+                                {modelInfo.meshCount}개
+                            </span>
+                        </div>
+                        <div className="flex gap-4 justify-between">
+                            <span className="text-white/70">삼각형:</span>
+                            <span className="font-mono text-yellow-300">
+                                {modelInfo.triangleCount.toLocaleString()}개
+                            </span>
+                        </div>
+                        <div className="pt-2 mt-2 border-t border-white/20">
+                            <div className="mb-1 text-white/70">원본 크기:</div>
+                            <div className="pl-2 space-y-1 font-mono text-xs text-gray-400">
+                                <div>X: {modelInfo.originalSize.x}m</div>
+                                <div>Y: {modelInfo.originalSize.y}m</div>
+                                <div>Z: {modelInfo.originalSize.z}m</div>
+                            </div>
+                        </div>
+                        <div className="pt-2 mt-2 border-t border-white/20">
+                            <div className="flex gap-4 justify-between mb-2">
+                                <span className="text-white/70">
+                                    적용 스케일:
+                                </span>
+                                <span className="font-mono text-cyan-300">
+                                    {modelInfo.scale}x
+                                </span>
+                            </div>
+                            <div className="mb-1 text-white/70">최종 크기:</div>
+                            <div className="pl-2 space-y-1 font-mono text-xs text-purple-300">
+                                <div>X: {modelInfo.size.x}m</div>
+                                <div>Y: {modelInfo.size.y}m</div>
+                                <div>Z: {modelInfo.size.z}m</div>
+                            </div>
+                        </div>
+                        {installedDevices.length > 0 && (
+                            <div className="pt-2 mt-2 border-t border-white/20">
+                                <div className="flex gap-4 justify-between">
+                                    <span className="text-white/70">
+                                        설치된 디바이스:
+                                    </span>
+                                    <span className="font-mono text-orange-300">
+                                        {installedDevices.length}개
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

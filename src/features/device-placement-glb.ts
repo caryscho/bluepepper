@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { useThree, useFrame } from "@react-three/fiber";
-import { DEVICE_SIZE } from "./constants";
+import { DEVICE_SIZE } from "./device-placement/constants";
 
-interface DevicePlacementHandlerProps {
+interface DevicePlacementHandlerGLBProps {
     isAddDeviceMode: boolean;
     onPlaceDevice: (
         position: THREE.Vector3,
         rotation: THREE.Euler,
-        attachedTo: "wall" | "column",
+        attachedTo: string, // GLB에서는 메시 이름
         attachedToId: string
     ) => void;
     onPreviewPositionChange: (
@@ -18,21 +18,19 @@ interface DevicePlacementHandlerProps {
     ) => void;
 }
 
-function DevicePlacementHandler({
+function DevicePlacementHandlerGLB({
     isAddDeviceMode,
     onPlaceDevice,
     onPreviewPositionChange,
-}: DevicePlacementHandlerProps) {
+}: DevicePlacementHandlerGLBProps) {
     const { camera, raycaster, gl, scene } = useThree();
     const [mousePosition, setMousePosition] = useState(new THREE.Vector2());
-    const wallsRef = useRef<THREE.Mesh[]>([]);
-    const columnsRef = useRef<THREE.Mesh[]>([]);
+    const meshesRef = useRef<THREE.Mesh[]>([]);
 
     // 재사용 가능한 객체들 (매 프레임마다 생성하지 않음)
     const tempVector = useRef(new THREE.Vector3());
     const tempVector2 = useRef(new THREE.Vector3());
     const tempNormal = useRef(new THREE.Vector3());
-    const allTargetsRef = useRef<THREE.Mesh[]>([]);
     const lastPositionRef = useRef<THREE.Vector3 | null>(null);
 
     // Hover 효과를 위한 state와 ref
@@ -66,30 +64,25 @@ function DevicePlacementHandler({
         };
     }, [isAddDeviceMode, gl, onPreviewPositionChange]);
 
-    // 벽과 기둥 mesh 참조 수집
+    // GLB 모델의 모든 mesh 참조 수집
     useEffect(() => {
         if (!isAddDeviceMode) return;
 
-        const walls: THREE.Mesh[] = [];
-        const columns: THREE.Mesh[] = [];
+        const meshes: THREE.Mesh[] = [];
 
         scene.traverse((object) => {
             if (object instanceof THREE.Mesh) {
-                if (object.userData.type === "wall") {
-                    walls.push(object);
-                } else if (object.userData.type === "column") {
-                    columns.push(object);
-                }
+                // GLB 모델의 모든 메시를 배치 대상으로 포함
+                meshes.push(object);
+                console.log("배치 가능한 메시:", object.name || "이름없음");
             }
         });
 
-        wallsRef.current = walls;
-        columnsRef.current = columns;
-        // allTargets 배열도 미리 생성 (매 프레임마다 생성하지 않음)
-        allTargetsRef.current = [...walls, ...columns];
+        meshesRef.current = meshes;
+        console.log(`총 ${meshes.length}개의 배치 가능한 메시 발견`);
     }, [isAddDeviceMode, scene]);
 
-    // Raycasting으로 벽/기둥 위치 계산 (최적화됨)
+    // Raycasting으로 GLB 메시 위치 계산 (최적화됨)
     useFrame(() => {
         if (!isAddDeviceMode) {
             // 모드가 꺼지면 hover 효과 제거
@@ -105,13 +98,12 @@ function DevicePlacementHandler({
             return;
         }
 
-        // Raycasting 설정 (threshold 조정으로 성능 향상) 카메라 위치에서 광선검을 쏨 충돌하는 객체가 있는가 확인함
+        // Raycasting 설정
         raycaster.setFromCamera(mousePosition, camera);
         raycaster.params.Line = { threshold: 0.1 };
 
-        // 미리 생성된 배열 사용 (매 프레임마다 새 배열 생성하지 않음)
         const intersects = raycaster.intersectObjects(
-            allTargetsRef.current,
+            meshesRef.current,
             false
         );
 
@@ -162,7 +154,7 @@ function DevicePlacementHandler({
             // 기기 크기
             const deviceDepth = DEVICE_SIZE.depth || 0.01;
 
-            // 면에서 약간 떨어진 위치 (벽/기둥 표면에서) - 재사용 가능한 객체 사용
+            // 면에서 약간 떨어진 위치 (표면에서)
             const offset = tempVector.current;
             offset.copy(normal).multiplyScalar(deviceDepth / 2 + 0.01);
 
@@ -178,7 +170,7 @@ function DevicePlacementHandler({
             }
             lastPositionRef.current = position.clone();
 
-            // 성냥갑의 얇은 부분(depth)이 앞을 향하도록 Y축 기준 90도 회전
+            // 기기 회전: 표면에 수직으로 배치
             const finalRotation = new THREE.Euler(0, Math.PI / 2, 0);
 
             onPreviewPositionChange(position.clone(), finalRotation, true);
@@ -206,15 +198,14 @@ function DevicePlacementHandler({
         if (!isAddDeviceMode) return;
 
         const handleClick = (event: MouseEvent) => {
-            // UI 요소 클릭은 무시 (사이드바 등)
+            // UI 요소 클릭은 무시
             const target = event.target as HTMLElement;
             if (target.closest(".absolute") || target.closest("button")) {
                 return;
             }
 
             raycaster.setFromCamera(mousePosition, camera);
-            const allTargets = [...wallsRef.current, ...columnsRef.current];
-            const intersects = raycaster.intersectObjects(allTargets, false);
+            const intersects = raycaster.intersectObjects(meshesRef.current, false);
 
             if (intersects.length > 0) {
                 const intersect = intersects[0];
@@ -234,15 +225,18 @@ function DevicePlacementHandler({
                     .multiplyScalar(deviceDepth / 2 + 0.01);
                 const position = point.clone().add(offset);
 
-                // 성냥갑의 얇은 부분(depth)이 앞을 향하도록 Y축 기준 90도 회전
                 const rotation = new THREE.Euler(0, Math.PI / 2, 0);
 
-                // 부착된 오브젝트 정보
-                const attachedToId = intersect.object.userData.id || "";
-                const attachedTo =
-                    intersect.object.userData.type === "wall"
-                        ? "wall"
-                        : "column";
+                // 부착된 메시 정보
+                const attachedToId = intersect.object.userData.id || 
+                    `mesh-${intersect.object.id}`;
+                const attachedTo = intersect.object.name || "mesh";
+
+                console.log("디바이스 배치:", {
+                    meshName: attachedTo,
+                    meshId: attachedToId,
+                    position: position,
+                });
 
                 onPlaceDevice(position, rotation, attachedTo, attachedToId);
             }
@@ -286,4 +280,4 @@ function DevicePlacementHandler({
     return null; // 이 컴포넌트는 렌더링하지 않음
 }
 
-export default DevicePlacementHandler;
+export default DevicePlacementHandlerGLB;
