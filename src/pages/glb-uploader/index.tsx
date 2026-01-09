@@ -235,8 +235,8 @@ export default function GlbUploaderPage() {
                     </span>
                 )}
                 {selectedObject && (
-                    <div className="p-2 ml-4 text-sm bg-green-100 rounded-md">
-                        선택된 객체: <strong>{selectedObject}</strong>
+                    <div className="p-2 ml-4 text-sm bg-green-400 rounded-md">
+                        선택 객체: <strong>{selectedObject}</strong>
                     </div>
                 )}
             </div>
