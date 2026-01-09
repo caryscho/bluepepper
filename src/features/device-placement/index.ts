@@ -35,6 +35,10 @@ function DevicePlacementHandler({
     const tempNormal = useRef(new THREE.Vector3());
     const allTargetsRef = useRef<THREE.Mesh[]>([]);
     const lastPositionRef = useRef<THREE.Vector3 | null>(null);
+    
+    // Hover 효과를 위한 state와 ref
+    const hoveredObjectRef = useRef<THREE.Mesh | null>(null);
+    const originalColorRef = useRef<THREE.Color | null>(null);
 
     // 마우스 위치 업데이트
     useEffect(() => {
@@ -89,6 +93,15 @@ function DevicePlacementHandler({
     // Raycasting으로 벽/기둥 위치 계산 (최적화됨)
     useFrame(() => {
         if (!isAddDeviceMode) {
+            // 모드가 꺼지면 hover 효과 제거
+            if (hoveredObjectRef.current && originalColorRef.current) {
+                const material = hoveredObjectRef.current.material as THREE.MeshStandardMaterial;
+                if (material.color) {
+                    material.color.copy(originalColorRef.current);
+                }
+                hoveredObjectRef.current = null;
+                originalColorRef.current = null;
+            }
             return;
         }
 
@@ -102,6 +115,29 @@ function DevicePlacementHandler({
         if (intersects.length > 0) {
             const intersect = intersects[0];
             const point = intersect.point;
+            
+            // Hover 효과: 현재 intersect된 객체가 이전과 다르면 색상 변경
+            if (intersect.object instanceof THREE.Mesh) {
+                if (hoveredObjectRef.current !== intersect.object) {
+                    // 이전에 hover된 객체가 있으면 원래 색상으로 복원
+                    if (hoveredObjectRef.current && originalColorRef.current) {
+                        const prevMaterial = hoveredObjectRef.current.material as THREE.MeshStandardMaterial;
+                        if (prevMaterial.color) {
+                            prevMaterial.color.copy(originalColorRef.current);
+                        }
+                    }
+                    
+                    // 새로운 객체를 hover
+                    hoveredObjectRef.current = intersect.object;
+                    const material = intersect.object.material as THREE.MeshStandardMaterial;
+                    if (material.color) {
+                        // 원래 색상 저장
+                        originalColorRef.current = material.color.clone();
+                        // 노란색으로 변경
+                        material.color.setHex(0xffff00);
+                    }
+                }
+            }
             
             // 재사용 가능한 객체 사용
             const normal = tempNormal.current;
@@ -142,6 +178,16 @@ function DevicePlacementHandler({
 
             onPreviewPositionChange(position.clone(), finalRotation, true);
         } else {
+            // 교차점이 없으면 hover 효과 제거
+            if (hoveredObjectRef.current && originalColorRef.current) {
+                const material = hoveredObjectRef.current.material as THREE.MeshStandardMaterial;
+                if (material.color) {
+                    material.color.copy(originalColorRef.current);
+                }
+                hoveredObjectRef.current = null;
+                originalColorRef.current = null;
+            }
+            
             if (lastPositionRef.current !== null) {
                 lastPositionRef.current = null;
                 onPreviewPositionChange(null, null, false);
@@ -217,6 +263,18 @@ function DevicePlacementHandler({
             window.removeEventListener("keydown", handleKeyDown);
         };
     }, [isAddDeviceMode, onPreviewPositionChange]);
+
+    // 컴포넌트 언마운트 시 hover 효과 정리
+    useEffect(() => {
+        return () => {
+            if (hoveredObjectRef.current && originalColorRef.current) {
+                const material = hoveredObjectRef.current.material as THREE.MeshStandardMaterial;
+                if (material.color) {
+                    material.color.copy(originalColorRef.current);
+                }
+            }
+        };
+    }, []);
 
     return null; // 이 컴포넌트는 렌더링하지 않음
 }
