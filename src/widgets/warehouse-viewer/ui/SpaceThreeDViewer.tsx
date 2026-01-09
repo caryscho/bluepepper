@@ -328,17 +328,6 @@ function SpaceThreeDViewer({
                     <p>FOV: {cameraDebug.fov}°</p>
                 </div>
             )} */}
-            {/* device 검색 */}
-            <div className="flex overflow-hidden gap-1 bg-white rounded-lg w-[240px] absolute top-6 left-1/2 -translate-x-1/2 z-10 text-black">
-                <button className="text-black">
-                    <SearchIcon className="w-4 h-4" />
-                </button>
-                <input
-                    className="mr-2 bg-white outline-none grow focus:outline-none"
-                    type="text"
-                    placeholder="Device Serial Number"
-                />
-            </div>
             <Canvas
                 camera={{
                     position: [centerX, Math.max(length, width) * 1.5, centerZ],

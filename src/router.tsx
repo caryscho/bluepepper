@@ -3,6 +3,7 @@ import Layout from "./app/ui/Layout";
 import WarehousePage from "./pages/warehouse/ui/WarehousePage";
 import DevicemodelPage from "./pages/device-model/ui/DevicemodelPage";
 import GlbUploaderPage from "./pages/glb-uploader";
+import TestPage from "./pages/TestPage.tsx";
 
 function NotFoundPage() {
   return <div>404 - Page Not Found</div>;
@@ -40,6 +41,13 @@ export const router = createBrowserRouter([
         element: <GlbUploaderPage/>,
         handle: {
           title: "GLB Uploader"
+        }
+      },
+      {
+        path: 'test',
+        element: <TestPage/>,
+        handle: {
+          title: "Test"
         }
       },
       {

@@ -18,7 +18,7 @@ export function useWarehouseViewer() {
 
     // 2차원 <-> 3차원 전환 상태
     const [is2D, setIs2D] = useState(false);
-    
+
     // 2D/3D 전환 로딩 상태
     const [isDimensionLoading, setIsDimensionLoading] = useState(false);
 
@@ -88,15 +88,17 @@ export function useWarehouseViewer() {
         z: number;
     } | null>(null);
 
+    const [isHeatmap, setIsHeatmap] = useState(false);
+
     // 카메라 리셋 트리거
     const [resetCameraTrigger, setResetCameraTrigger] = useState(0);
 
     const handleToggleDimension = () => {
         // 이미 로딩 중이면 무시 (연속 클릭 방지)
         if (isDimensionLoading) return;
-        
+
         setIsDimensionLoading(true);
-        
+
         // Fiber 크래시 방지를 위한 딜레이
         setTimeout(() => {
             setIs2D(!is2D);
@@ -185,9 +187,23 @@ export function useWarehouseViewer() {
         }
     };
 
+    // 시리얼넘버 검색 핸들러
+    const handleSearchDeviceWithText = (serialNumber: string) => {
+        console.log(serialNumber, "serialNumber로 나는 포커스할거야 텍스트지롱");
+        const device = installedDevices.find((d) => d.serialNumber === serialNumber);
+        if (device) {
+            handleFocusDevice(device.id);
+        }
+    };
+
     // 카메라 리셋 핸들러
     const handleResetCamera = () => {
         setResetCameraTrigger((prev) => prev + 1);
+    };
+
+    // 열지도 토글 핸들러
+    const handleToggleHeatmap = () => {
+        setIsHeatmap(!isHeatmap);
     };
 
     return {
@@ -209,6 +225,7 @@ export function useWarehouseViewer() {
         editingDeviceId,
         focusTarget,
         resetCameraTrigger,
+        isHeatmap,
         // 핸들러
         handleToggleDimension,
         handleToggleAddDeviceMode,
@@ -222,5 +239,7 @@ export function useWarehouseViewer() {
         handleDeleteDevice,
         handleFocusDevice,
         handleResetCamera,
+        handleToggleHeatmap,
+        handleSearchDeviceWithText,
     };
 }

@@ -32,6 +32,7 @@ const WarehouseViewer = () => {
         editingDeviceId,
         focusTarget,
         resetCameraTrigger,
+        isHeatmap,  
         handleToggleAddDeviceMode,
         handleSelectDevice,
         handleCloseModal,
@@ -44,6 +45,8 @@ const WarehouseViewer = () => {
         handleFocusDevice,
         handleResetCamera,
         handleToggleDimension,
+        handleToggleHeatmap,
+        handleSearchDeviceWithText,
     } = useWarehouseViewer();
 
     return (
@@ -53,12 +56,15 @@ const WarehouseViewer = () => {
         >
             <Controls
                 is2D={is2D}
+                isHeatmap={isHeatmap}
                 isDimensionLoading={isDimensionLoading}
                 isAddDeviceMode={isAddDeviceMode}
                 onToggleDimension={handleToggleDimension}
                 onToggleAddDeviceMode={handleToggleAddDeviceMode}
-                onToggleDeviceListMode={handleToggleDeviceListMode}
+                onToggleDeviceListMode={handleToggleDeviceListMode}   
+                onToggleHeatmap={handleToggleHeatmap}   
                 onResetCamera={handleResetCamera}
+                onSearchDeviceWithText={handleSearchDeviceWithText}
             />
             {is2D ? (
                 <TwoDViewer installedDevices={installedDevices} />
