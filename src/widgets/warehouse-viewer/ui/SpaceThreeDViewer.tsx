@@ -22,6 +22,7 @@ import HeatmapLayer from "@/widgets/warehouse-viewer/ui/controls/HeatmapLayer";
 import { Column, Human, Walls, Shelf, Door } from "./structures";
 import InstancedColumns from "./structures/InstancedColumns";
 import InstancedShelves from "./structures/InstancedShelves";
+import InstancedWalls from "./structures/InstancedWalls";
 
 interface ThreeDViewerProps {
     centerX: number;
@@ -449,20 +450,15 @@ function SpaceThreeDViewer({
                         orientation: shelf.orientation as "north" | "south" | "east" | "west",
                     }))} 
                 />
-                {/* 벽 */}
-                {warehouseData.structure.walls.map((wall) => {
-                    // 타입 변환: number[]를 [number, number]로, type을 올바른 타입으로
-                    const wallWithTuple: Wall = {
+                {/* 벽 - InstancedMesh로 최적화 */}
+                <InstancedWalls
+                    walls={warehouseData.structure.walls.map((wall) => ({
                         ...wall,
-                        start: [wall.start[0], wall.start[1]] as [
-                            number,
-                            number
-                        ],
+                        start: [wall.start[0], wall.start[1]] as [number, number],
                         end: [wall.end[0], wall.end[1]] as [number, number],
                         type: wall.type as "exterior" | "interior",
-                    };
-                    return <Walls key={wall.id} wall={wallWithTuple} />;
-                })}
+                    }))}
+                />
                 {/* 문 */}
                 {warehouseData.structure.doors.map((door) => (
                     <Door key={door.id} door={door} />

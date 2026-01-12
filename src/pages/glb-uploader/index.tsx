@@ -1,11 +1,10 @@
 import { useRef, useState, useEffect } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
-import { OrbitControls, useGLTF, Center, Bounds } from "@react-three/drei";
+import { OrbitControls, useGLTF } from "@react-three/drei";
 import { Suspense } from "react";
 import * as THREE from "three";
 import { useWarehouseViewer } from "@/widgets/warehouse-viewer/model/useWarehouseViewer";
 import Controls from "@/widgets/warehouse-viewer/ui/controls";
-import glb01 from "@/data/glb_01.glb";
 import DevicePlacementHandlerGLB from "@/features/device-placement-glb";
 import DevicePreview from "@/features/device-placement/ui/DevicePreview";
 import InstalledDevice from "@/entity/device/ui/InstalledDevice";
@@ -15,95 +14,95 @@ import DeviceList from "@/features/device-list/ui/DeviceList";
 import { DEVICE_SIZE } from "@/features/device-placement/constants";
 
 // GLB 모델 컴포넌트 (자동 스케일 & 카메라 조정)
-function Model({ url }: { url: string }) {
-    const { scene } = useGLTF(url);
-    const { camera } = useThree();
+// function Model({ url }: { url: string }) {
+//     const { scene } = useGLTF(url);
+//     const { camera } = useThree();
 
-    useEffect(() => {
-        // 바운딩 박스 계산
-        const box = new THREE.Box3().setFromObject(scene);
-        const size = box.getSize(new THREE.Vector3());
-        const center = box.getCenter(new THREE.Vector3());
+//     useEffect(() => {
+//         // 바운딩 박스 계산
+//         const box = new THREE.Box3().setFromObject(scene);
+//         const size = box.getSize(new THREE.Vector3());
+//         const center = box.getCenter(new THREE.Vector3());
 
-        console.log("Model Info:", {
-            size: {
-                x: size.x.toFixed(2),
-                y: size.y.toFixed(2),
-                z: size.z.toFixed(2),
-            },
-            center: {
-                x: center.x.toFixed(2),
-                y: center.y.toFixed(2),
-                z: center.z.toFixed(2),
-            },
-        });
+//         console.log("Model Info:", {
+//             size: {
+//                 x: size.x.toFixed(2),
+//                 y: size.y.toFixed(2),
+//                 z: size.z.toFixed(2),
+//             },
+//             center: {
+//                 x: center.x.toFixed(2),
+//                 y: center.y.toFixed(2),
+//                 z: center.z.toFixed(2),
+//             },
+//         });
 
-        // GLB 파일 내부 구조 탐색 (모든 메시의 이름 출력)
-        console.log("=== GLB 내부 구조 ===");
-        scene.traverse((child) => {
-            if (child instanceof THREE.Mesh) {
-                console.log("Mesh 발견:", {
-                    name: child.name || "이름 없음",
-                    type: child.type,
-                    userData: child.userData,
-                    // material 정보도 확인 가능
-                    material: (child.material as THREE.Material)?.name,
-                });
-            }
-        });
+//         // GLB 파일 내부 구조 탐색 (모든 메시의 이름 출력)
+//         console.log("=== GLB 내부 구조 ===");
+//         scene.traverse((child) => {
+//             if (child instanceof THREE.Mesh) {
+//                 console.log("Mesh 발견:", {
+//                     name: child.name || "이름 없음",
+//                     type: child.type,
+//                     userData: child.userData,
+//                     // material 정보도 확인 가능
+//                     material: (child.material as THREE.Material)?.name,
+//                 });
+//             }
+//         });
 
-        // 모델을 중앙으로 이동
-        scene.position.sub(center);
+//         // 모델을 중앙으로 이동
+//         scene.position.sub(center);
 
-        // 카메라 거리를 모델 크기에 맞춰 자동 조정
-        const maxDim = Math.max(size.x, size.y, size.z);
-        if (camera instanceof THREE.PerspectiveCamera) {
-            const fov = camera.fov * (Math.PI / 180);
-            let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-            cameraZ *= 2.5; // 여유 공간
+//         // 카메라 거리를 모델 크기에 맞춰 자동 조정
+//         const maxDim = Math.max(size.x, size.y, size.z);
+//         if (camera instanceof THREE.PerspectiveCamera) {
+//             const fov = camera.fov * (Math.PI / 180);
+//             let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+//             cameraZ *= 2.5; // 여유 공간
 
-            camera.position.set(cameraZ, cameraZ * 0.7, cameraZ);
-            camera.lookAt(0, 0, 0);
-            camera.updateProjectionMatrix();
-        }
-    }, [scene, camera]);
+//             camera.position.set(cameraZ, cameraZ * 0.7, cameraZ);
+//             camera.lookAt(0, 0, 0);
+//             camera.updateProjectionMatrix();
+//         }
+//     }, [scene, camera]);
 
-    // GLB 모델의 메시를 클릭했을 때 처리
-    const handleClick = (event: any) => {
-        event.stopPropagation();
+//     // GLB 모델의 메시를 클릭했을 때 처리
+//     const handleClick = (event: any) => {
+//         event.stopPropagation();
 
-        const clickedObject = event.object;
+//         const clickedObject = event.object;
 
-        console.log("클릭한 객체 정보:", {
-            name: clickedObject.name || "이름 없음",
-            type: clickedObject.type,
-            position: clickedObject.position,
-            userData: clickedObject.userData,
-            // 부모 객체 정보
-            parent: clickedObject.parent?.name,
-        });
+//         console.log("클릭한 객체 정보:", {
+//             name: clickedObject.name || "이름 없음",
+//             type: clickedObject.type,
+//             position: clickedObject.position,
+//             userData: clickedObject.userData,
+//             // 부모 객체 정보
+//             parent: clickedObject.parent?.name,
+//         });
 
-        // 클릭한 위치 (3D 공간 좌표)
-        console.log("클릭 위치 (월드 좌표):", {
-            x: event.point.x.toFixed(2),
-            y: event.point.y.toFixed(2),
-            z: event.point.z.toFixed(2),
-        });
+//         // 클릭한 위치 (3D 공간 좌표)
+//         console.log("클릭 위치 (월드 좌표):", {
+//             x: event.point.x.toFixed(2),
+//             y: event.point.y.toFixed(2),
+//             z: event.point.z.toFixed(2),
+//         });
 
-        // 실제 사용 예시: 클릭한 객체의 이름에 따라 다른 동작 수행
-        if (clickedObject.name.includes("wall")) {
-            console.log("🧱 벽을 클릭했습니다!");
-        } else if (clickedObject.name.includes("door")) {
-            console.log("🚪 문을 클릭했습니다!");
-        } else if (clickedObject.name.includes("window")) {
-            console.log("🪟 창문을 클릭했습니다!");
-        } else {
-            console.log("❓ 기타 객체를 클릭했습니다:", clickedObject.name);
-        }
-    };
+//         // 실제 사용 예시: 클릭한 객체의 이름에 따라 다른 동작 수행
+//         if (clickedObject.name.includes("wall")) {
+//             console.log("🧱 벽을 클릭했습니다!");
+//         } else if (clickedObject.name.includes("door")) {
+//             console.log("🚪 문을 클릭했습니다!");
+//         } else if (clickedObject.name.includes("window")) {
+//             console.log("🪟 창문을 클릭했습니다!");
+//         } else {
+//             console.log("❓ 기타 객체를 클릭했습니다:", clickedObject.name);
+//         }
+//     };
 
-    return <primitive object={scene} onClick={handleClick} />;
-}
+//     return <primitive object={scene} onClick={handleClick} />;
+// }
 
 // 클릭 가능한 GLB 모델 컴포넌트 (각 메시를 개별적으로 클릭 가능하게)
 function ClickableGLBModel({
@@ -131,10 +130,21 @@ function ClickableGLBModel({
     );
 
     useEffect(() => {
+        // 씬 초기화 (캐시된 scene의 이전 변형 제거)
+        scene.position.set(0, 0, 0);
+        scene.rotation.set(0, 0, 0);
+        scene.scale.set(1, 1, 1);
+
         // 바운딩 박스 계산 (원본 크기)
         const box = new THREE.Box3().setFromObject(scene);
         const originalSize = box.getSize(new THREE.Vector3());
         const center = box.getCenter(new THREE.Vector3());
+
+        console.log("🔍 씬 초기 상태:", {
+            position: scene.position.toArray(),
+            scale: scene.scale.toArray(),
+            originalSize: originalSize.toArray().map((v) => v.toFixed(3)),
+        });
 
         // 모델을 중앙으로 이동
         scene.position.sub(center);
@@ -304,10 +314,10 @@ export default function GlbUploaderPage() {
         isDimensionLoading,
         isAddDeviceMode,
         selectedDeviceSerialNumber,
-        installedDevices,
-        setInstalledDevices,
+        // installedDevices, // GLB 페이지는 로컬 state 사용
         selectedDevice,
         hoveredDevice,
+        editingDeviceId,
         isHeatmap,
         showDeviceList,
         handleToggleAddDeviceMode,
@@ -318,7 +328,7 @@ export default function GlbUploaderPage() {
         handleDeviceHover,
         handleCloseDeviceDetail,
         handleChangePosition,
-        handleDeleteDevice,
+        // handleDeleteDevice, // 로컬로 재정의
         handleFocusDevice,
         handleResetCamera,
         handleToggleDimension,
@@ -340,6 +350,9 @@ export default function GlbUploaderPage() {
         scale: number;
     } | null>(null);
 
+    // 로컬 설치 기기 (GLB 업로더 페이지 전용 - useWarehouseViewer와 독립)
+    const [installedDevices, setInstalledDevices] = useState<any[]>([]);
+
     // 디바이스 배치 미리보기 상태
     const [previewPosition, setPreviewPosition] =
         useState<THREE.Vector3 | null>(null);
@@ -347,6 +360,15 @@ export default function GlbUploaderPage() {
         null
     );
     const [isPreviewValid, setIsPreviewValid] = useState(false);
+
+    // 로컬 디바이스 삭제 핸들러
+    const handleDeleteDevice = (deviceId: string) => {
+        const updatedDevices = installedDevices.filter(
+            (device) => device.id !== deviceId
+        );
+        setInstalledDevices(updatedDevices);
+        handleCloseDeviceDetail(); // 삭제 후 모달 닫기
+    };
 
     const handleClick = () => {
         fileInput.current?.click();
@@ -368,11 +390,6 @@ export default function GlbUploaderPage() {
         console.log("GLB file loaded:", file.name);
     };
 
-    const handleSampleGLBFile = () => {
-        setModelUrl(glb01);
-        setFileName("glb_01.glb");
-    };
-
     // 디바이스 배치 핸들러
     const handlePlaceDevice = (
         position: THREE.Vector3,
@@ -380,31 +397,58 @@ export default function GlbUploaderPage() {
         attachedTo: string,
         attachedToId: string
     ) => {
-        const newDevice = {
-            id: `device-${Date.now()}`,
-            serialNumber: selectedDeviceSerialNumber,
-            position: {
-                x: position.x,
-                y: position.y,
-                z: position.z,
-            },
-            rotation: {
-                x: rotation.x,
-                y: rotation.y,
-                z: rotation.z,
-            },
-            attachedTo,
-            attachedToId,
-            installedAt: new Date().toISOString(),
-            status: "active" as const,
-            temperature: 20 + Math.random() * 15, // POC: 20-35°C 랜덤
-            humidity: 45 + Math.random() * 30, // POC: 45-75% 랜덤
-        };
+        if (editingDeviceId) {
+            // 위치 변경 모드: 기존 디바이스 업데이트
+            const existingDevice = installedDevices.find(
+                (d) => d.id === editingDeviceId
+            );
+            if (existingDevice) {
+                const updatedDevice = {
+                    ...existingDevice,
+                    position: {
+                        x: position.x,
+                        y: position.y,
+                        z: position.z,
+                    },
+                    rotation: {
+                        x: rotation.x,
+                        y: rotation.y,
+                        z: rotation.z,
+                    },
+                    attachedTo,
+                    attachedToId,
+                };
+                const updatedDevices = installedDevices.map((d) =>
+                    d.id === editingDeviceId ? updatedDevice : d
+                );
+                setInstalledDevices(updatedDevices);
+            }
+        } else {
+            // 새 디바이스 추가
+            const newDevice = {
+                id: `device-${Date.now()}`,
+                serialNumber: selectedDeviceSerialNumber,
+                position: {
+                    x: position.x,
+                    y: position.y,
+                    z: position.z,
+                },
+                rotation: {
+                    x: rotation.x,
+                    y: rotation.y,
+                    z: rotation.z,
+                },
+                attachedTo,
+                attachedToId,
+                installedAt: new Date().toISOString(),
+                status: "active" as const,
+                temperature: 20 + Math.random() * 15, // POC: 20-35°C 랜덤
+                humidity: 45 + Math.random() * 30, // POC: 45-75% 랜덤
+            };
 
-        const updatedDevices = [...installedDevices, newDevice];
-        setInstalledDevices(updatedDevices);
-
-        console.log("디바이스 배치 완료:", newDevice);
+            const updatedDevices = [...installedDevices, newDevice];
+            setInstalledDevices(updatedDevices);
+        }
 
         // 배치 완료 후 모드 해제
         handleCloseModal();
@@ -465,7 +509,7 @@ export default function GlbUploaderPage() {
             </div>
 
             {/* 3D 뷰어 */}
-            <div className="relative flex-1 bg-red-200">
+            <div className="relative flex-1 bg-[#EFEFEF]">
                 <Controls
                     is2D={is2D}
                     isHeatmap={isHeatmap}
@@ -540,7 +584,6 @@ export default function GlbUploaderPage() {
                                 onClick={handleDeviceClick}
                                 onDeviceHover={handleDeviceHover}
                                 isHovered={hoveredDevice?.id === device.id}
-                                deviceSize={DEVICE_SIZE}
                             />
                         ))}
 
@@ -597,7 +640,7 @@ export default function GlbUploaderPage() {
                 )}
             </div>
             {modelUrl && modelInfo && (
-                <div className="absolute right-6 top-52 z-10 p-4 rounded-lg shadow-lg bg-black/80">
+                <div className="absolute top-20 left-64 z-10 p-4 rounded-lg shadow-lg bg-black/80">
                     <div className="pb-2 mb-3 text-lg font-bold text-white border-b border-white/30">
                         📦 GLB 파일 정보
                     </div>
