@@ -26,6 +26,10 @@ export default function InstancedWalls({ walls }: InstancedWallsProps) {
     useEffect(() => {
         if (!exteriorRef.current || !interiorRef.current) return;
 
+        // userData 설정
+        exteriorRef.current.userData.type = "wall";
+        interiorRef.current.userData.type = "wall";
+
         const matrix = new THREE.Matrix4();
         const position = new THREE.Vector3();
         const quaternion = new THREE.Quaternion();

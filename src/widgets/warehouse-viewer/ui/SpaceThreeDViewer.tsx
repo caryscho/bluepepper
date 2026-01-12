@@ -437,28 +437,44 @@ function SpaceThreeDViewer({
                     centerZ={centerZ}
                     divisions={20}
                 />
-                
                 {/* 기둥들 (Columns) - InstancedMesh로 최적화 */}
-                <InstancedColumns columns={warehouseData.structure.columns} />
-                
-
-                
+                {/* <InstancedColumns columns={warehouseData.structure.columns} /> */}
+                {warehouseData.structure.columns.map((column) => (
+                    <Column key={column.id} column={column} />
+                ))}
                 {/* 선반들 (Shelves) - InstancedMesh로 최적화 */}
-                <InstancedShelves 
+                <InstancedShelves
                     shelves={warehouseData.structure.shelves.map((shelf) => ({
                         ...shelf,
-                        orientation: shelf.orientation as "north" | "south" | "east" | "west",
-                    }))} 
+                        orientation: shelf.orientation as
+                            | "north"
+                            | "south"
+                            | "east"
+                            | "west",
+                    }))}
                 />
                 {/* 벽 - InstancedMesh로 최적화 */}
-                <InstancedWalls
+                {warehouseData.structure.walls.map((wall) => (
+                    <Walls   
+                        key={wall.id} 
+                        wall={{
+                            ...wall,
+                            start: [wall.start[0], wall.start[1]] as [number, number],
+                            end: [wall.end[0], wall.end[1]] as [number, number],
+                            type: wall.type as "exterior" | "interior",
+                        }} />
+                ))}
+                {/* <InstancedWalls
                     walls={warehouseData.structure.walls.map((wall) => ({
                         ...wall,
-                        start: [wall.start[0], wall.start[1]] as [number, number],
+                        start: [wall.start[0], wall.start[1]] as [
+                            number,
+                            number
+                        ],
                         end: [wall.end[0], wall.end[1]] as [number, number],
                         type: wall.type as "exterior" | "interior",
                     }))}
-                />
+                /> */}
                 {/* 문 */}
                 {warehouseData.structure.doors.map((door) => (
                     <Door key={door.id} door={door} />

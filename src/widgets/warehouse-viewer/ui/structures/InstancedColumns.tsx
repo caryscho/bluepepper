@@ -12,6 +12,9 @@ export default function InstancedColumns({ columns }: InstancedColumnsProps) {
     useEffect(() => {
         if (!meshRef.current) return;
 
+        // userData 설정 (DevicePlacementHandler가 인식할 수 있도록)
+        meshRef.current.userData.type = "column";
+
         const matrix = new THREE.Matrix4();
         const position = new THREE.Vector3();
         const quaternion = new THREE.Quaternion();
@@ -50,7 +53,7 @@ export default function InstancedColumns({ columns }: InstancedColumnsProps) {
         <instancedMesh 
             ref={meshRef} 
             args={[undefined, undefined, columns.length]}
-            frustumCulled={false} // frustum culling 비활성화
+            frustumCulled={false}
         >
             <boxGeometry args={[1, 1, 1]} />
             <meshStandardMaterial color="#CDCDCD" />
