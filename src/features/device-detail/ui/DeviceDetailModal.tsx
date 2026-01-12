@@ -111,7 +111,7 @@ export default function DeviceDetailModal({
                         </label>
                         <p className="text-lg text-black">
                             {device.temperature !== undefined
-                                ? `${device.temperature}°C`
+                                ? `${device.temperature.toFixed(1)}°C`
                                 : "데이터 없음"}
                         </p>
                     </div>
@@ -123,7 +123,7 @@ export default function DeviceDetailModal({
                         </label>
                         <p className="text-lg text-black">
                             {device.humidity !== undefined
-                                ? `${device.humidity}%`
+                                ? `${device.humidity.toFixed(1)}%`
                                 : "데이터 없음"}
                         </p>
                     </div>
