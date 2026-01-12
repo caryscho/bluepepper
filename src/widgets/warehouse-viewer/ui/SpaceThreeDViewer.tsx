@@ -20,6 +20,8 @@ import HeatmapLayer from "@/widgets/warehouse-viewer/ui/controls/HeatmapLayer";
 
 // 구조물
 import { Column, Human, Walls, Shelf, Door } from "./structures";
+import InstancedColumns from "./structures/InstancedColumns";
+import InstancedShelves from "./structures/InstancedShelves";
 
 interface ThreeDViewerProps {
     centerX: number;
@@ -434,23 +436,19 @@ function SpaceThreeDViewer({
                     centerZ={centerZ}
                     divisions={20}
                 />
-                {/* 기둥들 (Columns) */}
-                {warehouseData.structure.columns.map((column) => (
-                    <Column key={column.id} column={column} />
-                ))}
-                {/* 선반들 (Shelves) */}
-                {warehouseData.structure.shelves.map((shelf) => {
-                    // 타입 변환: orientation을 올바른 타입으로
-                    const shelfWithType = {
+                
+                {/* 기둥들 (Columns) - InstancedMesh로 최적화 */}
+                <InstancedColumns columns={warehouseData.structure.columns} />
+                
+
+                
+                {/* 선반들 (Shelves) - InstancedMesh로 최적화 */}
+                <InstancedShelves 
+                    shelves={warehouseData.structure.shelves.map((shelf) => ({
                         ...shelf,
-                        orientation: shelf.orientation as
-                            | "north"
-                            | "south"
-                            | "east"
-                            | "west",
-                    };
-                    return <Shelf key={shelf.id} shelf={shelfWithType} />;
-                })}
+                        orientation: shelf.orientation as "north" | "south" | "east" | "west",
+                    }))} 
+                />
                 {/* 벽 */}
                 {warehouseData.structure.walls.map((wall) => {
                     // 타입 변환: number[]를 [number, number]로, type을 올바른 타입으로

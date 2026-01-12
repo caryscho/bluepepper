@@ -10,27 +10,6 @@ const columnGeometry = new THREE.BoxGeometry(1, 1, 1);
 const columnMaterial = new THREE.MeshStandardMaterial({ color: "#CDCDCD" });
 
 export default function Column({ column }: ColumnProps) {
-    {
-        /* {warehouseData.structure.columns.map((column) => (
-                    <mesh
-                        key={column.id}
-                        geometry={columnGeometry}
-                        material={columnMaterial}
-                        position={[
-                            column.position.x,
-                            column.height / 2,
-                            column.position.z,
-                        ]}
-                        scale={[
-                            column.size.width,
-                            column.height,
-                            column.size.depth,
-                        ]}
-                        userData={{ type: "column", id: column.id }}
-                    />
-                ))} */
-    }
-
     return (
         <mesh
             geometry={columnGeometry}
