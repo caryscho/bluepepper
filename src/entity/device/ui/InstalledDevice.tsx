@@ -1,10 +1,10 @@
-import { Edges, Html } from "@react-three/drei";
+import { Html } from "@react-three/drei";
 import * as THREE from "three";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState, useMemo } from "react";
 import { DEVICE_SIZE } from "@/features/device-placement/constants";
 
-// 모든 디바이스가 공유하는 Geometry (성냥갑 형태 = 박스)
-const deviceGeometry = new THREE.BoxGeometry(1, 1, 1);
+// 모든 디바이스가 공유하는 Geometry (구 형태)
+const deviceGeometry = new THREE.SphereGeometry(0.5, 32, 32);
 
 // 상태별 Material (색상만 다름)
 const activeMaterial = new THREE.MeshStandardMaterial({ color: "#61C10E" });
@@ -38,7 +38,7 @@ interface InstalledDeviceProps {
     isHovered?: boolean;
 }
 
-export default function InstalledDevice({
+const InstalledDevice = memo(function InstalledDevice({
     device,
     onClick,
     onDeviceHover,
@@ -94,43 +94,36 @@ export default function InstalledDevice({
     }, [isHovered]);
 
 
-    // 호버에 따른 스케일 계산
-    const baseScale = isCurrentlyHovered ? 1.3 : 1.2;
-    const finalScale: [number, number, number] = [
-        DEVICE_SIZE.width * baseScale,
-        DEVICE_SIZE.height * baseScale,
-        DEVICE_SIZE.depth * baseScale,
-    ];
+    // 호버에 따른 스케일 계산 (구는 균일한 크기) - useMemo로 최적화
+    const finalScale = useMemo(() => {
+        const baseScale = isCurrentlyHovered ? 1.3 : 1.2;
+        const radius = Math.max(DEVICE_SIZE.width, DEVICE_SIZE.height, DEVICE_SIZE.depth);
+        return radius * baseScale;
+    }, [isCurrentlyHovered]);
+
+    // position을 Vector3로 메모이제이션
+    const position = useMemo(() => 
+        [device.position.x, device.position.y, device.position.z] as [number, number, number],
+        [device.position.x, device.position.y, device.position.z]
+    );
 
     return (
         <mesh
             ref={meshRef}
             geometry={deviceGeometry}
             material={getStatusMaterial(device.status)}
-            position={[device.position.x, device.position.y, device.position.z]}
-            rotation={[
-                device.rotation?.x || 0,
-                device.rotation?.y || 0,
-                device.rotation?.z || 0,
-            ]}
+            position={position}
             scale={finalScale}
             onPointerEnter={handlePointerEnter}
             onPointerLeave={handlePointerLeave}
             onClick={handleClick}
         >
-            {/* 호버 시 파란색 보더 표시 - scale 제거하여 호버 영역 안정화 */}
-            {isCurrentlyHovered && (
-                <Edges
-                    threshold={15}
-                    color="#0066FF"
-                />
-            )}
-            {/* 호버 시 Tooltip 표시 - 디바이스 오른쪽 위 모서리 기준 */}
+            {/* 호버 시 Tooltip 표시 - 구 오른쪽 위 기준 */}
             {isCurrentlyHovered && (
                 <Html
                     position={[
-                        DEVICE_SIZE.width * baseScale / 2 + 0.1,  // 오른쪽 끝 + 여유
-                        DEVICE_SIZE.height * baseScale / 2 + 0.1,  // 위쪽 끝 + 여유
+                        finalScale + 0.1,  // 구 반지름 + 여유
+                        finalScale + 0.1,  // 구 반지름 + 여유
                         0
                     ]}
                     distanceFactor={10}
@@ -145,14 +138,16 @@ export default function InstalledDevice({
                             {device.serialNumber}
                         </div>
                         <div className="mt-1 text-xs text-gray-600">
-                            온도: {device?.temperature !== undefined ? `${device?.temperature}°C` : "N/A"}
+                            온도: {device?.temperature !== undefined ? `${device?.temperature.toFixed(1)}°C` : "N/A"}
                         </div>
                         <div className="text-xs text-gray-600">
-                            습도: {device?.humidity !== undefined ? `${device?.humidity}%` : "N/A"}
+                            습도: {device?.humidity !== undefined ? `${device?.humidity.toFixed(1)}%` : "N/A"}
                         </div>
                     </div>
                 </Html>
             )}
         </mesh>
     );
-}
+});
+
+export default InstalledDevice;

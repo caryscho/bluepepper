@@ -50,67 +50,7 @@ export function useWarehouseViewer() {
             status: "active",
             temperature: 28.5,
             humidity: 65,
-        },
-        {
-            id: "device-01234567",
-            serialNumber: "01234567(T70)",
-            position: {
-                x: 19.520860339199963,
-                y: 9.133884921529493,
-                z: 24.916233830056985,
-            },
-            rotation: {
-                x: 0,
-                y: 1.5707963267948966,
-                z: 0,
-            },
-            attachedTo: "column",
-            attachedToId: "col-10",
-            installedAt: "2026-01-02T07:11:10.239Z",
-            status: "active",
-            temperature: 18.2, // 적정 온도 (초록색)
-            humidity: 55,
-        },
-        {
-            id: "device-1767936301678",
-            serialNumber: "VC7KR13A(T71)",
-            position: {
-                x: 9.536485688056239,
-                y: 8.708181325772383,
-                z: 25.08418861177652,
-            },
-            rotation: {
-                x: 0,
-                y: 1.5707963267948966,
-                z: 0,
-            },
-            attachedTo: "column",
-            attachedToId: "col-8",
-            installedAt: "2026-01-09T05:25:01.678Z",
-            status: "active",
-            temperature: 12.8, // 낮은 온도 (파란색)
-            humidity: 48,
-        },
-        {
-            id: "device-1767936307775",
-            serialNumber: "VC7KR18F(T71)",
-            position: {
-                x: 29.602358795603127,
-                y: 7.7908105387079845,
-                z: 9.890104865301035,
-            },
-            rotation: {
-                x: 0,
-                y: 1.5707963267948966,
-                z: 0,
-            },
-            attachedTo: "column",
-            attachedToId: "col-3",
-            installedAt: "2026-01-09T05:25:07.775Z",
-            status: "active",
-            temperature: 32.1, // 매우 높은 온도 (빨간색)
-            humidity: 72,
-        },
+        }
     ]);
 
     // 기기 목록 표시 여부
@@ -233,10 +173,6 @@ export function useWarehouseViewer() {
 
     // 시리얼넘버 검색 핸들러
     const handleSearchDeviceWithText = (serialNumber: string) => {
-        console.log(
-            serialNumber,
-            "serialNumber로 나는 포커스할거야 텍스트지롱"
-        );
         const device = installedDevices.find(
             (d) => d.serialNumber === serialNumber
         );

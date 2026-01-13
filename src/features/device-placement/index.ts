@@ -25,18 +25,16 @@ function DevicePlacementHandler({
 }: DevicePlacementHandlerProps) {
     const { camera, raycaster, gl, scene } = useThree();
     const [mousePosition, setMousePosition] = useState(new THREE.Vector2());
-    const wallsRef = useRef<(THREE.Mesh | THREE.InstancedMesh)[]>([]);
-    const columnsRef = useRef<(THREE.Mesh | THREE.InstancedMesh)[]>([]);
 
     // 재사용 가능한 객체들 (매 프레임마다 생성하지 않음)
     const tempVector = useRef(new THREE.Vector3());
     const tempVector2 = useRef(new THREE.Vector3());
     const tempNormal = useRef(new THREE.Vector3());
-    const allTargetsRef = useRef<(THREE.Mesh | THREE.InstancedMesh)[]>([]);
+    const allTargetsRef = useRef<THREE.Mesh[]>([]);
     const lastPositionRef = useRef<THREE.Vector3 | null>(null);
 
     // Hover 효과를 위한 state와 ref
-    const hoveredObjectRef = useRef<THREE.Mesh | THREE.InstancedMesh | null>(null);
+    const hoveredObjectRef = useRef<THREE.Mesh | null>(null);
     const originalColorRef = useRef<THREE.Color | null>(null);
 
     // 마우스 위치 업데이트
@@ -66,34 +64,34 @@ function DevicePlacementHandler({
         };
     }, [isAddDeviceMode, gl, onPreviewPositionChange]);
 
-    // 벽과 기둥 mesh 참조 수집
+    // 설치 가능한 큰 구조물만 수집 (성능 최적화)
     useEffect(() => {
         if (!isAddDeviceMode) return;
 
-        const walls: (THREE.Mesh | THREE.InstancedMesh)[] = [];
-        const columns: (THREE.Mesh | THREE.InstancedMesh)[] = [];
+        const installableMeshes: THREE.Mesh[] = [];
+
+        // 포함할 객체 타입만 명시 (화이트리스트)
+        const includeTypes = new Set([
+            'wall',
+            'column',
+            'floor',
+            // 'shelf',  // 선반은 너무 많아서 제외 (필요하면 추가)
+        ]);
 
         scene.traverse((object) => {
-            if (object instanceof THREE.Mesh || object instanceof THREE.InstancedMesh) {
-                console.log('🔍 Checking object:', {
-                    hasCount: 'count' in object,
-                    userData: object.userData,
-                    userDataType: object.userData?.type,
-                });
-                if (object.userData.type === "wall") {
-                    walls.push(object);
-                } else if (object.userData.type === "column") {
-                    columns.push(object);
+            // InstancedMesh는 raycasting이 느려서 제외, 일반 Mesh만
+            if (object instanceof THREE.Mesh && !(object instanceof THREE.InstancedMesh)) {
+                const objType = object.userData?.type;
+                
+                // 타입이 없으면 기본적으로 포함 (바닥, 큰 구조물)
+                // 또는 명시된 타입만 포함
+                if (!objType || includeTypes.has(objType)) {
+                    installableMeshes.push(object);
                 }
             }
         });
 
-        console.log('✅ Device placement targets found - walls:', walls.length, 'columns:', columns.length);
-
-        wallsRef.current = walls;
-        columnsRef.current = columns;
-        // allTargets 배열도 미리 생성 (매 프레임마다 생성하지 않음)
-        allTargetsRef.current = [...walls, ...columns];
+        allTargetsRef.current = installableMeshes;
     }, [isAddDeviceMode, scene]);
 
     // Raycasting으로 벽/기둥 위치 계산 (최적화됨)
@@ -125,31 +123,6 @@ function DevicePlacementHandler({
         if (intersects.length > 0) {
             const intersect = intersects[0];
             const point = intersect.point;
-
-            // Hover 효과: 현재 intersect된 객체가 이전과 다르면 색상 변경
-            if (intersect.object instanceof THREE.Mesh || intersect.object instanceof THREE.InstancedMesh) {
-                if (hoveredObjectRef.current !== intersect.object) {
-                    // 이전에 hover된 객체가 있으면 원래 색상으로 복원
-                    if (hoveredObjectRef.current && originalColorRef.current) {
-                        const prevMaterial = hoveredObjectRef.current
-                            .material as THREE.MeshStandardMaterial;
-                        if (prevMaterial.color) {
-                            prevMaterial.color.copy(originalColorRef.current);
-                        }
-                    }
-
-                    // 새로운 객체를 hover
-                    hoveredObjectRef.current = intersect.object;
-                    const material = intersect.object
-                        .material as THREE.MeshStandardMaterial;
-                    if (material.color) {
-                        // 원래 색상 저장
-                        originalColorRef.current = material.color.clone();
-                        // 노란색으로 변경
-                        material.color.setHex(0xffff00);
-                    }
-                }
-            }
 
             // 재사용 가능한 객체 사용
             const normal = tempNormal.current;
@@ -220,8 +193,7 @@ function DevicePlacementHandler({
             }
 
             raycaster.setFromCamera(mousePosition, camera);
-            const allTargets = [...wallsRef.current, ...columnsRef.current];
-            const intersects = raycaster.intersectObjects(allTargets, false);
+            const intersects = raycaster.intersectObjects(allTargetsRef.current, false);
 
             if (intersects.length > 0) {
                 const intersect = intersects[0];
@@ -230,7 +202,7 @@ function DevicePlacementHandler({
                     intersect.face?.normal.clone() ||
                     new THREE.Vector3(0, 0, 1);
 
-                if (intersect.object instanceof THREE.Mesh || intersect.object instanceof THREE.InstancedMesh) {
+                if (intersect.object instanceof THREE.Mesh) {
                     intersect.object.localToWorld(normal);
                     normal.normalize();
                 }
@@ -246,10 +218,7 @@ function DevicePlacementHandler({
 
                 // 부착된 오브젝트 정보
                 const attachedToId = intersect.object.userData.id || "";
-                const attachedTo =
-                    intersect.object.userData.type === "wall"
-                        ? "wall"
-                        : "column";
+                const attachedTo = intersect.object.userData.type || "surface"; // 타입이 없으면 "surface"
 
                 onPlaceDevice(position, rotation, attachedTo, attachedToId);
             }
