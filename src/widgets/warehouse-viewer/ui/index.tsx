@@ -12,6 +12,7 @@ import DeviceDetailModal from "@/features/device-detail/ui/DeviceDetailModal";
 
 // ui components
 import Controls from "@/widgets/warehouse-viewer/ui/controls";
+import { LoadingSpinner } from "@/shared/ui/LoadingSpinner";
 
 const WarehouseViewer = () => {
     const {
@@ -66,7 +67,9 @@ const WarehouseViewer = () => {
                 onResetCamera={handleResetCamera}
                 onSearchDeviceWithText={handleSearchDeviceWithText}
             />
-            {is2D ? (
+            {isDimensionLoading ? (
+                <LoadingSpinner message="Switching dimension..." />
+            ) : is2D ? (
                 <TwoDViewer installedDevices={installedDevices} />
             ) : (
                 <SpaceThreeDViewer
