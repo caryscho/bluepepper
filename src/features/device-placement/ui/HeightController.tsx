@@ -41,7 +41,7 @@ export default function HeightController({
         <group
             position={[devicePosition.x, devicePosition.y, devicePosition.z]}
         >
-            <Html center distanceFactor={10} position={[0, 0, 0]}>
+            <Html center distanceFactor={8} position={[0, 0, 0]}>
                 <div
                     className="flex flex-col justify-center items-center w-8 h-8 text-gray-400 bg-white rounded-full border-2 border-gray-200 shadow-xl select-none overflow1-hidden"
                     style={{
@@ -57,7 +57,7 @@ export default function HeightController({
                                 e.stopPropagation();
                                 onHeightChange(devicePosition.y + 0.5);
                             }}
-                            className="p-0 text-sm leading-none transition-colors cursor"
+                            className="p-0 text-sm leading-none"
                         >
                             {index % 2 === 0 ? "▲" : "▼"}
                         </span>

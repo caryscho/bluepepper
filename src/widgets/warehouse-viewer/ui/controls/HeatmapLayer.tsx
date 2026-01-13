@@ -68,7 +68,7 @@ export default function HeatmapLayer({
 
             {/* 디바이스 위치 표시 (월드 좌표) - 그라디언트 원 */}
             {installedDevices.map((device) => {
-                const radius = 8; // 실제 원형 사이즈
+            const radius = 8; // 실제 원형 사이즈
                 const texture = useMemo(
                     () => createGradientTexture(device.temperature || 20),
                     [device.temperature]

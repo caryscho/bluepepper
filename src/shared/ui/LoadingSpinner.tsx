@@ -11,8 +11,8 @@ interface LoadingSpinnerProps {
 export function CanvasLoadingSpinner({ message = "Loading..." }: LoadingSpinnerProps) {
   return (
     <Html center>
-      <div className="flex flex-col items-center gap-3">
-        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      <div className="flex flex-col gap-3 items-center">
+        <div className="w-12 h-12 rounded-full border-4 border-blue-500 animate-spin border-t-transparent"></div>
         <p className="text-lg font-medium text-gray-700">{message}</p>
       </div>
     </Html>
@@ -24,8 +24,8 @@ export function CanvasLoadingSpinner({ message = "Loading..." }: LoadingSpinnerP
  */
 export function LoadingSpinner({ message = "Loading..." }: LoadingSpinnerProps) {
   return (
-    <div className="flex flex-col items-center justify-center h-full">
-      <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+    <div className="flex flex-col justify-center items-center h-full">
+      <div className="w-16 h-16 rounded-full border-4 border-blue-500 animate-spin border-t-transparent"></div>
       <p className="mt-4 text-xl font-medium text-gray-700">{message}</p>
     </div>
   );

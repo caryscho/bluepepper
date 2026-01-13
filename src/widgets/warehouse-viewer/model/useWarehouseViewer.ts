@@ -193,10 +193,6 @@ export function useWarehouseViewer() {
 
     // 시리얼넘버 검색 핸들러
     const handleSearchDeviceWithText = (serialNumber: string) => {
-        console.log(
-            serialNumber,
-            "serialNumber로 나는 포커스할거야 텍스트지롱"
-        );
         const device = installedDevices.find(
             (d) => d.serialNumber === serialNumber
         );
@@ -228,6 +224,7 @@ export function useWarehouseViewer() {
         selectedDeviceSerialNumber,
         installedDevices,
         setInstalledDevices,
+        setSelectedDevice,
         showDeviceList,
         selectedDevice,
         hoveredDevice,
