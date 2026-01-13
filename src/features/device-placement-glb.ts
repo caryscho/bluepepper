@@ -74,12 +74,10 @@ function DevicePlacementHandlerGLB({
             if (object instanceof THREE.Mesh) {
                 // GLB 모델의 모든 메시를 배치 대상으로 포함
                 meshes.push(object);
-                console.log("배치 가능한 메시:", object.name || "이름없음");
             }
         });
 
         meshesRef.current = meshes;
-        console.log(`총 ${meshes.length}개의 배치 가능한 메시 발견`);
     }, [isAddDeviceMode, scene]);
 
     // Raycasting으로 GLB 메시 위치 계산 (최적화됨)
@@ -151,12 +149,14 @@ function DevicePlacementHandlerGLB({
                 normal.normalize();
             }
 
-            // 기기 크기
-            const deviceDepth = DEVICE_SIZE.depth || 0.01;
+            // 구의 반지름 계산
+            const radius = Math.max(DEVICE_SIZE.width, DEVICE_SIZE.height, DEVICE_SIZE.depth);
+            const baseScale = 1.2;
+            const sphereRadius = radius * baseScale;
 
-            // 면에서 약간 떨어진 위치 (표면에서)
+            // 구가 완전히 밖으로 나오도록 반지름만큼 offset
             const offset = tempVector.current;
-            offset.copy(normal).multiplyScalar(deviceDepth / 2 + 0.01);
+            offset.copy(normal).multiplyScalar(sphereRadius + 0.05);
 
             const position = tempVector2.current;
             position.copy(point).add(offset);
@@ -219,10 +219,14 @@ function DevicePlacementHandlerGLB({
                     normal.normalize();
                 }
 
-                const deviceDepth = DEVICE_SIZE.depth || 0.01;
+                // 구의 반지름 계산
+                const radius = Math.max(DEVICE_SIZE.width, DEVICE_SIZE.height, DEVICE_SIZE.depth);
+                const baseScale = 1.2;
+                const sphereRadius = radius * baseScale;
+                
                 const offset = normal
                     .clone()
-                    .multiplyScalar(deviceDepth / 2 + 0.01);
+                    .multiplyScalar(sphereRadius + 0.05);
                 const position = point.clone().add(offset);
 
                 const rotation = new THREE.Euler(0, Math.PI / 2, 0);
@@ -231,12 +235,6 @@ function DevicePlacementHandlerGLB({
                 const attachedToId = intersect.object.userData.id || 
                     `mesh-${intersect.object.id}`;
                 const attachedTo = intersect.object.name || "mesh";
-
-                console.log("디바이스 배치:", {
-                    meshName: attachedTo,
-                    meshId: attachedToId,
-                    position: position,
-                });
 
                 onPlaceDevice(position, rotation, attachedTo, attachedToId);
             }
