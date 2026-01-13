@@ -1,0 +1,155 @@
+{
+  "shipmentId": "SHIP-2026-001",
+  "origin": "서울 창고",
+  "destination": "부산 물류센터",
+  "startTime": "2026-01-13T09:00:00Z",
+  "endTime": "2026-01-13T13:30:00Z",
+  "vehicle": "TRUCK-A-123",
+  "impactThreshold": {
+    "warning": 2.5,
+    "danger": 4.0
+  },
+  "impactData": [
+    {
+      "timestamp": "2026-01-13T09:00:00Z",
+      "timeOffset": 0,
+      "gForce": 0.98,
+      "severity": "normal",
+      "event": "출발"
+    },
+    {
+      "timestamp": "2026-01-13T09:15:00Z",
+      "timeOffset": 900,
+      "gForce": 1.2,
+      "severity": "normal",
+      "event": null
+    },
+    {
+      "timestamp": "2026-01-13T09:30:00Z",
+      "timeOffset": 1800,
+      "gForce": 1.1,
+      "severity": "normal",
+      "event": null
+    },
+    {
+      "timestamp": "2026-01-13T09:45:00Z",
+      "timeOffset": 2700,
+      "gForce": 3.2,
+      "severity": "warning",
+      "event": "급정거"
+    },
+    {
+      "timestamp": "2026-01-13T10:00:00Z",
+      "timeOffset": 3600,
+      "gForce": 1.0,
+      "severity": "normal",
+      "event": null
+    },
+    {
+      "timestamp": "2026-01-13T10:15:00Z",
+      "timeOffset": 4500,
+      "gForce": 1.3,
+      "severity": "normal",
+      "event": null
+    },
+    {
+      "timestamp": "2026-01-13T10:30:00Z",
+      "timeOffset": 5400,
+      "gForce": 4.8,
+      "severity": "danger",
+      "event": "과속방지턱"
+    },
+    {
+      "timestamp": "2026-01-13T10:45:00Z",
+      "timeOffset": 6300,
+      "gForce": 1.2,
+      "severity": "normal",
+      "event": null
+    },
+    {
+      "timestamp": "2026-01-13T11:00:00Z",
+      "timeOffset": 7200,
+      "gForce": 0.95,
+      "severity": "normal",
+      "event": null
+    },
+    {
+      "timestamp": "2026-01-13T11:15:00Z",
+      "timeOffset": 8100,
+      "gForce": 2.8,
+      "severity": "warning",
+      "event": "차선 변경"
+    },
+    {
+      "timestamp": "2026-01-13T11:30:00Z",
+      "timeOffset": 9000,
+      "gForce": 1.1,
+      "severity": "normal",
+      "event": null
+    },
+    {
+      "timestamp": "2026-01-13T11:45:00Z",
+      "timeOffset": 9900,
+      "gForce": 5.5,
+      "severity": "danger",
+      "event": "급커브"
+    },
+    {
+      "timestamp": "2026-01-13T12:00:00Z",
+      "timeOffset": 10800,
+      "gForce": 1.0,
+      "severity": "normal",
+      "event": null
+    },
+    {
+      "timestamp": "2026-01-13T12:15:00Z",
+      "timeOffset": 11700,
+      "gForce": 1.4,
+      "severity": "normal",
+      "event": null
+    },
+    {
+      "timestamp": "2026-01-13T12:30:00Z",
+      "timeOffset": 12600,
+      "gForce": 0.9,
+      "severity": "normal",
+      "event": null
+    },
+    {
+      "timestamp": "2026-01-13T12:45:00Z",
+      "timeOffset": 13500,
+      "gForce": 3.5,
+      "severity": "warning",
+      "event": "급출발"
+    },
+    {
+      "timestamp": "2026-01-13T13:00:00Z",
+      "timeOffset": 14400,
+      "gForce": 1.1,
+      "severity": "normal",
+      "event": null
+    },
+    {
+      "timestamp": "2026-01-13T13:15:00Z",
+      "timeOffset": 15300,
+      "gForce": 1.3,
+      "severity": "normal",
+      "event": null
+    },
+    {
+      "timestamp": "2026-01-13T13:30:00Z",
+      "timeOffset": 16200,
+      "gForce": 0.85,
+      "severity": "normal",
+      "event": "도착"
+    }
+  ],
+  "summary": {
+    "totalDuration": 16200,
+    "normalCount": 13,
+    "warningCount": 4,
+    "dangerCount": 2,
+    "maxImpact": 5.5,
+    "avgImpact": 1.8
+  }
+}

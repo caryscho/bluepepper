@@ -3,6 +3,7 @@ import Layout from "./app/ui/Layout";
 import WarehousePage from "./pages/warehouse/ui/WarehousePage";
 import DevicemodelPage from "./pages/device-model/ui/DevicemodelPage";
 import GlbUploaderPage from "./pages/glb-uploader";
+import ChartShowcasePage from "./pages/chart-showcase/index";
 
 function NotFoundPage() {
     return (
@@ -26,7 +27,7 @@ function HomePage() {
                     3D Warehouse IoT Device Management System
                 </p>
 
-                <div className="grid grid-cols-1 gap-6 mt-12 md:grid-cols-3">
+                <div className="grid grid-cols-1 gap-6 mt-12 md:grid-cols-2">
                     <a
                         href="/warehouse"
                         className="p-8 bg-white rounded-xl shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
@@ -65,6 +66,18 @@ function HomePage() {
                             커스텀 3D 모델 업로드 및 디바이스 배치
                         </p>
                     </a>
+                    <a
+                        href="/chart-showcase"
+                        className="p-8 bg-white rounded-xl shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
+                    >
+                        <div className="mb-4 text-4xl">📊</div>
+                        <h3 className="mb-2 text-xl font-bold text-gray-800">
+                            Chart Showcase
+                        </h3>
+                        <p className="text-gray-600">
+                            차트 시각화 페이지
+                        </p>
+                    </a>
                 </div>
             </div>
         </div>
@@ -99,6 +112,13 @@ export const router = createBrowserRouter([
                 element: <GlbUploaderPage />,
                 handle: {
                     title: "GLB Uploader",
+                },
+            },
+            {
+                path: "chart-showcase",
+                element: <ChartShowcasePage />,
+                handle: {
+                    title: "Chart Showcase",
                 },
             },
             {

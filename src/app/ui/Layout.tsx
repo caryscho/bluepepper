@@ -18,6 +18,7 @@ export default function Layout() {
                     <NavLink to="warehouse">Warehouse Viewer</NavLink>
                     <NavLink to="device-model">Device Model</NavLink>
                     <NavLink to="glb-uploader">GLB Uploader</NavLink>
+                    <NavLink to="chart-showcase">Chart Showcase</NavLink>
                 </nav>
             </header>
             <div className="flex flex-col w-full h-screen">
