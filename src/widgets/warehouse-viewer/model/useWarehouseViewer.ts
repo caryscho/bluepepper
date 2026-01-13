@@ -50,7 +50,27 @@ export function useWarehouseViewer() {
             status: "active",
             temperature: 28.5,
             humidity: 65,
-        }
+        },
+        {
+            id: "device-1768274372731",
+            serialNumber: "34901753(T70)",
+            position: {
+                x: 29.564170044712007,
+                y: 8.031168744169666,
+                z: 40.08685241476226,
+            },
+            rotation: {
+                x: 0,
+                y: 1.5707963267948966,
+                z: 0,
+            },
+            attachedTo: "column",
+            attachedToId: "col-17",
+            installedAt: "2026-01-13T03:19:32.731Z",
+            status: "active",
+            temperature: 20.973952769483855,
+            humidity: 46.805864892459084,
+        },
     ]);
 
     // 기기 목록 표시 여부
@@ -173,6 +193,10 @@ export function useWarehouseViewer() {
 
     // 시리얼넘버 검색 핸들러
     const handleSearchDeviceWithText = (serialNumber: string) => {
+        console.log(
+            serialNumber,
+            "serialNumber로 나는 포커스할거야 텍스트지롱"
+        );
         const device = installedDevices.find(
             (d) => d.serialNumber === serialNumber
         );
