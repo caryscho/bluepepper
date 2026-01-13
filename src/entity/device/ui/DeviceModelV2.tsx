@@ -37,7 +37,6 @@ export default function DeviceModel3D({
     });
 
     const { width, height, depth } = diveSize || deviceType.size;
-    console.log(width, height, depth, "사이즈");
 
     // 둥근 모서리 반경
     const radius = Math.min(width, height, depth) * 0.2;

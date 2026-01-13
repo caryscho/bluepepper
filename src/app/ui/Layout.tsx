@@ -9,9 +9,8 @@ export default function Layout() {
 
                 <nav className="flex flex-col gap-1 mt-10">
                     <NavLink to="warehouse">Warehouse Viewer</NavLink>
-                    <NavLink to="divice-model">Divice Model</NavLink>
+                    <NavLink to="device-model">Device Model</NavLink>
                     <NavLink to="glb-uploader">GLB Uploader</NavLink>
-                    <NavLink to="test">Paste Test</NavLink>
                 </nav>
             </header>
             <div className="flex flex-col w-full h-screen">
