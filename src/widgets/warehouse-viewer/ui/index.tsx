@@ -8,7 +8,7 @@ import { useWarehouseViewer } from "@/widgets/warehouse-viewer/model/useWarehous
 // features ui
 import DeviceList from "@/features/device-list/ui/DeviceList";
 import DeviceSelector from "@/features/device-placement/ui/DeviceSelector";
-import DeviceDetailModal from "@/features/device-detail/ui/DeviceDetailModal";
+import DeviceDetailBox from "@/features/device-detail/ui/DeviceDetailBox";
 
 // ui components
 import Controls from "@/widgets/warehouse-viewer/ui/controls";
@@ -73,6 +73,7 @@ const WarehouseViewer = () => {
                 <TwoDViewer installedDevices={installedDevices} />
             ) : (
                 <SpaceThreeDViewer
+                    selectedDevice={selectedDevice}
                     centerX={centerX}
                     centerZ={centerZ}
                     length={length}
@@ -119,7 +120,7 @@ const WarehouseViewer = () => {
             </div>
             {/* 디바이스 상세 정보 모달 */}
             {selectedDevice && (
-                <DeviceDetailModal
+                <DeviceDetailBox
                     device={selectedDevice}
                     onClose={handleCloseDeviceDetail}
                     onChangePosition={handleChangePosition}

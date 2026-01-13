@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import * as THREE from "three";
 import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
+import { useFocusTarget } from "@/shared/hooks/useFocusTarget";
 
 import { useWarehouseViewer } from "@/widgets/warehouse-viewer/model/useWarehouseViewer";
 import Controls from "@/widgets/warehouse-viewer/ui/controls";
@@ -19,7 +20,19 @@ import DeviceList from "@/features/device-list/ui/DeviceList";
 import { DEVICE_SIZE } from "@/features/device-placement/constants";
 import HeightController from "@/features/device-placement/ui/HeightController";
 
-// 클릭 가능한 GLB 모델 컴포넌트 (각 메시를 개별적으로 클릭 가능하게)
+// 카메라 포커스 컨트롤러 (Canvas 내부에서 사용)
+function CameraFocusController({ 
+    focusTarget,
+    controlsRef 
+}: { 
+    focusTarget: { x: number; y: number; z: number } | null;
+    controlsRef: React.RefObject<any>;
+}) {
+    useFocusTarget(focusTarget, controlsRef);
+    return null;
+}
+
+// 클릭 가능한 GLB 모델 컴포넌트 GLB 로드해서 만든 컴포넌트이당
 function ClickableGLBModel({
     url,
     onObjectClick,
@@ -222,7 +235,7 @@ export default function GlbUploaderPage() {
         handleCloseDeviceDetail,
         handleChangePosition,
         // handleDeleteDevice, // 로컬로 재정의
-        handleFocusDevice,
+        // handleFocusDevice,
         handleResetCamera,
         handleToggleDimension,
         handleToggleHeatmap,
@@ -230,6 +243,7 @@ export default function GlbUploaderPage() {
     } = useWarehouseViewer();
 
     const fileInput = useRef<HTMLInputElement>(null);
+    const orbitControlsRef = useRef<any>(null); // 카메라 포커스를 위한 ref
     const [modelUrl, setModelUrl] = useState<string | null>(null);
     const [fileName, setFileName] = useState<string | null>(null);
     const [selectedObject, setSelectedObject] = useState<string | null>(null);
@@ -254,6 +268,13 @@ export default function GlbUploaderPage() {
     );
     const [isPreviewValid, setIsPreviewValid] = useState(false);
 
+    // 카메라 포커스용 상태
+    const [focusTarget, setFocusTarget] = useState<{
+        x: number;
+        y: number;
+        z: number;
+    } | null>(null);
+
     // 로컬 디바이스 삭제 핸들러
     const handleDeleteDevice = (deviceId: string) => {
         const updatedDevices = installedDevices.filter(
@@ -271,6 +292,18 @@ export default function GlbUploaderPage() {
                 : device
         );
         setInstalledDevices(updatedDevices);
+    };
+
+    // 로컬 디바이스 포커스 핸들러 (로컬 installedDevices 사용)
+    const handleFocusDeviceLocal = (deviceId: string) => {
+        const device = installedDevices.find((d) => d.id === deviceId);
+        if (device && device.position) {
+            setFocusTarget({
+                x: device.position.x,
+                y: device.position.y,
+                z: device.position.z,
+            });
+        }
     };
 
     const handleClick = () => {
@@ -437,9 +470,15 @@ export default function GlbUploaderPage() {
                             far: 10000,
                         }}
                     >
+                        <CameraFocusController 
+                            focusTarget={focusTarget}
+                            controlsRef={orbitControlsRef}
+                        />
+                        
                         <gridHelper args={[100, 20]} />
 
                         <OrbitControls
+                            ref={orbitControlsRef}
                             minDistance={0.1}
                             maxDistance={1000}
                             enablePan={true}
@@ -505,7 +544,7 @@ export default function GlbUploaderPage() {
                                     onDeviceHover={handleDeviceHover}
                                     isHovered={hoveredDevice?.id === device.id}
                                 />
-                                {selectedDevice && (
+                                {selectedDevice && selectedDevice.serialNumber === device.serialNumber && (
                                     <HeightController
                                         devicePosition={device.position}
                                         onHeightChange={(newY) =>
@@ -555,7 +594,7 @@ export default function GlbUploaderPage() {
                         <DeviceList
                             installedDevices={installedDevices}
                             onClose={handleToggleDeviceListMode}
-                            onFocusDevice={handleFocusDevice}
+                            onFocusDevice={handleFocusDeviceLocal}
                         />
                     </div>
                 )}

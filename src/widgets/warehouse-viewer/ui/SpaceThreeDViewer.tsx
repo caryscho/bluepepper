@@ -23,8 +23,10 @@ import { Column, Human, Walls, Shelf, Door } from "./structures";
 import InstancedColumns from "./structures/InstancedColumns";
 import InstancedShelves from "./structures/InstancedShelves";
 import InstancedWalls from "./structures/InstancedWalls";
+import HeightController from "@/features/device-placement/ui/HeightController";
 
 interface ThreeDViewerProps {
+    selectedDevice: any | null;
     centerX: number;
     centerZ: number;
     length: number;
@@ -195,6 +197,7 @@ function CameraDebugInfo({
 }
 
 function SpaceThreeDViewer({
+    selectedDevice,
     centerX,
     centerZ,
     length,
@@ -328,6 +331,16 @@ function SpaceThreeDViewer({
         []
     );
 
+    // 디바이스 높이 변경 핸들러
+    const handleHeightChange = (deviceId: string, newY: number) => {
+        const updatedDevices = installedDevices.map((device) =>
+            device.id === deviceId
+                ? { ...device, position: { ...device.position, y: newY } }
+                : device
+        );
+        onInstalledDevicesChange(updatedDevices);
+    };
+
     return (
         <div className="relative flex-1 w-full h-full bg-[#EFEFEF] overflow-hidden">
             {/* 카메라 디버그 정보 */}
@@ -394,7 +407,9 @@ function SpaceThreeDViewer({
                                 <DevicePlacementHandler
                                     isAddDeviceMode={isAddDeviceMode}
                                     onPlaceDevice={handlePlaceDevice}
-                                    onPreviewPositionChange={handlePreviewPositionChange}
+                                    onPreviewPositionChange={
+                                        handlePreviewPositionChange
+                                    }
                                 />
                                 <DevicePreview
                                     position={previewPosition}
@@ -407,13 +422,25 @@ function SpaceThreeDViewer({
                 {/* 설치된 디바이스들 */}
                 {installedDevices.map((device) => {
                     return (
-                        <InstalledDevice
-                            key={device.id}
-                            device={device}
-                            onClick={onDeviceClick}
-                            onDeviceHover={onDeviceHover}
-                            isHovered={hoveredDevice?.id === device.id}
-                        />
+                        <>
+                            <InstalledDevice
+                                key={device.id}
+                                device={device}
+                                onClick={onDeviceClick}
+                                onDeviceHover={onDeviceHover}
+                                isHovered={hoveredDevice?.id === device.id}
+                            />
+                            {selectedDevice &&
+                                selectedDevice.serialNumber ===
+                                    device.serialNumber && (
+                                    <HeightController
+                                        devicePosition={device.position}
+                                        onHeightChange={(newY) =>
+                                            handleHeightChange(device.id, newY)
+                                        }
+                                    />
+                                )}
+                        </>
                     );
                 })}
                 {/* 히트맵 레이어 */}

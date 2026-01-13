@@ -58,7 +58,7 @@ export default function DeviceDetailModal({
         <div className="absolute right-0 top-0 bg-white rounded-lg shadow-xl p-6 w-[220px] max-h-[80vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-bold text-black">
-                    디바이스 상세 정보
+                    {device.serialNumber}
                 </h2>
                 <button
                     onClick={onClose}
@@ -68,30 +68,10 @@ export default function DeviceDetailModal({
                 </button>
             </div>
 
-            <div className="space-y-4">
-                {/* 시리얼 넘버 */}
-                <div>
-                    <label className="block mb-1 text-sm font-medium text-gray-700">
-                        시리얼 넘버
-                    </label>
-                    <p className="text-lg text-black">
-                        {device.serialNumber}
-                        <button
-                            onClick={() => {
-                                navigator.clipboard.writeText(
-                                    device.serialNumber
-                                );
-                            }}
-                        >
-                            <CopyIcon className="w-4 h-4 text-gray-500" />{" "}
-                            {/* copy to clipboard */}
-                        </button>
-                    </p>
-                </div>
-
+            <div className="flex flex-col gap-2">
                 {/* 상태 */}
-                <div>
-                    <label className="block mb-1 text-sm font-medium text-gray-700">
+                <div className="flex gap-2 items-center">
+                    <label className="block text-sm font-medium text-gray-700">
                         상태
                     </label>
                     <span
@@ -104,8 +84,8 @@ export default function DeviceDetailModal({
                 </div>
 
                 {/* 온도 */}
-                <div>
-                    <label className="block mb-1 text-sm font-medium text-gray-700">
+                <div className="flex gap-2 items-center">
+                    <label className="block text-sm font-medium text-gray-700">
                         온도
                     </label>
                     <p className="text-lg text-black">
@@ -116,8 +96,8 @@ export default function DeviceDetailModal({
                 </div>
 
                 {/* 습도 */}
-                <div>
-                    <label className="block mb-1 text-sm font-medium text-gray-700">
+                <div className="flex gap-2 items-center">
+                    <label className="block text-sm font-medium text-gray-700">
                         습도
                     </label>
                     <p className="text-lg text-black">
@@ -128,8 +108,8 @@ export default function DeviceDetailModal({
                 </div>
 
                 {/* 위치 정보 */}
-                <div>
-                    <label className="block mb-1 text-sm font-medium text-gray-700">
+                <div className="">
+                    <label className="block text-sm font-medium text-gray-700">
                         위치
                         <span
                             onClick={onChangePosition}
@@ -154,8 +134,8 @@ export default function DeviceDetailModal({
                 </div>
 
                 {/* 설치일 */}
-                <div>
-                    <label className="block mb-1 text-sm font-medium text-gray-700">
+                <div className="">
+                    <label className="block text-sm font-medium text-gray-700 shrink-0">
                         설치일
                     </label>
                     <p className="text-sm text-gray-600">
@@ -164,14 +144,14 @@ export default function DeviceDetailModal({
                 </div>
 
                 {/* button area */}
-                <div className="flex justify-end">
+                <div className="flex justify-end mt-2">
                     <button
                         onClick={() => {
                             if (onDelete) {
                                 onDelete(device.id);
                             }
                         }}
-                        className="px-4 py-2 text-white bg-red-500 rounded-lg hover:bg-red-600"
+                        className="px-4 py-2 text-xs font-medium text-white bg-red-500 rounded-lg hover:bg-red-600"
                     >
                         디바이스를 제거
                     </button>
