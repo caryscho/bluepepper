@@ -14,7 +14,7 @@ import DevicePlacementHandlerGLB from "@/features/device-placement-glb";
 import DevicePreview from "@/features/device-placement/ui/DevicePreview";
 import InstalledDevice from "@/entity/device/ui/InstalledDevice";
 import DeviceSelector from "@/features/device-placement/ui/DeviceSelector";
-import DeviceDetailModal from "@/features/device-detail/ui/DeviceDetailModal";
+import DeviceDetailBox from "@/features/device-detail/ui/DeviceDetailBox";
 import DeviceList from "@/features/device-list/ui/DeviceList";
 import { DEVICE_SIZE } from "@/features/device-placement/constants";
 import HeightController from "@/features/device-placement/ui/HeightController";
@@ -25,6 +25,7 @@ function ClickableGLBModel({
     onObjectClick,
     onModelInfoUpdate,
     targetSize,
+    onDeviceDeselect,
 }: {
     url: string;
     onObjectClick: (name: string) => void;
@@ -37,6 +38,7 @@ function ClickableGLBModel({
         scale: number;
     }) => void;
     targetSize: number; // 목표 건물 크기 (미터)
+    onDeviceDeselect: () => void; // 디바이스 선택 해제
 }) {
     const { scene } = useGLTF(url);
     const { camera } = useThree();
@@ -177,6 +179,11 @@ function ClickableGLBModel({
     const handleClick = (event: any) => {
         event.stopPropagation();
         const clickedObject = event.object;
+        
+        // InstalledDevice가 아니면 선택 해제
+        if (clickedObject.userData?.type !== "installed-device") {
+            onDeviceDeselect();
+        }
 
         const objectInfo = `${clickedObject.name || "이름없음"} (타입: ${
             clickedObject.type
@@ -460,6 +467,7 @@ export default function GlbUploaderPage() {
                                 onObjectClick={setSelectedObject}
                                 onModelInfoUpdate={setModelInfo}
                                 targetSize={targetModelSize}
+                                onDeviceDeselect={handleCloseDeviceDetail}
                             />
                         </Suspense>
 
@@ -497,10 +505,14 @@ export default function GlbUploaderPage() {
                                     onDeviceHover={handleDeviceHover}
                                     isHovered={hoveredDevice?.id === device.id}
                                 />
-                                <HeightController 
-                                    devicePosition={device.position}
-                                    onHeightChange={(newY) => handleHeightChange(device.id, newY)}
-                                />
+                                {selectedDevice && (
+                                    <HeightController
+                                        devicePosition={device.position}
+                                        onHeightChange={(newY) =>
+                                            handleHeightChange(device.id, newY)
+                                        }
+                                    />
+                                )}
                             </group>
                         ))}
                     </Canvas>
@@ -524,7 +536,7 @@ export default function GlbUploaderPage() {
 
                 {/* 디바이스 상세 정보 모달 */}
                 {selectedDevice && (
-                    <DeviceDetailModal
+                    <DeviceDetailBox
                         device={selectedDevice}
                         onClose={handleCloseDeviceDetail}
                         onChangePosition={handleChangePosition}
@@ -549,7 +561,7 @@ export default function GlbUploaderPage() {
                 )}
             </div>
             {modelUrl && modelInfo && (
-                <div className="absolute top-32 left-64 z-10 p-4 rounded-lg shadow-lg bg-black/80">
+                <div className="absolute bottom-0 left-0 z-10 p-4 rounded-lg shadow-lg bg-black/80">
                     <div className="pb-2 mb-3 text-lg font-bold text-white border-b border-white/30">
                         📦 GLB 파일 정보
                     </div>
