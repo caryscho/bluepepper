@@ -1,4 +1,4 @@
-import { useMemo, useState, useRef, useEffect } from "react";
+import { useMemo, useState, useRef, useEffect, useCallback } from "react";
 import * as THREE from "three";
 import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
@@ -252,7 +252,7 @@ function SpaceThreeDViewer({
     const handlePlaceDevice = (
         position: THREE.Vector3,
         rotation: THREE.Euler,
-        attachedTo: "wall" | "column",
+        attachedTo: string,
         attachedToId: string
     ) => {
         if (editingDeviceId) {
@@ -313,6 +313,20 @@ function SpaceThreeDViewer({
         setPreviewPosition(null);
         setPreviewRotation(null);
     };
+
+    // 미리보기 위치 변경 핸들러 (useCallback으로 메모이제이션하여 무한 재렌더링 방지)
+    const handlePreviewPositionChange = useCallback(
+        (
+            pos: THREE.Vector3 | null,
+            rot: THREE.Euler | null,
+            isValid: boolean
+        ) => {
+            setPreviewPosition(pos);
+            setPreviewRotation(rot);
+            setIsPreviewValid(isValid);
+        },
+        []
+    );
 
     return (
         <div className="relative flex-1 w-full h-full bg-[#EFEFEF] overflow-hidden">
@@ -380,15 +394,7 @@ function SpaceThreeDViewer({
                                 <DevicePlacementHandler
                                     isAddDeviceMode={isAddDeviceMode}
                                     onPlaceDevice={handlePlaceDevice}
-                                    onPreviewPositionChange={(
-                                        pos: THREE.Vector3 | null,
-                                        rot: THREE.Euler | null,
-                                        isValid: boolean
-                                    ) => {
-                                        setPreviewPosition(pos);
-                                        setPreviewRotation(rot);
-                                        setIsPreviewValid(isValid);
-                                    }}
+                                    onPreviewPositionChange={handlePreviewPositionChange}
                                 />
                                 <DevicePreview
                                     position={previewPosition}
@@ -411,16 +417,16 @@ function SpaceThreeDViewer({
                     );
                 })}
                 {/* 히트맵 레이어 */}
-                {
-                    isHeatmap && (
-                        <HeatmapLayer
-                            installedDevices={installedDevices}
-                            position={[centerX, 0, centerZ]}
-                            size={{ length, width }}
-                            ceilingHeight={warehouseData.structure.dimensions.height}
-                        />
-                    )
-                }
+                {isHeatmap && (
+                    <HeatmapLayer
+                        installedDevices={installedDevices}
+                        position={[centerX, 0, centerZ]}
+                        size={{ length, width }}
+                        ceilingHeight={
+                            warehouseData.structure.dimensions.height
+                        }
+                    />
+                )}
                 {/* 바닥: JSON의 dimensions 사용 */}
                 <mesh
                     rotation={[-Math.PI / 2, 0, 0]}
@@ -443,7 +449,7 @@ function SpaceThreeDViewer({
                     <Column key={column.id} column={column} />
                 ))}
                 {/* 선반들 (Shelves) - InstancedMesh로 최적화 */}
-                <InstancedShelves
+                {/* <InstancedShelves
                     shelves={warehouseData.structure.shelves.map((shelf) => ({
                         ...shelf,
                         orientation: shelf.orientation as
@@ -452,17 +458,21 @@ function SpaceThreeDViewer({
                             | "east"
                             | "west",
                     }))}
-                />
+                /> */}
                 {/* 벽 - InstancedMesh로 최적화 */}
                 {warehouseData.structure.walls.map((wall) => (
-                    <Walls   
-                        key={wall.id} 
+                    <Walls
+                        key={wall.id}
                         wall={{
                             ...wall,
-                            start: [wall.start[0], wall.start[1]] as [number, number],
+                            start: [wall.start[0], wall.start[1]] as [
+                                number,
+                                number
+                            ],
                             end: [wall.end[0], wall.end[1]] as [number, number],
                             type: wall.type as "exterior" | "interior",
-                        }} />
+                        }}
+                    />
                 ))}
                 {/* <InstancedWalls
                     walls={warehouseData.structure.walls.map((wall) => ({

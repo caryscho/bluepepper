@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { memo, useMemo } from "react";
 import { Column as ColumnType } from "@/types/warehouse";
 
 interface ColumnProps {
@@ -9,14 +10,26 @@ interface ColumnProps {
 const columnGeometry = new THREE.BoxGeometry(1, 1, 1);
 const columnMaterial = new THREE.MeshStandardMaterial({ color: "#CDCDCD" });
 
-export default function Column({ column }: ColumnProps) {
+const Column = memo(function Column({ column }: ColumnProps) {
+    // position과 scale을 메모이제이션
+    const position = useMemo(() => 
+        [column.position.x, column.height / 2, column.position.z] as [number, number, number],
+        [column.position.x, column.height, column.position.z]
+    );
+
+    const scale = useMemo(() =>
+        [column.size.width, column.height, column.size.depth] as [number, number, number],
+        [column.size.width, column.height, column.size.depth]
+    );
     return (
         <mesh
             geometry={columnGeometry}
             material={columnMaterial}
-            position={[column.position.x, column.height / 2, column.position.z]}
-            scale={[column.size.width, column.height, column.size.depth]}
+            position={position}
+            scale={scale}
             userData={{ type: "column", id: column.id }}
         />
     );
-}
+});
+
+export default Column;
