@@ -5,141 +5,229 @@
   "startTime": "2026-01-13T09:00:00Z",
   "endTime": "2026-01-13T13:30:00Z",
   "vehicle": "TRUCK-A-123",
-  "impactThreshold": {
-    "warning": 2.5,
-    "danger": 4.0
+  "tiltThreshold": {
+    "warning": 15.0,
+    "danger": 30.0
   },
-  "impactData": [
+  "initialOrientation": {
+    "roll": 0.0,
+    "pitch": 0.0,
+    "yaw": 0.0,
+    "description": "초기 기준 기울기 (0도 = 수평)"
+  },
+  "tiltData": [
     {
       "timestamp": "2026-01-13T09:00:00Z",
       "timeOffset": 0,
-      "gForce": 0.98,
+      "roll": 0.0,
+      "pitch": 0.0,
+      "yaw": 0.0,
+      "tiltMagnitude": 0.0,
       "severity": "normal",
       "event": "출발"
     },
     {
       "timestamp": "2026-01-13T09:15:00Z",
       "timeOffset": 900,
-      "gForce": 1.2,
+      "roll": 2.5,
+      "pitch": -1.2,
+      "yaw": 0.8,
+      "tiltMagnitude": 2.8,
       "severity": "normal",
       "event": null
     },
     {
       "timestamp": "2026-01-13T09:30:00Z",
       "timeOffset": 1800,
-      "gForce": 1.1,
+      "roll": -1.8,
+      "pitch": 0.5,
+      "yaw": -0.3,
+      "tiltMagnitude": 1.9,
       "severity": "normal",
       "event": null
     },
     {
       "timestamp": "2026-01-13T09:45:00Z",
       "timeOffset": 2700,
-      "gForce": 3.2,
+      "roll": 18.5,
+      "pitch": -12.3,
+      "yaw": 5.2,
+      "tiltMagnitude": 22.8,
       "severity": "warning",
-      "event": "급정거"
+      "event": "급정거",
+      "motionDescription": {
+        "type": "sudden_stop",
+        "direction": "forward_tilt",
+        "intensity": "high"
+      }
     },
     {
       "timestamp": "2026-01-13T10:00:00Z",
       "timeOffset": 3600,
-      "gForce": 1.0,
+      "roll": 1.2,
+      "pitch": 0.8,
+      "yaw": -0.5,
+      "tiltMagnitude": 1.5,
       "severity": "normal",
       "event": null
     },
     {
       "timestamp": "2026-01-13T10:15:00Z",
       "timeOffset": 4500,
-      "gForce": 1.3,
+      "roll": -2.1,
+      "pitch": 1.5,
+      "yaw": 1.2,
+      "tiltMagnitude": 2.8,
       "severity": "normal",
       "event": null
     },
     {
       "timestamp": "2026-01-13T10:30:00Z",
       "timeOffset": 5400,
-      "gForce": 4.8,
+      "roll": 25.3,
+      "pitch": 18.7,
+      "yaw": -8.5,
+      "tiltMagnitude": 32.4,
       "severity": "danger",
-      "event": "과속방지턱"
+      "event": "과속방지턱",
+      "motionDescription": {
+        "type": "vertical_bump",
+        "direction": "upward_jump",
+        "intensity": "very_high"
+      }
     },
     {
       "timestamp": "2026-01-13T10:45:00Z",
       "timeOffset": 6300,
-      "gForce": 1.2,
+      "roll": 1.8,
+      "pitch": -0.9,
+      "yaw": 0.6,
+      "tiltMagnitude": 2.1,
       "severity": "normal",
       "event": null
     },
     {
       "timestamp": "2026-01-13T11:00:00Z",
       "timeOffset": 7200,
-      "gForce": 0.95,
+      "roll": -0.5,
+      "pitch": 0.3,
+      "yaw": -0.2,
+      "tiltMagnitude": 0.6,
       "severity": "normal",
       "event": null
     },
     {
       "timestamp": "2026-01-13T11:15:00Z",
       "timeOffset": 8100,
-      "gForce": 2.8,
+      "roll": 12.8,
+      "pitch": 3.2,
+      "yaw": -15.5,
+      "tiltMagnitude": 20.1,
       "severity": "warning",
-      "event": "차선 변경"
+      "event": "차선 변경",
+      "motionDescription": {
+        "type": "lateral_movement",
+        "direction": "left_sway",
+        "intensity": "medium"
+      }
     },
     {
       "timestamp": "2026-01-13T11:30:00Z",
       "timeOffset": 9000,
-      "gForce": 1.1,
+      "roll": 0.8,
+      "pitch": -0.4,
+      "yaw": 0.3,
+      "tiltMagnitude": 0.9,
       "severity": "normal",
       "event": null
     },
     {
       "timestamp": "2026-01-13T11:45:00Z",
       "timeOffset": 9900,
-      "gForce": 5.5,
+      "roll": -28.5,
+      "pitch": 5.2,
+      "yaw": 22.3,
+      "tiltMagnitude": 36.8,
       "severity": "danger",
-      "event": "급커브"
+      "event": "급커브",
+      "motionDescription": {
+        "type": "sharp_turn",
+        "direction": "right_tilt",
+        "intensity": "very_high"
+      }
     },
     {
       "timestamp": "2026-01-13T12:00:00Z",
       "timeOffset": 10800,
-      "gForce": 1.0,
+      "roll": 0.2,
+      "pitch": -0.1,
+      "yaw": 0.1,
+      "tiltMagnitude": 0.2,
       "severity": "normal",
       "event": null
     },
     {
       "timestamp": "2026-01-13T12:15:00Z",
       "timeOffset": 11700,
-      "gForce": 1.4,
+      "roll": 1.5,
+      "pitch": 2.1,
+      "yaw": -0.8,
+      "tiltMagnitude": 2.7,
       "severity": "normal",
       "event": null
     },
     {
       "timestamp": "2026-01-13T12:30:00Z",
       "timeOffset": 12600,
-      "gForce": 0.9,
+      "roll": -0.8,
+      "pitch": 0.5,
+      "yaw": 0.4,
+      "tiltMagnitude": 1.0,
       "severity": "normal",
       "event": null
     },
     {
       "timestamp": "2026-01-13T12:45:00Z",
       "timeOffset": 13500,
-      "gForce": 3.5,
+      "roll": 3.2,
+      "pitch": 16.8,
+      "yaw": -2.5,
+      "tiltMagnitude": 17.3,
       "severity": "warning",
-      "event": "급출발"
+      "event": "급출발",
+      "motionDescription": {
+        "type": "acceleration",
+        "direction": "backward_tilt",
+        "intensity": "medium"
+      }
     },
     {
       "timestamp": "2026-01-13T13:00:00Z",
       "timeOffset": 14400,
-      "gForce": 1.1,
+      "roll": 0.9,
+      "pitch": -0.6,
+      "yaw": 0.2,
+      "tiltMagnitude": 1.1,
       "severity": "normal",
       "event": null
     },
     {
       "timestamp": "2026-01-13T13:15:00Z",
       "timeOffset": 15300,
-      "gForce": 1.3,
+      "roll": -1.2,
+      "pitch": 1.0,
+      "yaw": -0.5,
+      "tiltMagnitude": 1.6,
       "severity": "normal",
       "event": null
     },
     {
       "timestamp": "2026-01-13T13:30:00Z",
       "timeOffset": 16200,
-      "gForce": 0.85,
+      "roll": 0.0,
+      "pitch": 0.0,
+      "yaw": 0.0,
+      "tiltMagnitude": 0.0,
       "severity": "normal",
       "event": "도착"
     }
@@ -149,7 +237,7 @@
     "normalCount": 13,
     "warningCount": 4,
     "dangerCount": 2,
-    "maxImpact": 5.5,
-    "avgImpact": 1.8
+    "maxTilt": 36.8,
+    "avgTilt": 8.2
   }
 }

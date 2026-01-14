@@ -46,7 +46,7 @@ export default function ChartShowcasePage() {
         }
 
         // Prepare data
-        const labels = data.impactData.map((item) => {
+        const labels = data.tiltData.map((item) => {
             const date = new Date(item.timestamp);
             return date.toLocaleTimeString("ko-KR", {
                 hour: "2-digit",
@@ -54,16 +54,16 @@ export default function ChartShowcasePage() {
             });
         });
 
-        const normalData = data.impactData.map((item) =>
-            item.severity === "normal" ? item.gForce : null
+        const normalData = data.tiltData.map((item) =>
+            item.severity === "normal" ? item.tiltMagnitude : null
         );
 
-        const warningData = data.impactData.map((item) =>
-            item.severity === "warning" ? item.gForce : null
+        const warningData = data.tiltData.map((item) =>
+            item.severity === "warning" ? item.tiltMagnitude : null
         );
 
-        const dangerData = data.impactData.map((item) =>
-            item.severity === "danger" ? item.gForce : null
+        const dangerData = data.tiltData.map((item) =>
+            item.severity === "danger" ? item.tiltMagnitude : null
         );
 
         const options: ChartOptions<"line"> = {
@@ -79,7 +79,7 @@ export default function ChartShowcasePage() {
                 },
                 title: {
                     display: true,
-                    text: `운송 충격 모니터링 - ${data.origin} → ${data.destination}`,
+                    text: `운송 기울기 감지 모니터링 - ${data.origin} → ${data.destination}`,
                     font: {
                         size: 18,
                     },
@@ -88,7 +88,7 @@ export default function ChartShowcasePage() {
                     callbacks: {
                         afterLabel: (context) => {
                             const index = context.dataIndex;
-                            const event = data.impactData[index].event;
+                            const event = data.tiltData[index].event;
                             return event ? `이벤트: ${event}` : "";
                         },
                     },
@@ -99,10 +99,10 @@ export default function ChartShowcasePage() {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: "G-Force (중력가속도)",
+                        text: "기울기 변화량 (도)",
                     },
                     ticks: {
-                        callback: (value) => `${value}G`,
+                        callback: (value) => `${value}°`,
                     },
                 },
                 x: {
@@ -158,10 +158,10 @@ export default function ChartShowcasePage() {
         };
     }, [data]);
 
-    const dangerEvents = data.impactData.filter(
+    const dangerEvents = data.tiltData.filter(
         (item) => item.severity === "danger"
     );
-    const warningEvents = data.impactData.filter(
+    const warningEvents = data.tiltData.filter(
         (item) => item.severity === "warning"
     );
 
@@ -171,7 +171,7 @@ export default function ChartShowcasePage() {
                 {/* Header */}
                 <div className="p-6 bg-white rounded-lg shadow">
                     <h1 className="mb-4 text-3xl font-bold text-gray-900">
-                        운송 충격 모니터링 대시보드
+                        운송 기울기 감지 모니터링 대시보드
                     </h1>
                     <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                         <div className="p-4 bg-blue-50 rounded-lg">
@@ -241,7 +241,7 @@ export default function ChartShowcasePage() {
                                             </p>
                                         </div>
                                         <span className="text-2xl font-bold text-red-600">
-                                            {event.gForce.toFixed(1)}G
+                                            {event.tiltMagnitude.toFixed(1)}°
                                         </span>
                                     </div>
                                 </div>
@@ -272,7 +272,7 @@ export default function ChartShowcasePage() {
                                             </p>
                                         </div>
                                         <span className="text-2xl font-bold text-yellow-600">
-                                            {event.gForce.toFixed(1)}G
+                                            {event.tiltMagnitude.toFixed(1)}°
                                         </span>
                                     </div>
                                 </div>
@@ -297,15 +297,15 @@ export default function ChartShowcasePage() {
                             </p>
                         </div>
                         <div className="pl-4 border-l-4 border-purple-500">
-                            <p className="text-sm text-gray-600">최대 충격</p>
+                            <p className="text-sm text-gray-600">최대 기울기</p>
                             <p className="text-2xl font-bold text-gray-900">
-                                {data.summary.maxImpact.toFixed(1)}G
+                                {data.summary.maxTilt.toFixed(1)}°
                             </p>
                         </div>
                         <div className="pl-4 border-l-4 border-indigo-500">
-                            <p className="text-sm text-gray-600">평균 충격</p>
+                            <p className="text-sm text-gray-600">평균 기울기</p>
                             <p className="text-2xl font-bold text-gray-900">
-                                {data.summary.avgImpact.toFixed(1)}G
+                                {data.summary.avgTilt.toFixed(1)}°
                             </p>
                         </div>
                     </div>
