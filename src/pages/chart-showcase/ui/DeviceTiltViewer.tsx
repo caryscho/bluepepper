@@ -2,7 +2,6 @@ import DeviceModelT1 from "@/entity/device/ui/DeviceModelT1";
 import { AVAILABLE_DEVICE_TYPES } from "@/types/device";
 import { Canvas, useThree } from "@react-three/fiber";
 import { useEffect } from "react";
-import * as THREE from "three";
 import shippingData from "../../../data/shipping-sample.json";
 import type { ShippingData } from "../../../types/shipping";
 
@@ -46,17 +45,17 @@ export default function DeviceTiltViewer({
         pitch = deltaTiltData.pitch;
         yaw = deltaTiltData.yaw;
     } else {
-        // dataIndex로 계산
+        // dataIndex로 계산 - 시작 시점(0번 인덱스) 기준
         const tiltPoint = data.tiltData[dataIndex];
-        const initialOrientation = data.initialOrientation;
-        roll = tiltPoint.roll - initialOrientation.roll;
-        pitch = tiltPoint.pitch - initialOrientation.pitch;
-        yaw = tiltPoint.yaw - initialOrientation.yaw;
+        const startPoint = data.tiltData[0]; // 첫 번째 데이터 포인트를 기준으로
+        roll = tiltPoint.roll - startPoint.roll;
+        pitch = tiltPoint.pitch - startPoint.pitch;
+        yaw = tiltPoint.yaw - startPoint.yaw;
     }
 
     return (
         <>
-            <p className="text-xs text-gray-500">
+            <p className="relative ml-2 text-xs text-gray-500">
                 roll: {roll} pitch: {pitch} yaw: {yaw}
             </p>
             <Canvas

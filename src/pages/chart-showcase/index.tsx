@@ -15,8 +15,6 @@ import shippingData from "../../data/shipping-sample.json";
 import type { ShippingData } from "../../types/shipping";
 import DeviceTiltViewer from "./ui/DeviceTiltViewer";
 
-import { Canvas } from "@react-three/fiber";
-
 // Register Chart.js components
 ChartJS.register(
     CategoryScale,
@@ -183,10 +181,12 @@ export default function ChartShowcasePage() {
             }
 
             const tileData = data.tiltData[currentIndex];
+            // 시작 시점(0번 인덱스) 기준으로 기울기 변화량 계산
+            const startPoint = data.tiltData[0];
             setDeltaTiltData({
-                roll: tileData.roll - data.initialOrientation.roll,
-                pitch: tileData.pitch - data.initialOrientation.pitch,
-                yaw: tileData.yaw - data.initialOrientation.yaw,
+                roll: tileData.roll - startPoint.roll,
+                pitch: tileData.pitch - startPoint.pitch,
+                yaw: tileData.yaw - startPoint.yaw,
             });
             console.log(tileData, "tileData");
 
@@ -251,7 +251,6 @@ export default function ChartShowcasePage() {
                         </div>
                     </div>
                 </div>
-                <p className="text-sm text-black">{JSON.stringify(deltaTiltData, null, 2)}</p>
 
                 {/* Chart */}
                 <div className="relative p-6 bg-white rounded-lg shadow">
@@ -262,7 +261,7 @@ export default function ChartShowcasePage() {
                         ></canvas>
                         {/* 3D Device Viewer */}
                         <div className="absolute top-4 right-4 w-[280px] aspect-video bg-white border border-gray-300 rounded-lg shadow-lg z-10">
-                            <DeviceTiltViewer deltaTiltData={deltaTiltData}/>
+                            <DeviceTiltViewer deltaTiltData={deltaTiltData} />
                         </div>
                     </div>
                 </div>

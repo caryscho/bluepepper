@@ -152,11 +152,7 @@ export default function DeviceModel3D({
     }, [deviceType.name]);
 
     return (
-        <group 
-            ref={groupRef}
-            rotation={!autoRotate ? [rollRad, pitchRad, yawRad] : undefined}
-            rotation-order={!autoRotate ? "ZYX" : undefined}
-        >
+        <group ref={groupRef}>
             {/* 메인 흰색 케이스 (둥근 모서리) */}
             <RoundedBox
                 args={[width, height, depth]}
