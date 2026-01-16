@@ -129,14 +129,14 @@ const InstalledDevice = memo(function InstalledDevice({
                         finalScale + 0.1,  // 구 반지름 + 여유
                         0
                     ]}
-                    distanceFactor={10}
                     style={{
                         pointerEvents: "none",
                         userSelect: "none",
-                        transform: "translate(0, -100%)", // 왼쪽 위 정렬
+                        transform: "translate(-50%, -100%)",
                     }}
+                    zIndexRange={[100, 0]}
                 >
-                    <div className="bg-white border shadow-lg rounded-lg p-2 min-w-[150px]">
+                    <div className="bg-white border shadow-lg rounded-lg p-2 min-w-[150px] text-[14px]">
                         <div className="text-sm font-semibold text-black">
                             {device.serialNumber}
                         </div>
