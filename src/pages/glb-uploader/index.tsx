@@ -12,19 +12,22 @@ import Controls from "@/widgets/warehouse-viewer/ui/controls";
 import { CanvasLoadingSpinner } from "@/shared/ui/LoadingSpinner";
 
 import DevicePlacementHandlerGLB from "@/features/device-placement-glb";
-import DevicePreview from "@/features/device-placement/ui/DevicePreview";
+// import DevicePreview from "@/features/device-placement/ui/DevicePreview"; // 기존 네모 노란 매치박스
+import DevicePreview from "@/features/device-placement/ui/DevicePreviewMarker"; // todo => marker 모양 또는 실제 마우스 좌표 보정해서 렌더링 한것
 import InstalledDevice from "@/entity/device/ui/InstalledDevice";
 import DeviceSelector from "@/features/device-placement/ui/DeviceSelector";
 import DeviceDetailBox from "@/features/device-detail/ui/DeviceDetailBox";
 import DeviceList from "@/features/device-list/ui/DeviceList";
 import { DEVICE_SIZE } from "@/features/device-placement/constants";
 import HeightController from "@/features/device-placement/ui/HeightController";
+import DiscController from "@/features/device-placement/ui/DiscController";
+
 
 // 카메라 포커스 컨트롤러 (Canvas 내부에서 사용)
-function CameraFocusController({ 
+function CameraFocusController({
     focusTarget,
-    controlsRef 
-}: { 
+    controlsRef,
+}: {
     focusTarget: { x: number; y: number; z: number } | null;
     controlsRef: React.RefObject<any>;
 }) {
@@ -161,9 +164,10 @@ function ClickableGLBModel({
         if (hoveredObject && hoveredObject instanceof THREE.Mesh) {
             const material =
                 hoveredObject.material as THREE.MeshStandardMaterial;
-            if (material.color) {
-                material.color.setHex(0xffff00); // 노란색으로 변경
-            }
+            // 호버 색상 잠깐 끌꺼양
+            // if (material.color) {
+            //     material.color.setHex(0xffff00); // 노란색으로 변경
+            // }
         }
 
         return () => {
@@ -192,7 +196,7 @@ function ClickableGLBModel({
     const handleClick = (event: any) => {
         event.stopPropagation();
         const clickedObject = event.object;
-        
+
         // InstalledDevice가 아니면 선택 해제
         if (clickedObject.userData?.type !== "installed-device") {
             onDeviceDeselect();
@@ -470,11 +474,11 @@ export default function GlbUploaderPage() {
                             far: 10000,
                         }}
                     >
-                        <CameraFocusController 
+                        <CameraFocusController
                             focusTarget={focusTarget}
                             controlsRef={orbitControlsRef}
                         />
-                        
+
                         <gridHelper args={[100, 20]} />
 
                         <OrbitControls
@@ -544,14 +548,22 @@ export default function GlbUploaderPage() {
                                     onDeviceHover={handleDeviceHover}
                                     isHovered={hoveredDevice?.id === device.id}
                                 />
-                                {selectedDevice && selectedDevice.serialNumber === device.serialNumber && (
-                                    <HeightController
-                                        devicePosition={device.position}
-                                        onHeightChange={(newY) =>
-                                            handleHeightChange(device.id, newY)
-                                        }
-                                    />
-                                )}
+                                {selectedDevice &&
+                                    selectedDevice.serialNumber ===
+                                        device.serialNumber && (
+                                        <>
+                                            <HeightController
+                                                devicePosition={device.position}
+                                                onHeightChange={(newY) =>
+                                                    handleHeightChange(
+                                                        device.id,
+                                                        newY
+                                                    )
+                                                }
+                                            />
+                                            <DiscController/>
+                                        </>
+                                    )}
                             </group>
                         ))}
                     </Canvas>
