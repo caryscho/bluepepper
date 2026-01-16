@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -13,6 +13,9 @@ import {
 } from "chart.js";
 import shippingData from "../../data/shipping-sample.json";
 import type { ShippingData } from "../../types/shipping";
+import DeviceTiltViewer from "./ui/DeviceTiltViewer";
+
+import { Canvas } from "@react-three/fiber";
 
 // Register Chart.js components
 ChartJS.register(
@@ -29,6 +32,17 @@ ChartJS.register(
 export default function ChartShowcasePage() {
     const chartRef = useRef<HTMLCanvasElement>(null);
     const chartId = "shipping-impact-chart";
+    const [hoveredPoint, setHoveredPoint] = useState<{
+        dataIndex: number;
+        x: number;
+        y: number;
+    } | null>(null);
+
+    const [deltaTiltData, setDeltaTiltData] = useState<{
+        roll: number;
+        pitch: number;
+        yaw: number;
+    } | null>(null);
 
     const data = shippingData as ShippingData;
 
@@ -71,7 +85,7 @@ export default function ChartShowcasePage() {
             maintainAspectRatio: false,
             interaction: {
                 mode: "index",
-                intersect: false,
+                intersect: true,
             },
             plugins: {
                 legend: {
@@ -115,7 +129,7 @@ export default function ChartShowcasePage() {
         };
 
         // Create chart with explicit ID
-        new ChartJS(ctx, {
+        const chart = new ChartJS(ctx, {
             type: "line",
             data: {
                 labels,
@@ -150,8 +164,37 @@ export default function ChartShowcasePage() {
             options,
         });
 
+        // 포인트 진입 추적
+        let lastHoveredIndex: number | null = null;
+
+        // 이벤트 리스너 등록
+        chart.options.onHover = (event, activeElements) => {
+            // 포인트 위에 없을 때
+            if (activeElements.length === 0) {
+                lastHoveredIndex = null;
+                return;
+            }
+
+            const currentIndex = activeElements[0].index;
+
+            // 이미 같은 포인트 위에 있으면 아무것도 하지 않음
+            if (lastHoveredIndex === currentIndex) {
+                return;
+            }
+
+            const tileData = data.tiltData[currentIndex];
+            setDeltaTiltData({
+                roll: tileData.roll - data.initialOrientation.roll,
+                pitch: tileData.pitch - data.initialOrientation.pitch,
+                yaw: tileData.yaw - data.initialOrientation.yaw,
+            });
+            console.log(tileData, "tileData");
+
+            // 새로운 포인트에 진입했을 때만 실행
+            lastHoveredIndex = currentIndex;
+        };
+
         return () => {
-            const chart = ChartJS.getChart(chartId);
             if (chart) {
                 chart.destroy();
             }
@@ -208,11 +251,19 @@ export default function ChartShowcasePage() {
                         </div>
                     </div>
                 </div>
+                <p className="text-sm text-black">{JSON.stringify(deltaTiltData, null, 2)}</p>
 
                 {/* Chart */}
-                <div className="p-6 bg-white rounded-lg shadow">
-                    <div className="h-[500px]">
-                        <canvas id="shipping-impact-chart" ref={chartRef}></canvas>
+                <div className="relative p-6 bg-white rounded-lg shadow">
+                    <div className="h-[500px] relative">
+                        <canvas
+                            id="shipping-impact-chart"
+                            ref={chartRef}
+                        ></canvas>
+                        {/* 3D Device Viewer */}
+                        <div className="absolute top-4 right-4 w-[280px] aspect-video bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+                            <DeviceTiltViewer deltaTiltData={deltaTiltData}/>
+                        </div>
                     </div>
                 </div>
 

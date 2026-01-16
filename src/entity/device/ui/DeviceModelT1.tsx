@@ -1,4 +1,4 @@
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import { RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
@@ -13,6 +13,9 @@ interface DeviceModel3DProps {
     };
     autoRotate?: boolean;
     rotationSpeed?: number;
+    roll?: number; // X축 회전 (도)
+    pitch?: number; // Y축 회전 (도)
+    yaw?: number; // Z축 회전 (도)
 }
 
 /**
@@ -26,10 +29,30 @@ export default function DeviceModel3D({
     diveSize,
     autoRotate = true,
     rotationSpeed = 0.5,
+    roll = 0,
+    pitch = 0,
+    yaw = 0,
 }: DeviceModel3DProps) {
     const groupRef = useRef<THREE.Group>(null);
 
-    // Y축 회전 애니메이션
+    // 도(degree)를 라디안으로 변환
+    const rollRad = (roll * Math.PI) / 180;
+    const pitchRad = (pitch * Math.PI) / 180;
+    const yawRad = (yaw * Math.PI) / 180;
+
+    // tilt 각도 적용 (autoRotate가 false일 때는 useEffect로, true일 때는 useFrame으로)
+    useEffect(() => {
+        if (!autoRotate && groupRef.current) {
+            // Roll, Pitch, Yaw를 Three.js rotation에 적용
+            // Roll: X축 회전 (좌우 기울기)
+            // Pitch: Y축 회전 (앞뒤 기울기)
+            // Yaw: Z축 회전 (좌우 회전)
+            groupRef.current.rotation.order = 'ZYX'; // Yaw -> Pitch -> Roll 순서
+            groupRef.current.rotation.set(rollRad, pitchRad, yawRad);
+        }
+    }, [autoRotate, rollRad, pitchRad, yawRad]);
+
+    // Y축 회전 애니메이션 (autoRotate가 true일 때만)
     useFrame((_, delta) => {
         if (autoRotate && groupRef.current) {
             groupRef.current.rotation.y += rotationSpeed * delta;
@@ -129,7 +152,11 @@ export default function DeviceModel3D({
     }, [deviceType.name]);
 
     return (
-        <group ref={groupRef}>
+        <group 
+            ref={groupRef}
+            rotation={!autoRotate ? [rollRad, pitchRad, yawRad] : undefined}
+            rotation-order={!autoRotate ? "ZYX" : undefined}
+        >
             {/* 메인 흰색 케이스 (둥근 모서리) */}
             <RoundedBox
                 args={[width, height, depth]}
