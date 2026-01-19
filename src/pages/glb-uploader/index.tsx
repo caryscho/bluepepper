@@ -561,7 +561,9 @@ export default function GlbUploaderPage() {
                                                     )
                                                 }
                                             />
-                                            <DiscController/>
+                                            <DiscController
+                                                devicePosition={device.position}
+                                            />
                                         </>
                                     )}
                             </group>
