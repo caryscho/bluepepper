@@ -194,10 +194,11 @@ function ClickableGLBModel({
     };
 
     const handleClick = (event: any) => {
+        console.log('이것은 clickableGLBModel의 handleClick임')
         event.stopPropagation();
         const clickedObject = event.object;
 
-        // InstalledDevice가 아니면 선택 해제
+        // InstalledDevice가 아니면 선택 해제 ? heightController는 html dom이라 적용이안되나봄 
         if (clickedObject.userData?.type !== "installed-device") {
             onDeviceDeselect();
         }

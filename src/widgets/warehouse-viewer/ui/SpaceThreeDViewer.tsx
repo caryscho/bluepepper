@@ -196,6 +196,59 @@ function CameraDebugInfo({
     return null;
 }
 
+// Scene의 mesh 개수를 세는 컴포넌트
+function SceneMeshCounter({
+    onUpdate,
+    installedDevices,
+}: {
+    onUpdate: (info: { meshCount: number; triangleCount: number }) => void;
+    installedDevices: any[];
+}) {
+    const { scene } = useThree();
+
+    useEffect(() => {
+        console.log('sceneMeshCounter 실행됨');
+        // 씬이 변경될 때마다 mesh 개수 세기
+        const countMeshes = () => {
+            let meshCount = 0;
+            let triangleCount = 0;
+
+            scene.traverse((child) => {
+                if (child instanceof THREE.Mesh) {
+                    meshCount++;
+
+                    // 삼각형 개수 계산
+                    if (child.geometry) {
+                        const geometry = child.geometry;
+                        if (geometry.index) {
+                            triangleCount += geometry.index.count / 3;
+                        } else if (geometry.attributes.position) {
+                            triangleCount += geometry.attributes.position.count / 3;
+                        }
+                    }
+                }
+            });
+
+            onUpdate({
+                meshCount,
+                triangleCount: Math.round(triangleCount),
+            });
+        };
+
+        // 초기 카운트
+        countMeshes();
+
+        // installedDevices가 변경될 때마다 다시 카운트 (디바이스 추가/제거 시)
+        const timeoutId = setTimeout(() => {
+            countMeshes();
+        }, 100); // 약간의 딜레이로 렌더링 완료 후 카운트
+
+        return () => clearTimeout(timeoutId);
+    }, [scene, installedDevices.length, onUpdate]);
+
+    return null;
+}
+
 function SpaceThreeDViewer({
     selectedDevice,
     centerX,
@@ -221,6 +274,18 @@ function SpaceThreeDViewer({
     const [previewRotation, setPreviewRotation] = useState<THREE.Euler | null>(
         null
     );
+
+    const [modelInfo, setModelInfo] = useState<{
+        meshCount: number;
+        triangleCount: number;
+    } | null>(null);
+
+    useEffect(() => {
+        if (modelInfo) {
+            console.log('modelInfo', modelInfo);
+        }
+    }, [modelInfo]);
+    
     const [isPreviewValid, setIsPreviewValid] = useState(false);
     // OrbitControls ref
     const controlsRef = useRef<any>(null);
@@ -317,7 +382,7 @@ function SpaceThreeDViewer({
         setPreviewRotation(null);
     };
 
-    // 미리보기 위치 변경 핸들러 (useCallback으로 메모이제이션하여 무한 재렌더링 방지)
+    // 미리보기 위치 변경 핸들러 (메모이제이션하여 무한 재렌더링 방지)
     const handlePreviewPositionChange = useCallback(
         (
             pos: THREE.Vector3 | null,
@@ -343,6 +408,13 @@ function SpaceThreeDViewer({
 
     return (
         <div className="relative flex-1 w-full h-full bg-[#EFEFEF] overflow-hidden">
+            {modelInfo && (
+                <div className="absolute top-6 right-6 z-20 p-4 font-mono text-xs text-white rounded-lg bg-black/80 w-[300px]">
+                    <p className="mb-2 font-bold">Model Info</p>
+                    <p>Mesh Count: {modelInfo.meshCount}</p>
+                    <p>Triangle Count: {modelInfo.triangleCount}</p>
+                </div>
+            )}
             {/* 카메라 디버그 정보 */}
             {/* {cameraDebug && (
                 <div className="  absolute top-6 right-6 z-20 p-4 font-mono text-xs text-white rounded-lg bg-black/80 w-[300px]">
@@ -372,7 +444,7 @@ function SpaceThreeDViewer({
                 <ambientLight intensity={1.2} />
                 <directionalLight position={[10, 10, 5]} intensity={1.5} />
                 <directionalLight position={[-10, 10, -5]} intensity={0.8} />
-                <hemisphereLight intensity={0.6} />‰
+                <hemisphereLight intensity={0.6} />
                 {/* 카메라 컨트롤: 마우스로 드래그해서 회전, 휠로 줌, Shift+드래그로 이동 */}
                 <OrbitControls
                     ref={controlsRef}
@@ -397,6 +469,10 @@ function SpaceThreeDViewer({
                 <CameraDebugInfo
                     controlsRef={controlsRef}
                     onUpdate={setCameraDebug}
+                />
+                <SceneMeshCounter
+                    onUpdate={setModelInfo}
+                    installedDevices={installedDevices}
                 />
                 {/* 디바이스 배치 핸들러 및 미리보기 */}
                 {isAddDeviceMode &&
@@ -476,7 +552,7 @@ function SpaceThreeDViewer({
                     <Column key={column.id} column={column} />
                 ))}
                 {/* 선반들 (Shelves) - InstancedMesh로 최적화 */}
-                {/* <InstancedShelves
+                <InstancedShelves
                     shelves={warehouseData.structure.shelves.map((shelf) => ({
                         ...shelf,
                         orientation: shelf.orientation as
@@ -485,7 +561,7 @@ function SpaceThreeDViewer({
                             | "east"
                             | "west",
                     }))}
-                /> */}
+                />
                 {/* 벽 - InstancedMesh로 최적화 */}
                 {warehouseData.structure.walls.map((wall) => (
                     <Walls

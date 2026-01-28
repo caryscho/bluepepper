@@ -60,6 +60,7 @@ const Controls = ({
                     onToggleDimension={onToggleDimension}
                 />
             </div>
+            {/* 기기 설치 | 리스트 */}
             <DeviceContoller
                 is2D={is2D}
                 isAddDeviceMode={isAddDeviceMode}

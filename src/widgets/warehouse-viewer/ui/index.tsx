@@ -13,6 +13,7 @@ import DeviceDetailBox from "@/features/device-detail/ui/DeviceDetailBox";
 // ui components
 import Controls from "@/widgets/warehouse-viewer/ui/controls";
 import { LoadingSpinner } from "@/shared/ui/LoadingSpinner";
+import { useState } from "react";
 
 const WarehouseViewer = () => {
     const {
@@ -33,7 +34,7 @@ const WarehouseViewer = () => {
         editingDeviceId,
         focusTarget,
         resetCameraTrigger,
-        isHeatmap,  
+        isHeatmap,
         handleToggleAddDeviceMode,
         handleSelectDevice,
         handleCloseModal,
@@ -50,6 +51,7 @@ const WarehouseViewer = () => {
         handleSearchDeviceWithText,
     } = useWarehouseViewer();
 
+
     return (
         <div
             className="relative"
@@ -62,8 +64,8 @@ const WarehouseViewer = () => {
                 isAddDeviceMode={isAddDeviceMode}
                 onToggleDimension={handleToggleDimension}
                 onToggleAddDeviceMode={handleToggleAddDeviceMode}
-                onToggleDeviceListMode={handleToggleDeviceListMode}   
-                onToggleHeatmap={handleToggleHeatmap}   
+                onToggleDeviceListMode={handleToggleDeviceListMode}
+                onToggleHeatmap={handleToggleHeatmap}
                 onResetCamera={handleResetCamera}
                 onSearchDeviceWithText={handleSearchDeviceWithText}
             />
@@ -89,7 +91,7 @@ const WarehouseViewer = () => {
                     editingDeviceId={editingDeviceId}
                     focusTarget={focusTarget}
                     resetCameraTrigger={resetCameraTrigger}
-                    isHeatmap={isHeatmap}   
+                    isHeatmap={isHeatmap}
                 />
             )}
             {/* 기기 선택 모달 */}
@@ -106,11 +108,10 @@ const WarehouseViewer = () => {
 
             {/* CSS transition으로 fade in/out 애니메이션 - 항상 렌더링하여 exit 애니메이션 보장 */}
             <div
-                className={`absolute right-6 top-1/2 -translate-y-1/2 z-10 transition-all duration-300 ease-in-out ${
-                    showDeviceList
-                        ? "opacity-100 translate-x-0 pointer-events-auto"
-                        : "opacity-0 translate-x-4 pointer-events-none"
-                }`}
+                className={`absolute right-6 top-1/2 -translate-y-1/2 z-10 transition-all duration-300 ease-in-out ${showDeviceList
+                    ? "opacity-100 translate-x-0 pointer-events-auto"
+                    : "opacity-0 translate-x-4 pointer-events-none"
+                    }`}
             >
                 <DeviceList
                     installedDevices={installedDevices}
