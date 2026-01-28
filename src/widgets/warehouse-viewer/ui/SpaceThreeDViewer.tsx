@@ -408,13 +408,13 @@ function SpaceThreeDViewer({
 
     return (
         <div className="relative flex-1 w-full h-full bg-[#EFEFEF] overflow-hidden">
-            {modelInfo && (
+            {/* {modelInfo && (
                 <div className="absolute top-6 right-6 z-20 p-4 font-mono text-xs text-white rounded-lg bg-black/80 w-[300px]">
                     <p className="mb-2 font-bold">Model Info</p>
                     <p>Mesh Count: {modelInfo.meshCount}</p>
                     <p>Triangle Count: {modelInfo.triangleCount}</p>
                 </div>
-            )}
+            )} */}
             {/* 카메라 디버그 정보 */}
             {/* {cameraDebug && (
                 <div className="  absolute top-6 right-6 z-20 p-4 font-mono text-xs text-white rounded-lg bg-black/80 w-[300px]">
@@ -539,13 +539,13 @@ function SpaceThreeDViewer({
                     <meshStandardMaterial color="#C1C0C0" />
                 </mesh>
                 {/* 바닥 위에만 정확히 맞는 그리드 */}
-                <FloorGrid
+                {/* <FloorGrid
                     length={length}
                     width={width}
                     centerX={centerX}
                     centerZ={centerZ}
                     divisions={20}
-                />
+                /> */}
                 {/* 기둥들 (Columns) - InstancedMesh로 최적화 */}
                 {/* <InstancedColumns columns={warehouseData.structure.columns} /> */}
                 {warehouseData.structure.columns.map((column) => (

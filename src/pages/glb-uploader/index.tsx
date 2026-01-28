@@ -563,7 +563,26 @@ export default function GlbUploaderPage() {
                                                 }
                                             />
                                             <DiscController
-                                                devicePosition={device.position}
+                                                devicePosition={{
+                                                    ...device.position,
+                                                    y: device.position.y - (0.5 * Math.max(DEVICE_SIZE.width, DEVICE_SIZE.height, DEVICE_SIZE.depth) * 1.2)
+                                                }}
+                                                onPositionChange={(newPosition) => {
+                                                    // Y는 그대로 유지하고 X, Z만 업데이트
+                                                    const updatedDevices = installedDevices.map((d) =>
+                                                        d.id === device.id
+                                                            ? {
+                                                                  ...d,
+                                                                  position: {
+                                                                      ...d.position,
+                                                                      x: newPosition.x,
+                                                                      z: newPosition.z,
+                                                                  },
+                                                              }
+                                                            : d
+                                                    );
+                                                    setInstalledDevices(updatedDevices);
+                                                }}
                                             />
                                         </>
                                     )}
