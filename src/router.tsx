@@ -1,9 +1,10 @@
 import { createBrowserRouter } from "react-router-dom";
 import Layout from "./app/ui/Layout";
-import WarehousePage from "./pages/warehouse/ui/WarehousePage";
+import WarehousePage from "./pages/warehouse";
 import DevicemodelPage from "./pages/device-model/ui/DevicemodelPage";
 import GlbUploaderPage from "./pages/glb-uploader";
 import ChartShowcasePage from "./pages/chart-showcase/index";
+import FloorPlannerPage from "./pages/floor-planner";
 
 function NotFoundPage() {
     return (
@@ -78,6 +79,18 @@ function HomePage() {
                             차트 시각화 페이지
                         </p>
                     </a>
+                    <a
+                        href="/floor-planner"
+                        className="p-8 bg-white rounded-xl shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
+                    >
+                        <div className="mb-4 text-4xl">📐</div>
+                        <h3 className="mb-2 text-xl font-bold text-gray-800">
+                            Floor Planner
+                        </h3>
+                        <p className="text-gray-600">
+                            2D 평면도 편집기 및 3D 렌더링
+                        </p>
+                    </a>
                 </div>
             </div>
         </div>
@@ -119,6 +132,13 @@ export const router = createBrowserRouter([
                 element: <ChartShowcasePage />,
                 handle: {
                     title: "Chart Showcase",
+                },
+            },
+            {
+                path: "floor-planner",
+                element: <FloorPlannerPage />,
+                handle: {
+                    title: "Floor Planner",
                 },
             },
             {

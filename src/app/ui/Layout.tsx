@@ -19,6 +19,7 @@ export default function Layout() {
                     <NavLink to="device-model">Device Model</NavLink>
                     <NavLink to="glb-uploader">GLB Uploader</NavLink>
                     <NavLink to="chart-showcase">Chart Showcase</NavLink>
+                    <NavLink to="floor-planner">Floor Planner</NavLink>
                 </nav>
             </header>
             <div className="flex flex-col w-full h-screen">
