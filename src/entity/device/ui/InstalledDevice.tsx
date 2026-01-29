@@ -79,8 +79,8 @@ const InstalledDevice = memo(function InstalledDevice({
         }
     };
 
-    const handleClick = (e: any) => {
-        console.log("무슨클릭임 1111")
+    const handleDeviceClick = (e: any) => {
+        console.log("handleDeviceClick")
         e.stopPropagation(); // GLB 모델 클릭으로 전파 방지
         if (onClick) {
             onClick(device);
@@ -118,7 +118,7 @@ const InstalledDevice = memo(function InstalledDevice({
             scale={finalScale}
             onPointerEnter={handlePointerEnter}
             onPointerLeave={handlePointerLeave}
-            onClick={handleClick}
+            onClick={handleDeviceClick}
             userData={{ type: "installed-device", deviceId: device.id }}
         >
             {/* 호버 시 Tooltip 표시 - 구 오른쪽 위 기준 */}

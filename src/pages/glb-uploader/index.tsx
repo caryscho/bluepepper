@@ -193,8 +193,8 @@ function ClickableGLBModel({
         document.body.style.cursor = "default";
     };
 
-    const handleClick = (event: any) => {
-        console.log('이것은 clickableGLBModel의 handleClick임')
+    const handleGLBModelClick = (event: any) => {
+        console.log('handleGLBModelClick임')
         event.stopPropagation();
         const clickedObject = event.object;
 
@@ -212,7 +212,7 @@ function ClickableGLBModel({
     return (
         <primitive
             object={scene}
-            onClick={handleClick}
+            onClick={handleGLBModelClick}
             onPointerOver={handlePointerOver}
             onPointerOut={handlePointerOut}
         />

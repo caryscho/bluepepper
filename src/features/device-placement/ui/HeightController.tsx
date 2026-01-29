@@ -13,10 +13,12 @@ export default function HeightController({
     const [isDragging, setIsDragging] = useState(false);
     const startYRef = useRef(0);
     const startHeightRef = useRef(0);
+    const hasMovedRef = useRef(false); // 실제로 드래그가 발생했는지 추적
 
     const handlePointerDown = (e: React.PointerEvent) => {
         e.stopPropagation();
         setIsDragging(true);
+        hasMovedRef.current = false; // 드래그 시작 시 초기화
         startYRef.current = e.clientY;
         startHeightRef.current = devicePosition.y;
         (e.target as HTMLElement).setPointerCapture(e.pointerId);
@@ -26,14 +28,29 @@ export default function HeightController({
         if (!isDragging) return;
         e.stopPropagation();
 
-        // 마우스 Y 변화량 → 3D 높이 변화량
-        const deltaY = (startYRef.current - e.clientY) * 0.01; // 민감도 조절
-        const newY = Math.max(0, startHeightRef.current + deltaY);
-        onHeightChange(newY);
+        // 최소 이동 거리 체크 (클릭만 했을 때의 작은 움직임 무시)
+        const deltaY = startYRef.current - e.clientY;
+        const absDeltaY = Math.abs(deltaY);
+        
+        // 2픽셀 이상 움직였을 때만 드래그로 간주하고 위치 변경
+        if (absDeltaY > 2) {
+            hasMovedRef.current = true;
+            // 마우스 Y 변화량 → 3D 높이 변화량
+            const deltaY3D = deltaY * 0.01; // 민감도 조절
+            const newY = Math.max(0, startHeightRef.current + deltaY3D);
+            onHeightChange(newY);
+            // 시작 위치를 업데이트하여 누적 오차 방지
+            startYRef.current = e.clientY;
+            startHeightRef.current = newY;
+        }
+        // 2픽셀 이하의 움직임은 무시 (클릭만 했을 때)
     };
 
     const handlePointerUp = (e: React.PointerEvent) => {
+        // 드래그가 실제로 발생하지 않았다면 아무것도 하지 않음
+        // (handlePointerMove에서 이미 이동이 없으면 onHeightChange를 호출하지 않았으므로)
         setIsDragging(false);
+        hasMovedRef.current = false;
         (e.target as HTMLElement).releasePointerCapture(e.pointerId);
     };
 
