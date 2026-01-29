@@ -73,20 +73,23 @@ export default function FloorPlanner() {
       onKeyDown={handleKeyDown}
       tabIndex={0}
     >
-      <Toolbar
-        mode={mode}
-        onModeChange={handleModeChange}
-        onExport={handleExport}
-        onImport={handleImport}
-      />
+      { !is3D && (
+        <Toolbar
+          mode={mode}
+          onModeChange={handleModeChange}
+          onExport={handleExport}
+          onImport={handleImport}
+        />
+      )}
+
 
       {/* 2D/3D Toggle */}
       <div className="absolute top-4 right-4 z-20">
         <button
           onClick={() => setIs3D(!is3D)}
-          className="px-4 py-2 bg-white rounded-lg shadow-lg hover:bg-gray-50 transition-colors"
+          className="px-4 py-2 text-gray-500 bg-white rounded-lg shadow-lg transition-colors hover:bg-gray-50"
         >
-          {is3D ? '2D View' : '3D View'}
+          {is3D ? ' Build' : '3D View'}
         </button>
       </div>
 

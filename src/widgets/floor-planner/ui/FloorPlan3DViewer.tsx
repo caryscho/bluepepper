@@ -35,7 +35,7 @@ function Room3D({ room }: { room: Room }) {
         rotation={[-Math.PI / 2, 0, 0]}
       >
         <planeGeometry args={[width, height]} />
-        <meshStandardMaterial color="#dbeafe" opacity={0.8} transparent />
+        {/* <meshStandardMaterial color="#dbeafe" opacity={0.8} transparent /> */}
       </mesh>
 
       {/* 북쪽 벽 (z = y, 작은 z 값) */}
@@ -158,13 +158,13 @@ function FloorPlanScene({ floorPlan }: { floorPlan: FloorPlan }) {
       />
 
       {/* Floor */}
-      <mesh
+      {/* <mesh
         rotation={[-Math.PI / 2, 0, 0]}
         position={[bounds.centerX, 0, bounds.centerZ]}
       >
         <planeGeometry args={[bounds.width * 2, bounds.length * 2]} />
         <meshBasicMaterial color="#FFFFFF" />
-      </mesh>
+      </mesh> */}
 
       {/* Rooms */}
       {floorPlan.rooms.map((room) => (

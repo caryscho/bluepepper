@@ -15,8 +15,8 @@ interface FloorPlanEditorProps {
   selectedElementId: string | null
   selectedElementType: 'room' | 'wall' | null
   onStartDrawing: (point: Point) => void
-  onUpdateDrawing: (point: Point) => void
-  onFinishDrawing: () => void
+  onUpdateDrawing: (point: Point, shiftKey?: boolean) => void
+  onFinishDrawing: (endPoint?: Point) => void
   onCancelDrawing: () => void
   onSelectElement: (id: string, type: 'room' | 'wall') => void
 }
@@ -90,34 +90,44 @@ export default function FloorPlanEditor({
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent<SVGSVGElement>) => {
-      console.log('handleMouseDown called, mode:', mode, 'isDrawing:', isDrawing)
       const target = e.target as Element
-      console.log('Target:', target.tagName, 'closest rooms:', target.closest('#rooms'), 'closest walls:', target.closest('#walls'))
       
       // Handle drawing modes
       if (mode === 'draw-room' || mode === 'draw-wall') {
-        console.log('In drawing mode, checking conditions...')
         // Start drawing if NOT clicking on existing rooms or walls
-        // Allow clicking on grid lines, SVG background, or empty space
         const isRoom = target.tagName === 'rect' && target.closest('#rooms')
         const isWall = target.tagName === 'line' && target.closest('#walls')
         
-        console.log('isRoom:', isRoom, 'isWall:', isWall)
-        
         if (!isRoom && !isWall) {
-          console.log('Starting drawing...')
           e.preventDefault()
           e.stopPropagation()
           const point = getWorldPoint(e)
-          console.log('World point:', point)
+          
           if (point) {
-            console.log('Calling onStartDrawing with:', point, 'mode:', mode)
-            onStartDrawing(point)
-          } else {
-            console.log('getWorldPoint returned null')
+            if (mode === 'draw-wall' && isDrawing && drawStartPoint) {
+              // 두 번째 클릭: wall 완성
+              console.log('Second click - finishing wall at:', point, 'start:', drawStartPoint)
+              // Shift 키가 눌려있으면 직선으로 조정
+              let finalPoint = point
+              if (e.shiftKey) {
+                const dx = Math.abs(point.x - drawStartPoint.x)
+                const dy = Math.abs(point.y - drawStartPoint.y)
+                if (dx > dy) {
+                  // 수평선
+                  finalPoint = { x: point.x, y: drawStartPoint.y }
+                } else {
+                  // 수직선
+                  finalPoint = { x: drawStartPoint.x, y: point.y }
+                }
+              }
+              // 끝점을 직접 전달하여 wall 생성
+              onFinishDrawing(finalPoint)
+            } else {
+              // 첫 번째 클릭 또는 room 드래그 시작
+              console.log('First click - starting drawing at:', point)
+              onStartDrawing(point)
+            }
           }
-        } else {
-          console.log('Clicked on existing element, not starting drawing')
         }
         return
       }
@@ -138,18 +148,17 @@ export default function FloorPlanEditor({
         }
       }
     },
-    [mode, isDrawing, getWorldPoint, onStartDrawing]
+    [mode, isDrawing, drawStartPoint, getWorldPoint, onStartDrawing, onUpdateDrawing, onFinishDrawing]
   )
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<SVGSVGElement>) => {
       // Handle drawing modes - update drawing preview
-      if (mode === 'draw-room' || mode === 'draw-wall') {
-        if (isDrawing) {
-          const point = getWorldPoint(e)
-          if (point) {
-            onUpdateDrawing(point)
-          }
+      if ((mode === 'draw-room' || mode === 'draw-wall') && isDrawing) {
+        const point = getWorldPoint(e)
+        if (point) {
+          // Shift 키 상태 전달
+          onUpdateDrawing(point, e.shiftKey)
         }
         return
       }
@@ -172,7 +181,8 @@ export default function FloorPlanEditor({
   const handleMouseUp = useCallback(
     (e: React.MouseEvent<SVGSVGElement>) => {
       // Handle drawing modes
-      if (mode === 'draw-room' || mode === 'draw-wall') {
+      if (mode === 'draw-room') {
+        // Room은 드래그 방식이므로 mouseUp에서 완성
         if (isDrawing) {
           e.preventDefault()
           e.stopPropagation()
@@ -180,6 +190,7 @@ export default function FloorPlanEditor({
         }
         return
       }
+      // Wall은 클릭-클릭 방식이므로 mouseDown에서 처리
       
       // Handle panning
       setIsPanning(false)
@@ -327,15 +338,35 @@ export default function FloorPlanEditor({
               />
             )}
             {mode === 'draw-wall' && (
-              <line
-                x1={drawStartPoint.x}
-                y1={drawStartPoint.y}
-                x2={drawCurrentPoint.x}
-                y2={drawCurrentPoint.y}
-                stroke="#2563eb"
-                strokeWidth={0.3}
-                strokeDasharray="0.2 0.2"
-              />
+              <>
+                {/* 가이드라인 (점선) */}
+                <line
+                  x1={drawStartPoint.x}
+                  y1={drawStartPoint.y}
+                  x2={drawCurrentPoint.x}
+                  y2={drawCurrentPoint.y}
+                  stroke="#2563eb"
+                  strokeWidth={0.3}
+                  strokeDasharray="0.2 0.2"
+                  opacity={0.6}
+                />
+                {/* 시작점 마커 */}
+                <circle
+                  cx={drawStartPoint.x}
+                  cy={drawStartPoint.y}
+                  r={0.3}
+                  fill="#2563eb"
+                  opacity={0.8}
+                />
+                {/* 현재점 마커 */}
+                <circle
+                  cx={drawCurrentPoint.x}
+                  cy={drawCurrentPoint.y}
+                  r={0.3}
+                  fill="#3b82f6"
+                  opacity={0.8}
+                />
+              </>
             )}
           </g>
         )}

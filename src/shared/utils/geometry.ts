@@ -73,6 +73,7 @@ export function rectanglesIntersect(
 
 /**
  * Convert screen coordinates to world coordinates
+ * Handles preserveAspectRatio="xMidYMid meet" by calculating actual viewport
  */
 export function screenToWorld(
   screenX: number,
@@ -81,11 +82,39 @@ export function screenToWorld(
   svgWidth: number,
   svgHeight: number
 ): Point {
-  const scaleX = viewBox.width / svgWidth
-  const scaleY = viewBox.height / svgHeight
+  // Calculate aspect ratios
+  const viewBoxAspect = viewBox.width / viewBox.height
+  const svgAspect = svgWidth / svgHeight
+
+  // Calculate actual viewport size (considering preserveAspectRatio="meet")
+  let actualWidth: number
+  let actualHeight: number
+  let offsetX = 0
+  let offsetY = 0
+
+  if (viewBoxAspect > svgAspect) {
+    // ViewBox is wider - fit to width
+    actualWidth = svgWidth
+    actualHeight = svgWidth / viewBoxAspect
+    offsetY = (svgHeight - actualHeight) / 2
+  } else {
+    // ViewBox is taller - fit to height
+    actualHeight = svgHeight
+    actualWidth = svgHeight * viewBoxAspect
+    offsetX = (svgWidth - actualWidth) / 2
+  }
+
+  // Adjust screen coordinates by offset
+  const adjustedX = screenX - offsetX
+  const adjustedY = screenY - offsetY
+
+  // Convert to world coordinates
+  const scaleX = viewBox.width / actualWidth
+  const scaleY = viewBox.height / actualHeight
+
   return {
-    x: viewBox.x + screenX * scaleX,
-    y: viewBox.y + screenY * scaleY,
+    x: viewBox.x + adjustedX * scaleX,
+    y: viewBox.y + adjustedY * scaleY,
   }
 }
 

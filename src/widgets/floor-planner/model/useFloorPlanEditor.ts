@@ -36,36 +36,67 @@ export function useFloorPlanEditor() {
   }, [])
 
   const handleStartDrawing = useCallback((point: Point) => {
-    console.log('handleStartDrawing called with point:', point, 'mode:', mode)
-    if (mode === 'draw-room' || mode === 'draw-wall') {
-      console.log('Setting drawing state to true')
+    console.log('handleStartDrawing called with point:', point, 'mode:', mode, 'isDrawing:', isDrawing)
+    if (mode === 'draw-room') {
+      // Room은 드래그 방식 유지
+      console.log('Setting drawing state to true for room')
       setIsDrawing(true)
       setDrawStartPoint(point)
       setDrawCurrentPoint(point)
-    } else {
-      console.log('Mode is not draw-room or draw-wall, mode:', mode)
+    } else if (mode === 'draw-wall') {
+      // Wall은 클릭-클릭 방식 - 첫 번째 클릭만 처리
+      if (!isDrawing) {
+        // 첫 번째 클릭: 시작점 설정
+        console.log('First click - setting start point for wall:', point)
+        setIsDrawing(true)
+        setDrawStartPoint(point)
+        setDrawCurrentPoint(point)
+      }
+      // 두 번째 클릭은 handleMouseDown에서 직접 처리
     }
-  }, [mode])
+  }, [mode, isDrawing])
 
-  const handleUpdateDrawing = useCallback((point: Point) => {
+  const handleUpdateDrawing = useCallback((point: Point, shiftKey: boolean = false) => {
     if (isDrawing && drawStartPoint) {
-      setDrawCurrentPoint(point)
+      if (shiftKey && mode === 'draw-wall') {
+        // Shift 키가 눌려있으면 직선으로 (수평 또는 수직)
+        const dx = Math.abs(point.x - drawStartPoint.x)
+        const dy = Math.abs(point.y - drawStartPoint.y)
+        
+        if (dx > dy) {
+          // 수평선: y 좌표를 시작점과 동일하게
+          setDrawCurrentPoint({ x: point.x, y: drawStartPoint.y })
+        } else {
+          // 수직선: x 좌표를 시작점과 동일하게
+          setDrawCurrentPoint({ x: drawStartPoint.x, y: point.y })
+        }
+      } else {
+        setDrawCurrentPoint(point)
+      }
     }
-  }, [isDrawing, drawStartPoint])
+  }, [isDrawing, drawStartPoint, mode])
 
-  const handleFinishDrawing = useCallback(() => {
-    if (!isDrawing || !drawStartPoint || !drawCurrentPoint) return
+  const handleFinishDrawing = useCallback((endPoint?: Point) => {
+    // endPoint가 제공되면 사용, 아니면 drawCurrentPoint 사용
+    const finalEndPoint = endPoint || drawCurrentPoint
+    console.log('handleFinishDrawing called', { isDrawing, drawStartPoint, drawCurrentPoint, endPoint, finalEndPoint, mode })
+    
+    if (!isDrawing || !drawStartPoint || !finalEndPoint) {
+      console.log('Early return - missing state')
+      return
+    }
 
     if (mode === 'draw-room') {
       const rect = normalizeRectangle({
         x: drawStartPoint.x,
         y: drawStartPoint.y,
-        width: drawCurrentPoint.x - drawStartPoint.x,
-        height: drawCurrentPoint.y - drawStartPoint.y,
+        width: finalEndPoint.x - drawStartPoint.x,
+        height: finalEndPoint.y - drawStartPoint.y,
       })
 
       // Minimum size check
       if (rect.width < 0.5 || rect.height < 0.5) {
+        console.log('Room too small, canceling')
         setIsDrawing(false)
         setDrawStartPoint(null)
         setDrawCurrentPoint(null)
@@ -77,14 +108,18 @@ export function useFloorPlanEditor() {
         type: 'rectangle' as const,
         bounds: rect,
       }
+      console.log('Adding room:', room)
       addRoom(room)
     } else if (mode === 'draw-wall') {
-      const dx = drawCurrentPoint.x - drawStartPoint.x
-      const dy = drawCurrentPoint.y - drawStartPoint.y
+      const dx = finalEndPoint.x - drawStartPoint.x
+      const dy = finalEndPoint.y - drawStartPoint.y
       const length = Math.sqrt(dx * dx + dy * dy)
+
+      console.log('Wall calculation:', { dx, dy, length, start: drawStartPoint, end: finalEndPoint })
 
       // Minimum length check
       if (length < 0.5) {
+        console.log('Wall too short, canceling')
         setIsDrawing(false)
         setDrawStartPoint(null)
         setDrawCurrentPoint(null)
@@ -94,17 +129,19 @@ export function useFloorPlanEditor() {
       const wall = {
         id: `wall-${nextIdRef.current.wall++}`,
         start: [drawStartPoint.x, drawStartPoint.y] as [number, number],
-        end: [drawCurrentPoint.x, drawCurrentPoint.y] as [number, number],
+        end: [finalEndPoint.x, finalEndPoint.y] as [number, number],
         height: 2.5, // Default height
         thickness: 0.2, // Default thickness
         type: 'interior' as const,
       }
+      console.log('Adding wall:', wall)
       addWall(wall)
     }
 
     setIsDrawing(false)
     setDrawStartPoint(null)
     setDrawCurrentPoint(null)
+    console.log('Drawing finished, state reset')
   }, [isDrawing, drawStartPoint, drawCurrentPoint, mode, addRoom, addWall])
 
   const handleCancelDrawing = useCallback(() => {

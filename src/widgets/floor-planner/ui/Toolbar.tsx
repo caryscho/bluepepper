@@ -18,37 +18,36 @@ export default function Toolbar({
     <div className="flex absolute top-4 left-4 z-20 flex-col gap-2 p-2 bg-white rounded-lg shadow-lg">
       <button
         onClick={() => onModeChange('select')}
-        className={`p-2 rounded transition-colors ${
-          mode === 'select'
+        className={`p-2 rounded transition-colors flex items-center gap-2 ${mode === 'select'
             ? 'bg-blue-500 text-white'
             : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-        }`}
+          }`}
         title="Select/Move"
       >
         <Move className="w-5 h-5" />
+        Move
       </button>
       <button
         onClick={() => onModeChange('draw-room')}
-        className={`p-2 rounded transition-colors ${
-          mode === 'draw-room'
+        className={`p-2 rounded transition-colors flex items-center gap-2 ${mode === 'draw-room'
             ? 'bg-blue-500 text-white'
             : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-        }`}
+          }`}
         title="Draw Room"
       >
         <Square className="w-5 h-5" />
-        
+        Room
       </button>
       <button
         onClick={() => onModeChange('draw-wall')}
-        className={`p-2 rounded transition-colors ${
-          mode === 'draw-wall'
+        className={`p-2 rounded transition-colors flex items-center gap-2   ${mode === 'draw-wall'
             ? 'bg-blue-500 text-white'
             : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-        }`}
+          }`}
         title="Draw Wall"
       >
         <Minus className="w-5 h-5" />
+        Wall
       </button>
       <div className="my-1 border-t" />
       <button
