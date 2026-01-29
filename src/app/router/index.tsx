@@ -1,10 +1,10 @@
 import { createBrowserRouter } from "react-router-dom";
-import Layout from "./app/ui/Layout";
-import WarehousePage from "./pages/warehouse";
-import DevicemodelPage from "./pages/device-model/ui/DevicemodelPage";
-import GlbUploaderPage from "./pages/glb-uploader";
-import ChartShowcasePage from "./pages/chart-showcase/index";
-import FloorPlannerPage from "./pages/floor-planner";
+import Layout from "../ui/Layout";
+import WarehousePage from "../../pages/warehouse";
+import DevicemodelPage from "../../pages/device-model/ui/DevicemodelPage";
+import GlbUploaderPage from "../../pages/glb-uploader";
+import ChartShowcasePage from "../../pages/chart-showcase/index";
+import FloorPlannerPage from "../../pages/floor-planner";
 
 function NotFoundPage() {
     return (
