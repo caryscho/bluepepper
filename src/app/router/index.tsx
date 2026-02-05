@@ -5,6 +5,7 @@ import DevicemodelPage from "../../pages/device-model/ui/DevicemodelPage";
 import GlbUploaderPage from "../../pages/glb-uploader";
 import ChartShowcasePage from "../../pages/chart-showcase/index";
 import FloorPlannerPage from "../../pages/floor-planner";
+import MapboxTestPage from "../../pages/mapbox-test";
 
 function NotFoundPage() {
     return (
@@ -91,6 +92,18 @@ function HomePage() {
                             2D 평면도 편집기 및 3D 렌더링
                         </p>
                     </a>
+                    <a
+                        href="/mapbox-test"
+                        className="p-8 bg-white rounded-xl shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
+                    >
+                        <div className="mb-4 text-4xl">🗺️</div>
+                        <h3 className="mb-2 text-xl font-bold text-gray-800">
+                            Mapbox Test
+                        </h3>
+                        <p className="text-gray-600">
+                            Mapbox GL 지도 연동 테스트
+                        </p>
+                    </a>
                 </div>
             </div>
         </div>
@@ -139,6 +152,13 @@ export const router = createBrowserRouter([
                 element: <FloorPlannerPage />,
                 handle: {
                     title: "Floor Planner",
+                },
+            },
+            {
+                path: "mapbox-test",
+                element: <MapboxTestPage />,
+                handle: {
+                    title: "Mapbox Test",
                 },
             },
             {

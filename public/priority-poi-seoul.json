@@ -1,0 +1,135 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [126.978, 37.5665]
+      },
+      "properties": {
+        "name": "서울대학교병원",
+        "name_en": "Seoul National University Hospital",
+        "class": "medical",
+        "type": "hospital"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [126.997, 37.5512]
+      },
+      "properties": {
+        "name": "서울대학교",
+        "name_en": "Seoul National University",
+        "class": "education",
+        "type": "university"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [126.988, 37.5700]
+      },
+      "properties": {
+        "name": "연세대학교 세브란스병원",
+        "name_en": "Severance Hospital",
+        "class": "medical",
+        "type": "hospital"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [126.965, 37.5550]
+      },
+      "properties": {
+        "name": "이화여자대학교",
+        "name_en": "Ewha Womans University",
+        "class": "education",
+        "type": "university"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [126.950, 37.5650]
+      },
+      "properties": {
+        "name": "서울대학교 사범대학부설고등학교",
+        "name_en": "SNU High School",
+        "class": "education",
+        "type": "school"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [126.990, 37.5600]
+      },
+      "properties": {
+        "name": "강남세브란스병원",
+        "name_en": "Gangnam Severance Hospital",
+        "class": "medical",
+        "type": "hospital"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [126.975, 37.5750]
+      },
+      "properties": {
+        "name": "서울아산병원",
+        "name_en": "Asan Medical Center",
+        "class": "medical",
+        "type": "hospital"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [126.995, 37.5450]
+      },
+      "properties": {
+        "name": "연세대학교",
+        "name_en": "Yonsei University",
+        "class": "education",
+        "type": "university"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [126.960, 37.5700]
+      },
+      "properties": {
+        "name": "고려대학교",
+        "name_en": "Korea University",
+        "class": "education",
+        "type": "university"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [126.985, 37.5500]
+      },
+      "properties": {
+        "name": "서울대학교병원 약국",
+        "name_en": "SNUH Pharmacy",
+        "class": "medical",
+        "type": "pharmacy"
+      }
+    }
+  ]
+}
