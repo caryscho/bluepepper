@@ -24,13 +24,9 @@ function HomePage() {
         <div className="flex flex-col justify-center items-center h-full bg-gradient-to-br from-blue-50 to-indigo-50">
             <div className="px-8 max-w-4xl text-center">
                 <h1 className="mb-6 text-6xl font-bold text-gray-800">
-                    Blueprint rendering
+                    Playground
                 </h1>
-                <p className="mb-12 text-2xl text-gray-600">
-                    3D Warehouse IoT Device Management System
-                </p>
-
-                <div className="grid grid-cols-1 gap-6 mt-12 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-6 mt-12 md:grid-cols-3">
                     <a
                         href="/warehouse"
                         className="p-8 bg-white rounded-xl shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
@@ -119,6 +115,13 @@ export const router = createBrowserRouter([
             {
                 index: true,
                 element: <HomePage />,
+            },
+            {
+                path: "playground",
+                element: <HomePage />,
+                handle: {
+                    title: "Playground",
+                },
             },
             {
                 path: "dashboard",
