@@ -6,6 +6,7 @@ import GlbUploaderPage from "../../pages/glb-uploader";
 import ChartShowcasePage from "../../pages/chart-showcase/index";
 import FloorPlannerPage from "../../pages/floor-planner";
 import MapboxTestPage from "../../pages/mapbox-test";
+import DashboardPage from "@/pages/dashboard";
 
 function NotFoundPage() {
     return (
@@ -118,6 +119,13 @@ export const router = createBrowserRouter([
             {
                 index: true,
                 element: <HomePage />,
+            },
+            {
+                path: "dashboard",
+                element: <DashboardPage />,
+                handle: {
+                    title: "Dashboard",
+                },
             },
             {
                 path: "warehouse",
