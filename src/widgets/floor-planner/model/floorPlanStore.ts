@@ -39,6 +39,17 @@ export function useFloorPlanStore() {
     }))
   }, [])
 
+  const addWalls = useCallback((walls: FloorPlanWall[]) => {
+    setFloorPlan((prev) => ({
+      ...prev,
+      walls: [...prev.walls, ...walls],
+      metadata: {
+        ...prev.metadata,
+        updatedAt: new Date().toISOString(),
+      },
+    }))
+  }, [])
+
   const deleteRoom = useCallback((roomId: string) => {
     setFloorPlan((prev) => ({
       ...prev,
@@ -99,6 +110,7 @@ export function useFloorPlanStore() {
     floorPlan,
     addRoom,
     addWall,
+    addWalls,
     deleteRoom,
     deleteWall,
     updateFloorPlan,

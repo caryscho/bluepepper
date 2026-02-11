@@ -12,6 +12,8 @@ export default function FloorPlanner() {
     isDrawing,
     drawStartPoint,
     drawCurrentPoint,
+    wallChain,
+    snapTarget,
     selectedElementId,
     selectedElementType,
     handleModeChange,
@@ -102,6 +104,8 @@ export default function FloorPlanner() {
           isDrawing={isDrawing}
           drawStartPoint={drawStartPoint}
           drawCurrentPoint={drawCurrentPoint}
+          wallChain={wallChain}
+          snapTarget={snapTarget}
           selectedElementId={selectedElementId}
           selectedElementType={selectedElementType}
           onStartDrawing={handleStartDrawing}

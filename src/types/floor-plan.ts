@@ -2,15 +2,14 @@
 
 export interface Room {
   id: string
-  type: 'rectangle' | 'polygon'  // MVP는 rectangle만
+  type: 'rectangle' | 'polygon'
   bounds: {
     x: number
     y: number
     width: number
     height: number
   }
-  // polygon 타입을 위한 확장 가능성
-  // vertices?: Array<{x: number, y: number}>
+  vertices?: Array<{ x: number; y: number }>
 }
 
 export interface FloorPlanWall {

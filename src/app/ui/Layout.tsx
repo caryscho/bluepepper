@@ -13,25 +13,23 @@ export default function Layout() {
         {
             to: '/dashboard',
             label: 'Dashboard',
-            icon: <LayoutDashboard className="w-4 h-4"/>,
+            icon: <LayoutDashboard className="w-4 h-4" />,
         },
         {
             to: "/playground",
             label: "Playground",
-            icon: <PlayIcon className="w-4 h-4"/>,
+            icon: <PlayIcon className="w-4 h-4" />,
         },
-        
-    ];  
+
+    ];
 
     return (
         <div className="flex h-screen">
-            <nav className={`flex flex-col relative p-4 h-screen text-black shrink-0 shadow-sm border-r border-gray-100 z-10 transition-all duration-300 ${
-                isMinimized ? "w-[80px]" : "w-[240px]"
-            }`}>
+            <nav className={`flex flex-col relative p-4 h-screen text-black shrink-0 shadow-sm border-r border-gray-100 z-10 transition-all duration-300 ${isMinimized ? "w-[80px]" : "w-[240px]"
+                }`}>
                 <div className="flex justify-between items-center mb-4">
-                    <Link to="/" className={`flex justify-center items-center py-4 transition-opacity ${
-                        isMinimized ? "w-full" : "w-full"
-                    }`}>
+                    <Link to="/" className={`flex justify-center items-center py-4 transition-opacity ${isMinimized ? "w-full" : "w-full"
+                        }`}>
                         {isMinimized ? (
                             <p className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-blue-500 to-blue-700">
                                 W
@@ -60,8 +58,7 @@ export default function Layout() {
                         to={item.to}
                         key={item.to}
                         className={({ isActive }) =>
-                            `flex justify-start items-center py-4 rounded-lg hover:bg-white hover:text-blue-600 transition-colors ${
-                                isActive ? "bg-white text-blue-600" : "text-black"
+                            `flex justify-start items-center py-4 rounded-lg hover:bg-white hover:text-blue-600 transition-colors ${isActive ? "bg-white text-blue-600" : "text-black"
                             } ${isMinimized ? "justify-center px-0" : "px-3"}`
                         }
                         title={isMinimized ? item.label : undefined}
@@ -71,12 +68,12 @@ export default function Layout() {
                     </NavLink>
                 ))}
                 <NavLink to="/mapbox-test" className="flex justify-start items-center px-3 py-4 mt-auto rounded-lg transition-colors hover:bg-white hover:text-blue-600">
-                    <span className="mr-2"><CogIcon className="w-4 h-4"/></span>
-                    <span>Setting</span>
+                    <span className="mr-2"><CogIcon className="w-4 h-4" /></span>
+                    {!isMinimized && <span>Setting</span>}
                 </NavLink>
                 <NavLink to="/mapbox-test" className="flex justify-start items-center px-3 py-4 rounded-lg transition-colors hover:bg-white hover:text-blue-600">
-                    <span className="mr-2"><LogOutIcon className="w-4 h-4"/></span>
-                    <span>Logout</span>
+                    <span className="mr-2"><LogOutIcon className="w-4 h-4" /></span>
+                    {!isMinimized && <span>Logout</span>}
                 </NavLink>
             </nav>
             <div className="flex flex-col w-full h-screen bg-white">

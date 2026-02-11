@@ -135,3 +135,98 @@ export function worldToScreen(
     y: (worldY - viewBox.y) * scaleY,
   }
 }
+
+// ── Snap & polygon helpers ──
+
+export const SNAP_THRESHOLD = 0.5 // meters
+
+/**
+ * Check if two points are within threshold distance
+ */
+export function pointsEqual(a: Point, b: Point, threshold: number = SNAP_THRESHOLD): boolean {
+  return distance(a, b) < threshold
+}
+
+/**
+ * Find the closest target point within threshold
+ */
+export function snapToPoint(
+  point: Point,
+  targets: Point[],
+  threshold: number = SNAP_THRESHOLD
+): Point | null {
+  let closest: Point | null = null
+  let minDist = threshold
+
+  for (const target of targets) {
+    const d = distance(point, target)
+    if (d < minDist) {
+      minDist = d
+      closest = target
+    }
+  }
+  return closest
+}
+
+/**
+ * Calculate bounding rectangle of a polygon
+ */
+export function polygonBounds(vertices: Point[]): Rectangle {
+  if (vertices.length === 0) return { x: 0, y: 0, width: 0, height: 0 }
+  const xs = vertices.map((v) => v.x)
+  const ys = vertices.map((v) => v.y)
+  const minX = Math.min(...xs)
+  const minY = Math.min(...ys)
+  return {
+    x: minX,
+    y: minY,
+    width: Math.max(...xs) - minX,
+    height: Math.max(...ys) - minY,
+  }
+}
+
+/**
+ * BFS to find a path between two points through wall segments.
+ * Returns the path as an array of Points (including from and to), or null if no path exists.
+ */
+export function findPathBetweenPoints(
+  from: Point,
+  to: Point,
+  segments: Array<{ id: string; start: Point; end: Point }>,
+  threshold: number = SNAP_THRESHOLD
+): Point[] | null {
+  type QueueItem = { point: Point; path: Point[]; usedIds: Set<string> }
+  const queue: QueueItem[] = [{ point: from, path: [from], usedIds: new Set() }]
+  const pointKey = (p: Point) => `${Math.round(p.x * 1000)},${Math.round(p.y * 1000)}`
+  const visited = new Set<string>()
+  visited.add(pointKey(from))
+
+  while (queue.length > 0) {
+    const { point, path, usedIds } = queue.shift()!
+
+    for (const seg of segments) {
+      if (usedIds.has(seg.id)) continue
+
+      let nextPoint: Point | null = null
+      if (distance(point, seg.start) < threshold) nextPoint = seg.end
+      else if (distance(point, seg.end) < threshold) nextPoint = seg.start
+
+      if (!nextPoint) continue
+
+      // Reached target?
+      if (distance(nextPoint, to) < threshold) {
+        return [...path, nextPoint]
+      }
+
+      const key = pointKey(nextPoint)
+      if (visited.has(key)) continue
+      visited.add(key)
+
+      const newUsed = new Set(usedIds)
+      newUsed.add(seg.id)
+      queue.push({ point: nextPoint, path: [...path, nextPoint], usedIds: newUsed })
+    }
+  }
+
+  return null
+}

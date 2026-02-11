@@ -12,11 +12,13 @@ interface FloorPlanEditorProps {
   isDrawing: boolean
   drawStartPoint: Point | null
   drawCurrentPoint: Point | null
+  wallChain: Point[]
+  snapTarget: Point | null
   selectedElementId: string | null
   selectedElementType: 'room' | 'wall' | null
   onStartDrawing: (point: Point) => void
   onUpdateDrawing: (point: Point, shiftKey?: boolean) => void
-  onFinishDrawing: (endPoint?: Point) => void
+  onFinishDrawing: (endPoint?: Point, shiftKey?: boolean) => void
   onCancelDrawing: () => void
   onSelectElement: (id: string, type: 'room' | 'wall') => void
 }
@@ -27,6 +29,8 @@ export default function FloorPlanEditor({
   isDrawing,
   drawStartPoint,
   drawCurrentPoint,
+  wallChain,
+  snapTarget,
   selectedElementId,
   selectedElementType,
   onStartDrawing,
@@ -91,51 +95,35 @@ export default function FloorPlanEditor({
   const handleMouseDown = useCallback(
     (e: React.MouseEvent<SVGSVGElement>) => {
       const target = e.target as Element
-      
+
       // Handle drawing modes
       if (mode === 'draw-room' || mode === 'draw-wall') {
-        // Start drawing if NOT clicking on existing rooms or walls
+        // Don't start drawing on existing rooms or walls
         const isRoom = target.tagName === 'rect' && target.closest('#rooms')
         const isWall = target.tagName === 'line' && target.closest('#walls')
-        
-        if (!isRoom && !isWall) {
+        const isPolygonRoom = target.tagName === 'polygon' && target.closest('#rooms')
+
+        if (!isRoom && !isWall && !isPolygonRoom) {
           e.preventDefault()
           e.stopPropagation()
           const point = getWorldPoint(e)
-          
+
           if (point) {
-            if (mode === 'draw-wall' && isDrawing && drawStartPoint) {
-              // 두 번째 클릭: wall 완성
-              console.log('Second click - finishing wall at:', point, 'start:', drawStartPoint)
-              // Shift 키가 눌려있으면 직선으로 조정
-              let finalPoint = point
-              if (e.shiftKey) {
-                const dx = Math.abs(point.x - drawStartPoint.x)
-                const dy = Math.abs(point.y - drawStartPoint.y)
-                if (dx > dy) {
-                  // 수평선
-                  finalPoint = { x: point.x, y: drawStartPoint.y }
-                } else {
-                  // 수직선
-                  finalPoint = { x: drawStartPoint.x, y: point.y }
-                }
-              }
-              // 끝점을 직접 전달하여 wall 생성
-              onFinishDrawing(finalPoint)
+            if (mode === 'draw-wall' && isDrawing && wallChain.length > 0) {
+              // Subsequent click in wall chain: add point / close
+              onFinishDrawing(point, e.shiftKey)
             } else {
-              // 첫 번째 클릭 또는 room 드래그 시작
-              console.log('First click - starting drawing at:', point)
+              // First click: start drawing
               onStartDrawing(point)
             }
           }
         }
         return
       }
-      
+
       // Handle select mode - panning
       if (mode === 'select' && e.button === 0 && !isDrawing) {
-        // Don't pan if clicking on room or wall
-        if (target.tagName === 'rect' || (target.tagName === 'line' && !target.closest('#grid'))) {
+        if (target.tagName === 'rect' || target.tagName === 'polygon' || (target.tagName === 'line' && !target.closest('#grid'))) {
           return
         }
         setIsPanning(true)
@@ -148,7 +136,7 @@ export default function FloorPlanEditor({
         }
       }
     },
-    [mode, isDrawing, drawStartPoint, getWorldPoint, onStartDrawing, onUpdateDrawing, onFinishDrawing]
+    [mode, isDrawing, wallChain, getWorldPoint, onStartDrawing, onFinishDrawing]
   )
 
   const handleMouseMove = useCallback(
@@ -157,12 +145,11 @@ export default function FloorPlanEditor({
       if ((mode === 'draw-room' || mode === 'draw-wall') && isDrawing) {
         const point = getWorldPoint(e)
         if (point) {
-          // Shift 키 상태 전달
           onUpdateDrawing(point, e.shiftKey)
         }
         return
       }
-      
+
       // Handle panning in select mode
       if (isPanning && panStart && svgRef.current) {
         const rect = svgRef.current.getBoundingClientRect()
@@ -180,18 +167,15 @@ export default function FloorPlanEditor({
 
   const handleMouseUp = useCallback(
     (e: React.MouseEvent<SVGSVGElement>) => {
-      // Handle drawing modes
-      if (mode === 'draw-room') {
-        // Room은 드래그 방식이므로 mouseUp에서 완성
-        if (isDrawing) {
-          e.preventDefault()
-          e.stopPropagation()
-          onFinishDrawing()
-        }
+      // Room: drag finish
+      if (mode === 'draw-room' && isDrawing) {
+        e.preventDefault()
+        e.stopPropagation()
+        onFinishDrawing()
         return
       }
-      // Wall은 클릭-클릭 방식이므로 mouseDown에서 처리
-      
+      // Wall chain: handled by mouseDown clicks, not mouseUp
+
       // Handle panning
       setIsPanning(false)
       setPanStart(null)
@@ -248,13 +232,15 @@ export default function FloorPlanEditor({
     return gridLines
   }
 
-  // Debug: log mode changes
-  useEffect(() => {
-    console.log('FloorPlanEditor mode changed to:', mode)
-  }, [mode])
+  // Check if snap target is the chain start (close indicator)
+  const isCloseSnap =
+    snapTarget &&
+    wallChain.length >= 3 &&
+    Math.abs(snapTarget.x - wallChain[0].x) < 0.01 &&
+    Math.abs(snapTarget.y - wallChain[0].y) < 0.01
 
   return (
-    <div 
+    <div
       className="relative w-full h-full bg-gray-50"
       style={{ cursor: mode === 'select' ? (isPanning ? 'grabbing' : 'grab') : 'crosshair' }}
     >
@@ -267,10 +253,11 @@ export default function FloorPlanEditor({
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
-        onMouseLeave={(e) => {
-          if ((mode === 'draw-room' || mode === 'draw-wall') && isDrawing) {
+        onMouseLeave={() => {
+          if (mode === 'draw-room' && isDrawing) {
             onFinishDrawing()
-          } else {
+          } else if (mode !== 'draw-wall') {
+            // Don't cancel wall chain on mouse leave
             setIsPanning(false)
             setPanStart(null)
           }
@@ -283,6 +270,24 @@ export default function FloorPlanEditor({
         <g id="rooms">
           {floorPlan.rooms.map((room) => {
             const isSelected = selectedElementId === room.id && selectedElementType === 'room'
+
+            // Polygon room
+            if (room.type === 'polygon' && room.vertices && room.vertices.length > 0) {
+              return (
+                <polygon
+                  key={room.id}
+                  points={room.vertices.map((v) => `${v.x},${v.y}`).join(' ')}
+                  fill={isSelected ? '#3b82f6' : '#dbeafe'}
+                  stroke={isSelected ? '#2563eb' : '#93c5fd'}
+                  strokeWidth={isSelected ? 0.2 : 0.1}
+                  opacity={0.6}
+                  onClick={() => onSelectElement(room.id, 'room')}
+                  style={{ cursor: 'pointer' }}
+                />
+              )
+            }
+
+            // Rectangle room
             return (
               <rect
                 key={room.id}
@@ -322,56 +327,117 @@ export default function FloorPlanEditor({
         </g>
 
         {/* Drawing preview */}
-        {isDrawing && drawStartPoint && drawCurrentPoint && (
-          <g id="drawing-preview">
-            {mode === 'draw-room' && (
-              <rect
-                x={Math.min(drawStartPoint.x, drawCurrentPoint.x)}
-                y={Math.min(drawStartPoint.y, drawCurrentPoint.y)}
-                width={Math.abs(drawCurrentPoint.x - drawStartPoint.x)}
-                height={Math.abs(drawCurrentPoint.y - drawStartPoint.y)}
-                fill="#3b82f6"
-                fillOpacity={0.3}
-                stroke="#2563eb"
-                strokeWidth={0.15}
-                strokeDasharray="0.2 0.2"
-              />
-            )}
-            {mode === 'draw-wall' && (
-              <>
-                {/* 가이드라인 (점선) */}
+        <g id="drawing-preview">
+          {/* Room drag preview */}
+          {isDrawing && drawStartPoint && drawCurrentPoint && mode === 'draw-room' && (
+            <rect
+              x={Math.min(drawStartPoint.x, drawCurrentPoint.x)}
+              y={Math.min(drawStartPoint.y, drawCurrentPoint.y)}
+              width={Math.abs(drawCurrentPoint.x - drawStartPoint.x)}
+              height={Math.abs(drawCurrentPoint.y - drawStartPoint.y)}
+              fill="#3b82f6"
+              fillOpacity={0.3}
+              stroke="#2563eb"
+              strokeWidth={0.15}
+              strokeDasharray="0.2 0.2"
+            />
+          )}
+
+          {/* Wall chain preview */}
+          {mode === 'draw-wall' && isDrawing && wallChain.length > 0 && (
+            <>
+              {/* Already committed chain segments (solid preview) */}
+              {wallChain.length > 1 &&
+                wallChain.slice(0, -1).map((p, i) => (
+                  <line
+                    key={`chain-seg-${i}`}
+                    x1={p.x}
+                    y1={p.y}
+                    x2={wallChain[i + 1].x}
+                    y2={wallChain[i + 1].y}
+                    stroke="#2563eb"
+                    strokeWidth={0.2}
+                    opacity={0.8}
+                  />
+                ))}
+
+              {/* Current segment (from last chain point to cursor) */}
+              {drawCurrentPoint && (
                 <line
-                  x1={drawStartPoint.x}
-                  y1={drawStartPoint.y}
+                  x1={wallChain[wallChain.length - 1].x}
+                  y1={wallChain[wallChain.length - 1].y}
                   x2={drawCurrentPoint.x}
                   y2={drawCurrentPoint.y}
                   stroke="#2563eb"
-                  strokeWidth={0.3}
-                  strokeDasharray="0.2 0.2"
+                  strokeWidth={0.2}
+                  strokeDasharray="0.3 0.15"
                   opacity={0.6}
                 />
-                {/* 시작점 마커 */}
+              )}
+
+              {/* Close preview (dashed line to start when close-snapping) */}
+              {isCloseSnap && drawCurrentPoint && (
+                <polygon
+                  points={[...wallChain, drawCurrentPoint]
+                    .map((p) => `${p.x},${p.y}`)
+                    .join(' ')}
+                  fill="#22c55e"
+                  fillOpacity={0.15}
+                  stroke="none"
+                />
+              )}
+
+              {/* Chain vertex dots */}
+              {wallChain.map((p, i) => (
                 <circle
-                  cx={drawStartPoint.x}
-                  cy={drawStartPoint.y}
-                  r={0.3}
-                  fill="#2563eb"
+                  key={`chain-pt-${i}`}
+                  cx={p.x}
+                  cy={p.y}
+                  r={i === 0 ? 0.3 : 0.2}
+                  fill={i === 0 ? '#22c55e' : '#2563eb'}
                   opacity={0.8}
                 />
-                {/* 현재점 마커 */}
+              ))}
+
+              {/* Start point close indicator (glowing ring) */}
+              {isCloseSnap && (
+                <circle
+                  cx={wallChain[0].x}
+                  cy={wallChain[0].y}
+                  r={0.6}
+                  fill="#22c55e"
+                  fillOpacity={0.25}
+                  stroke="#22c55e"
+                  strokeWidth={0.1}
+                />
+              )}
+
+              {/* Snap indicator (existing endpoint) */}
+              {snapTarget && !isCloseSnap && (
+                <circle
+                  cx={snapTarget.x}
+                  cy={snapTarget.y}
+                  r={0.4}
+                  fill="none"
+                  stroke="#f59e0b"
+                  strokeWidth={0.1}
+                />
+              )}
+
+              {/* Cursor point */}
+              {drawCurrentPoint && !isCloseSnap && (
                 <circle
                   cx={drawCurrentPoint.x}
                   cy={drawCurrentPoint.y}
-                  r={0.3}
+                  r={0.2}
                   fill="#3b82f6"
                   opacity={0.8}
                 />
-              </>
-            )}
-          </g>
-        )}
+              )}
+            </>
+          )}
+        </g>
       </svg>
-
     </div>
   )
 }
