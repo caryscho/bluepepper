@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Outlet, NavLink, useMatches, Link, useMatch } from "react-router-dom";
-import { WarehouseIcon, SmartphoneIcon, LayoutDashboard, ChevronLeft, ChevronRight, MapIcon, CogIcon, LogOutIcon, PlayIcon } from "lucide-react";
+import { WarehouseIcon, SmartphoneIcon, LayoutDashboard, ChevronLeft, ChevronRight, MapIcon, CogIcon, LogOutIcon, PlayIcon, TruckIcon } from "lucide-react";
 
 export default function Layout() {
     const [isMinimized, setIsMinimized] = useState(false);
@@ -19,6 +19,11 @@ export default function Layout() {
             to: '/warehouse',
             label: 'Warehouse',
             icon: <WarehouseIcon className="w-4 h-4" />,
+        },
+        {
+            to: '/tms', // hub
+            label: 'TMS',
+            icon: <TruckIcon className="w-4 h-4" />,
         },
         {
             to: "/playground",

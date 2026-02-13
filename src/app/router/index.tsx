@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import Layout from "../ui/Layout";
 import HomePage from "../../pages/home";
 import WarehousePage from "../../pages/warehouse";
+import TmsPage from "../../pages/tms";
 import DevicemodelPage from "../../pages/device-model/ui/DevicemodelPage";
 import GlbUploaderPage from "../../pages/glb-uploader";
 import ChartShowcasePage from "../../pages/chart-showcase/index";
@@ -48,6 +49,13 @@ export const router = createBrowserRouter([
                 element: <WarehousePage />,
                 handle: {
                     title: "Warehouse Viewer",
+                },
+            },
+            {
+                path: "tms",
+                element: <TmsPage />,
+                handle: {
+                    title: "TMS",
                 },
             },
             {
