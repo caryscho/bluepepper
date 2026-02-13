@@ -16,6 +16,11 @@ export default function Layout() {
             icon: <LayoutDashboard className="w-4 h-4" />,
         },
         {
+            to: '/warehouse',
+            label: 'Warehouse',
+            icon: <WarehouseIcon className="w-4 h-4" />,
+        },
+        {
             to: "/playground",
             label: "Playground",
             icon: <PlayIcon className="w-4 h-4" />,
