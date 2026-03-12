@@ -33,7 +33,8 @@ const Controls = ({
     return (
         <>
             {/* 시리얼넘버검색 */}
-            <div className="flex overflow-hidden gap-1 bg-white rounded-lg w-[240px] absolute top-6 left-1/2 -translate-x-1/2 z-10 text-black">
+            {!is2D && <div className="flex overflow-hidden gap-1 bg-white rounded-lg w-[240px] absolute top-6 left-1/2 -translate-x-1/2 z-10 text-black">
+                
                 <button className="text-black">
                     <SearchIcon className="w-4 h-4" />
                 </button>
@@ -47,7 +48,7 @@ const Controls = ({
                         }
                     }}
                 />
-            </div>
+            </div>}
             <div className="flex absolute bottom-8 left-8 z-10 flex-col gap-2 p-2 text-xs text-black shadow-me">
                 <Heatmap
                     isHeatmap={isHeatmap}

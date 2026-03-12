@@ -430,18 +430,18 @@ export default function GlbUploaderPage() {
 						onChange={(e) =>
 							setTargetModelSize(Number(e.target.value))
 						}
-						className="px-2 py-1 w-20 text-sm rounded border"
+						className="px-2 py-1 w-20 text-sm bg-white rounded border"
 						min="1"
 						max="500"
 					/>
 					<span className="text-sm text-gray-600">m</span>
 				</div>
 
-				{selectedObject && (
+				{/* {selectedObject && (
 					<div className="p-2 ml-4 text-sm bg-green-400 rounded-md">
 						선택 객체: <strong>{selectedObject}</strong>
 					</div>
-				)}
+				)} */}
 
 				{modelUrl && (
 					<span className="ml-10 text-sm text-gray-600">
@@ -632,7 +632,7 @@ export default function GlbUploaderPage() {
 				)}
 			</div>
 			{modelUrl && modelInfo && (
-				<div className="absolute bottom-0 left-0 z-10 p-4 rounded-lg shadow-lg bg-black/80">
+				<div className="hidden absolute bottom-0 left-0 z-10 p-4 rounded-lg shadow-lg bg-black/80">
 					<div className="pb-2 mb-3 text-lg font-bold text-white border-b border-white/30">
 						📦 GLB 파일 정보
 					</div>

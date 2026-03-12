@@ -12,12 +12,12 @@ function DeviceSelector({
     excludedSerialNumbers = [],
 }: DeviceSelectorProps) {
     const SNList = [
-        "52751318(T70)",
-        "01234567(T70)",
-        "34901753(T70)",
-        "34900326(T70)",
-        "VC7KR13A(T71)",
-        "VC7KR18F(T71)",
+        "3541",
+        "9485",
+        "1234",
+        "5678",
+        "VC7KR13A",
+        "VC7KR18F",
     ];
 
     // 선택된 것과 제외 목록을 합쳐서 필터링
@@ -45,7 +45,7 @@ function DeviceSelector({
                 <select
                     value={selectedDeviceTypeId || ""}
                     onChange={(e) => onSelectDevice(e.target.value)}
-                    className="p-2 w-full rounded-lg border"
+                    className="p-2 w-full bg-white rounded-lg border"
                 >
                     <option value="">선택하세요</option>
                     {availableDevices.map((serialNumber) => (
