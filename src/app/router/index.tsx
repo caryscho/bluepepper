@@ -9,6 +9,7 @@ import ChartShowcasePage from "../../pages/chart-showcase/index";
 import FloorPlannerPage from "../../pages/floor-planner";
 import MapboxTestPage from "../../pages/mapbox-test";
 import DashboardPage from "@/pages/dashboard";
+import DevicesPage from "../../pages/devices";
 
 function NotFoundPage() {
     return (
@@ -56,6 +57,13 @@ export const router = createBrowserRouter([
                 element: <TmsPage />,
                 handle: {
                     title: "TMS",
+                },
+            },
+            {
+                path: "devices",
+                element: <DevicesPage />,
+                handle: {
+                    title: "Devices",
                 },
             },
             {

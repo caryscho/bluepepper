@@ -25,6 +25,11 @@ export default function Layout() {
             label: 'Warehouse',
             icon: <WarehouseIcon className="w-4 h-4" />,
         },
+        {
+            to: '/devices',
+            label: 'Devices',
+            icon: <SmartphoneIcon className="w-4 h-4" />,
+        },
         // {
         //     to: '/tms', // hub
         //     label: 'TMS',
@@ -78,14 +83,14 @@ export default function Layout() {
                         {!isMinimized && item.label}
                     </NavLink>
                 ))}
-                <NavLink to="/mapbox-test" className="flex justify-start items-center px-3 py-4 mt-auto rounded-lg transition-colors hover:bg-white hover:text-blue-600">
+                {/* <NavLink to="/mapbox-test" className="flex justify-start items-center px-3 py-4 mt-auto rounded-lg transition-colors hover:bg-white hover:text-blue-600">
                     <span className="mr-2"><CogIcon className="w-4 h-4" /></span>
                     {!isMinimized && <span>Setting</span>}
                 </NavLink>
                 <NavLink to="/mapbox-test" className="flex justify-start items-center px-3 py-4 rounded-lg transition-colors hover:bg-white hover:text-blue-600">
                     <span className="mr-2"><LogOutIcon className="w-4 h-4" /></span>
                     {!isMinimized && <span>Logout</span>}
-                </NavLink>
+                </NavLink> */}
             </nav>
             <div className="flex flex-col w-full h-screen bg-white">
                 {currentTitle?.title && (
